@@ -1,6 +1,7 @@
 # encoding: utf-8
 from django.db.models import *
 from namebook.models import Entity
+import parser
 
 class Tournament(Model):
     "一次赛事，由许多场比赛Match组成"
@@ -12,31 +13,27 @@ class Tournament(Model):
 
     name = CharField(max_length=50)
     type = IntegerField(choices=TOURNAMENT_TYPES, null=True)
-    #participants
+    participants = ManyToManyField(Entity)
     text = TextField(blank=True)
+
+    def __unicode__(self):
+        return u"%s 参赛人数:%d" %(name, participants.count())
+
+    def addMatch(self, source):
+        return parser.parseMatch(source, self)
 
 
 class Match(Model):
     "一场比赛，通常为三局两胜制"
 
-    MATCH_TYPES = (
-            (1, "男单"),
-            (2, "女单"),
-            (3, "男双"),
-            (4, "女双"),
-            (5, "混双"),
-            )
-
-    tournament = ForeignKey(Tournament)
-    type = IntegerField(choices=MATCH_TYPES)
+    tournament = ForeignKey(Tournament, null=True)
     result = IntegerField(null=True) # 比赛结果，1,2代表赢家
     player1a = ForeignKey(Entity, related_name="player1a")
     player1b = ForeignKey(Entity, null=True, related_name="player1b")
     player2a = ForeignKey(Entity, related_name="player2a")
     player2b = ForeignKey(Entity, null=True, related_name="player2b")
-    datetime = DateTimeField(null=True)
+    comment = TextField(blank=True)
     extra = TextField(blank=True) # json record
-
 
     def __unicode__(self):
         p1 = unicode(self.player1a.name)
@@ -46,10 +43,15 @@ class Match(Model):
         if self.player2b:
             p2 += u" " + unicode(self.player2b.name)
 
-        if result == 1:
-            return p1 + u" 胜 " + p2
+        if self.result == 1:
+            p= p1 + u" 胜 " + p2
+        elif self.result == 2:
+            p= p1 + u" 负 " + p2
         else:
-            return p2 + u" 胜 " + p1
+            p= p1 + u" 对 " + p2
+
+        scores = " ".join([unicode(game) for game in self.game_set.all()])
+        return p+" " + scores + "\n" + self.comment
 
 
 class Game(Model):
