@@ -2,17 +2,17 @@
 from django.db import models
 
 class Entity(models.Model):
+    ENTITY_TYPES=(
+            (1, "男生"),
+            (2, "女生"),
+            (3, "团体"),
+            )
+
     name = models.CharField(max_length=10)
     type = models.IntegerField(choices=ENTITY_TYPES, null=True)
     categories = models.CharField(max_length=100, blank=True) # name序列，以空格分割
     text = models.TextField(blank=True)
     redirect = models.ForeignKey('self', blank=True, null=True)
-
-    ENTITY_TYPE=(
-            (1, "男生"),
-            (2, "女生"),
-            (3, "团体"),
-            )
 
     def __unicode__(self):
         return self.name
