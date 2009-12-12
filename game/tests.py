@@ -9,7 +9,7 @@ class SimpleTest(TestCase):
     def setUp(self):
         self.mmqtao=Entity.objects.create(name=u"套长")
 
-        t=Tournament.objects.create(name=u"测试赛")
+        t=Tournament.objects.create(name=u"测试赛", type=1)
         t.participants.add(self.mmqtao)
 
         self.t = t
@@ -45,3 +45,5 @@ class SimpleTest(TestCase):
         self.assertEquals(self.redwolf, result[0][1])
         self.assertEquals(2, result[1][0])
         self.assertEquals(self.mmqtao, result[1][1])
+
+        self.assertEquals(result, self.t.ranking())

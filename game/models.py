@@ -1,11 +1,13 @@
 # encoding: utf-8
+import json
 from django.db.models import *
 from namebook.models import Entity
 import parser
+import ranker
 
 class Extension:
     def xget(self, key):
-        return json.loads(self.extra)[key]
+        return json.loads(self.extra).get(key)
 
     def xset(self, key, val):
         r = json.loads(self.extra)
@@ -41,6 +43,26 @@ class Tournament(Model, Extension):
             self.participants.add(p)
             return p
 
+    def ranking(self):
+        if self.type is None:
+            raise ValueError("未指定比赛形式")
+        if self.type==1:
+            rank = ranker.RoundRobinRanker(self.get_ranking_targets(), self.match_set.all())
+            return rank.result()
+        else:
+            raise NotImplementedError
+    
+    def get_ranking_targets(self):
+        list=[]
+        targets = self.xget("ranking_targets")
+        if targets is None: return self.participants.all() #若未set过，返回所有participants
+        for id in targets:
+            list.append(Entity.objects.get(id=id))
+        return list
+    def set_ranking_targets(self, targets):
+        ids = [t.id for t in targets]
+        self.xset("ranking_targets",  ids)
+        
 class Match(Model, Extension):
     "一场比赛，通常为三局两胜制"
 

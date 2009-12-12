@@ -138,10 +138,10 @@ class RoundRobinRanker(Ranker):
 
 def give_rank(list, cmp, start=1):
     """
-    >>>give_rank([1,2,2,2,3,4,4],operator.sub)
-    [(1,1),(2,2),(2,2),(2,2),(5,3),(6,4),(7,4)]
-    >>>give_rank([2,1,4,3,2,2,4],operator.sub)
-    [(1,1),(2,2),(2,2),(2,2),(5,3),(6,4),(7,4)]
+    >>> give_rank([1,2,2,2,3,4,4],operator.sub)
+    [(1,1), (2,2), (2,2), (2,2), (5,3), (6,4), (7,4)]
+    >>> give_rank([2,1,4,3,2,2,4],operator.sub)
+    [(1,1), (2,2), (2,2), (2,2), (5,3), (6,4), (7,4)]
     """
     ls = sorted(list, cmp)
     li = gi = start
