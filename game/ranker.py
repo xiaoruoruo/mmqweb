@@ -76,8 +76,7 @@ class RoundRobinRanker(Ranker):
                     game_delta = self.target_points[g1[0][1]]['game_win'] - self.target_points[g1[0][1]]['game_lose']
                     str_game = u"%s，净胜局:%d" % (str_match, game_delta)
                     if len(g1)==1:
-                        points = self.target_points[g1[1]]
-                        result.append((rank1, g1[1], str_game))
+                        result.append((rank1, g1[0][1], str_game))
                     elif len(g1)==2:
                         #两名（对）运动员净胜局数相等，则两者比赛的胜者名次列前
                         a, b = give_rank([x[1] for x in g1], self.cmp_winner, rank1)
@@ -91,7 +90,7 @@ class RoundRobinRanker(Ranker):
                             score_delta = self.target_points[g2[0][1]]['score_win'] - self.target_points[g2[0][1]]['score_lose']
                             str_score = u"%s，净胜分:%d" % (str_game, score_delta)
                             if len(g2)==1:
-                                result.append((rank2, g2[1], str_score))
+                                result.append((rank2, g2[0][1], str_score))
                             elif len(g2)==2:
                                 #如还剩2名（对）运动员净胜分数相等，则两者间比赛的胜者名次列前
                                 a, b = give_rank([x[1] for x in g2], self.cmp_winner, rank2)

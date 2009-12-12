@@ -1,0 +1,14 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>比赛列表 - mmqweb</title>
+        <link rel=stylesheet type=text/css href='/mmqweb/media/mmqweb.css'>
+    </head>
+    <body>
+        <h2>{{ tournament.name }}</h2>
+        {% for match in matches %}
+        <div class="match"><pre>{{ match }}</pre></div>
+        {% endfor %}
+    </body>
+</html>
+

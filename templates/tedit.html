@@ -1,0 +1,35 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>编辑{{ tournament.name }} - mmqweb</title>
+        <link rel=stylesheet type=text/css href='/mmqweb/media/mmqweb.css'>
+    </head>
+    <body>
+        <h2>{{ tournament.name }}</h2>
+        <a href="{% url mmqweb.game.views.tournament_matches tid=tournament.id %}">查看全部{{match_count}}场比赛</a>
+        <br/>
+        <h4>简介文字：</h4>
+        <form action="{% url mmqweb.game.views.tournament_edit_text tid=tournament.id %}" method="POST">
+            {{ form_text.as_p }}
+            <input type="submit" value="修改" />
+            {{ text_status }}
+        </form>
+
+        <h4>增加比赛记录：</h4>
+        <div class="hint" style="font-size: 9pt">
+            在下面的文本框中可以一次输入多条比赛记录，比赛之间用空行空开，每条记录至少一行，格式如下：<br/>
+            <blockquote>
+            老大:套长 21:19 12:21 21:12<br/>
+            上面一行格式固定，这一行可以写评论。需要的话用[耗时:10]来表示各种结构化的数据，这样方便统计耗时最长的比赛。弃权，犯规等导致胜方需要特别说明的情况，在这里用[胜者:老大]表示。
+            </blockquote>
+        </div>
+        <form action="{% url mmqweb.game.views.tournament_add_matches tid=tournament.id %}" method="POST">
+            {{ form_match.as_p }}
+            <input type="submit" value="确定" />
+            {{ addmatch_status }}
+        </form>
+        
+
+    </body>
+</html>
+

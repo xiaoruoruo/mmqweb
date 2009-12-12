@@ -67,19 +67,19 @@ class Match(Model, Extension):
     "一场比赛，通常为三局两胜制"
 
     tournament = ForeignKey(Tournament, null=True)
-    result = IntegerField(null=True) # 比赛结果，1,2代表赢家
+    result = IntegerField(null=True, blank=True) # 比赛结果，1,2代表赢家
     player1a = ForeignKey(Entity, related_name="player1a")
-    player1b = ForeignKey(Entity, null=True, related_name="player1b")
+    player1b = ForeignKey(Entity, related_name="player1b", null=True, blank=True)
     player2a = ForeignKey(Entity, related_name="player2a")
-    player2b = ForeignKey(Entity, null=True, related_name="player2b")
+    player2b = ForeignKey(Entity, related_name="player2b", null=True, blank=True)
     comment = TextField(blank=True)
     extra = TextField(default="{}") # json record
 
     def __unicode__(self):
         p1, p2 = self.player1(), self.player2()
-        if self.result == 1:
+        if self.winner() == 1:
             p= p1 + u" 胜 " + p2
-        elif self.result == 2:
+        elif self.winner() == 2:
             p= p1 + u" 负 " + p2
         else:
             p= p1 + u" 对 " + p2

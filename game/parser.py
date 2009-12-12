@@ -1,6 +1,5 @@
 # encoding: utf-8
 import re
-from django.db import transaction
 
 import models
 
@@ -9,7 +8,6 @@ class ParseError(Exception):
 
 pattern = re.compile(r"\s*(?P<p1a>\w+)(\s+(?P<p1b>\w+))?:\s*(?P<p2a>\w+)(\s+(?P<p2b>\w+))?\s+(?P<games>.+)", re.UNICODE) # 第一行语法
 score_pattern = re.compile(r"(\d+):(\d+)") # 分数语法
-@transaction.commit_on_success
 def parseMatch(source, tournament):
     """
 解析source中的文本，成功则创建相应的Match和Game，保存，返回Match。
@@ -49,6 +47,6 @@ source例子见tests.py
                 game.match = match
                 game.save()
     else:
-        raise ParseError("格式错误")
+        raise ParseError(u"格式错误:%s" % lines[0])
 
     return match
