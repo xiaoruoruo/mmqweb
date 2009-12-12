@@ -6,10 +6,11 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
+    (r'^accounts/login/$', 'django.contrib.auth.views.login'), 
+    (r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page':'/mmqweb/'}), 
     (r'^mmqweb/', include('mmqweb.game.urls')),
     (r'^mmqweb/media/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root': settings.TEMPLATE_DIRS[0]}),
-
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),

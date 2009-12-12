@@ -3,6 +3,8 @@ from django.shortcuts import get_object_or_404, render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
 from django import forms
 from django.db import transaction
+from django.contrib.auth.decorators import permission_required
+from django.template import RequestContext
 
 from models import *
 import parser
@@ -17,8 +19,9 @@ def index(request):
     match_count = t.match_set.count()
     return render_to_response("index.html",
                               {'tournament':t, 'match_count':match_count, 'ranking':t.ranking()
-                              })
-    
+                              }, RequestContext(request))
+
+@permission_required('game.tournament_edit')
 def tournament_edit(request, tid, text_status="", addmatch_status="", match_text=""):
     t = Tournament.objects.get(id=tid)
     match_count = t.match_set.count()
@@ -34,6 +37,7 @@ def tournament_matches(request, tid):
     t = Tournament.objects.get(id=tid)
     return render_to_response("matches.html", {'tournament':t,'matches':t.match_set.all()})
     
+@permission_required('game.tournament_edit')
 def tournament_edit_text(request, tid):
     t = Tournament.objects.get(id=tid)
     status=u""
@@ -47,6 +51,7 @@ def tournament_edit_text(request, tid):
             status=u"修改失败？？"
     return tournament_edit(request, tid, text_status=status)
 
+@permission_required('game.tournament_edit')
 def tournament_add_matches(request, tid):
     t = Tournament.objects.get(id=tid)
     status = u""

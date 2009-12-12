@@ -5,16 +5,24 @@
         <link rel=stylesheet type=text/css href='/mmqweb/media/mmqweb.css'>
     </head>
     <body>
+        <div id="account">
+            {% if user.is_authenticated %}
+            {{ user.username }} <a href="{% url django.contrib.auth.views.logout %}">登出</a>
+            {% else %}
+            <a href="{% url django.contrib.auth.views.login %}">登录</a>
+            {% endif %}
+        </div>
         <div id="hl_tournament">
             <h2>近期赛事</h2>
             <h3>{{ tournament.name }}</h3>
             <a href="{% url mmqweb.game.views.tournament_edit tid=tournament.id %}">编辑</a>
             <a href="{% url mmqweb.game.views.tournament_matches tid=tournament.id %}">全部{{match_count}}场比赛</a>
             <pre>{{ tournament.text }}</pre>
-            <table>
-                <tr><th>排名</th><th>选手</th><th>详情</th></tr>
+            <h4>排名</h4>
+            <table border="1px">
+                <tr><th></th><th width="100px">选手</th><th>详情</th></tr>
                 {% for rank, player, comment in ranking %}
-                <tr><td>{{ rank }}</td><td>{{ player }}</td><td>{{ comment }}</td></tr>
+                <tr><td align="center">{{ rank }}</td><td align="center">{{ player }}</td><td>{{ comment }}</td></tr>
                 {% endfor %}
             </table>
         </div>
