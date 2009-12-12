@@ -3,7 +3,16 @@ from django.db.models import *
 from namebook.models import Entity
 import parser
 
-class Tournament(Model):
+class Extension:
+    def xget(self, key):
+        return json.loads(self.extra)[key]
+
+    def xset(self, key, val):
+        r = json.loads(self.extra)
+        r[key] = val
+        self.extra = json.dumps(r)
+
+class Tournament(Model, Extension):
     "一次赛事，由许多场比赛Match组成"
 
     TOURNAMENT_TYPES= (
@@ -15,15 +24,24 @@ class Tournament(Model):
     type = IntegerField(choices=TOURNAMENT_TYPES, null=True)
     participants = ManyToManyField(Entity)
     text = TextField(blank=True)
+    extra = TextField(default="{}") # json record
 
     def __unicode__(self):
-        return u"%s 参赛人数:%d" %(name, participants.count())
+        return u"%s" %(name)
 
     def addMatch(self, source):
         return parser.parseMatch(source, self)
 
+    def get_or_add_participant(self, name):
+        p = self.participants.filter(name__exact=name)
+        if p:
+            return p[0]
+        else:
+            p = Entity.objects.create(name=name)
+            self.participants.add(p)
+            return p
 
-class Match(Model):
+class Match(Model, Extension):
     "一场比赛，通常为三局两胜制"
 
     tournament = ForeignKey(Tournament, null=True)
@@ -33,7 +51,7 @@ class Match(Model):
     player2a = ForeignKey(Entity, related_name="player2a")
     player2b = ForeignKey(Entity, null=True, related_name="player2b")
     comment = TextField(blank=True)
-    extra = TextField(blank=True) # json record
+    extra = TextField(default="{}") # json record
 
     def __unicode__(self):
         p1 = unicode(self.player1a.name)
@@ -54,12 +72,12 @@ class Match(Model):
         return p+" " + scores + "\n" + self.comment
 
 
-class Game(Model):
+class Game(Model, Extension):
     "一局比赛，通常为21分制"
     match = ForeignKey(Match)
     score1 = IntegerField()
     score2 = IntegerField()
-    extra = TextField(blank=True) # json record
+    extra = TextField(default="{}") # json record
 
     def __unicode__(self):
         return u"%d:%d" % (self.score1, self.score2)
