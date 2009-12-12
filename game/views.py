@@ -31,11 +31,11 @@ def tournament_edit(request, tid, text_status="", addmatch_status="", match_text
                               {'tournament':t, 'match_count':match_count, 
                               'form_text':form_text, 'text_status':text_status, 
                               'form_match':form_match, 'addmatch_status':addmatch_status
-                              })
+                              }, RequestContext(request))
 
 def tournament_matches(request, tid):
     t = Tournament.objects.get(id=tid)
-    return render_to_response("matches.html", {'tournament':t,'matches':t.match_set.all()})
+    return render_to_response("matches.html", {'tournament':t,'matches':t.match_set.all()}, RequestContext(request))
     
 @permission_required('game.tournament_edit')
 def tournament_edit_text(request, tid):
