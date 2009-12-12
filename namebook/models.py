@@ -10,13 +10,13 @@ class Entity(models.Model):
 
     name = models.CharField(max_length=10)
     type = models.IntegerField(choices=ENTITY_TYPES, null=True)
-    categories = models.CharField(max_length=100, blank=True) # name序列，以空格分割
+    categories = models.ManyToManyField('self', related_name="children")
     text = models.TextField(blank=True)
     redirect = models.ForeignKey('self', blank=True, null=True)
 
     def __unicode__(self):
         return self.name
-
+    
     def alt_names(self):
         "返回该实体的别名序列，即redirect到该实体的实体"
         return Entity.objects.filter(redirect = self.id)

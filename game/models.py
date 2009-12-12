@@ -54,13 +54,7 @@ class Match(Model, Extension):
     extra = TextField(default="{}") # json record
 
     def __unicode__(self):
-        p1 = unicode(self.player1a.name)
-        if self.player1b:
-            p1 += u" " + unicode(self.player1b.name)
-        p2 = unicode(self.player2a.name)
-        if self.player2b:
-            p2 += u" " + unicode(self.player2b.name)
-
+        p1, p2 = self.player1(), self.player2()
         if self.result == 1:
             p= p1 + u" 胜 " + p2
         elif self.result == 2:
@@ -70,7 +64,29 @@ class Match(Model, Extension):
 
         scores = " ".join([unicode(game) for game in self.game_set.all()])
         return p+" " + scores + "\n" + self.comment
-
+    
+    def player1(self):
+        p1 = unicode(self.player1a.name)
+        if self.player1b: p1 += u" " + unicode(self.player1b.name)
+        return p1
+    def player2(self):
+        p2 = unicode(self.player2a.name)
+        if self.player1b: p2 += u" " + unicode(self.player2b.name)
+        return p2
+        
+    def winner(self):
+        "set or guess the result"
+        if not self.result:
+            games=[0, 0, 0]
+            for game in self.game_set.all():
+                games[game.winner()] += 1
+            if games[1] > games[2]:
+                self.result = 1
+            elif games[1] < games[2]:
+                self.result = 2
+            else:
+                self.result = 0
+        return self.result
 
 class Game(Model, Extension):
     "一局比赛，通常为21分制"
@@ -82,3 +98,10 @@ class Game(Model, Extension):
     def __unicode__(self):
         return u"%d:%d" % (self.score1, self.score2)
 
+    def winner(self):
+        if self.score1 > self.score2:
+            return 1
+        elif self.score1 < self.score2:
+            return 2
+        else:
+            return 0

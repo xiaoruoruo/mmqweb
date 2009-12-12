@@ -39,8 +39,6 @@ source例子见tests.py
         match.player1a, match.player1b, match.player2a, match.player2b = players
         match.save()
 
-        n_game = 0
-        n_p1win = 0
         # 识别局分
         games_str = m.group("games")
         if games_str:
@@ -50,16 +48,6 @@ source例子见tests.py
                 game.score1, game.score2 = score1, score2
                 game.match = match
                 game.save()
-
-                n_game += 1
-                if score1 > score2: n_p1win += 1
-
-        # 计算result
-        if n_p1win > n_game/2:
-            match.result = 1
-        else:
-            match.result = 2
-        match.save()
     else:
         raise ParseError("格式错误")
 
