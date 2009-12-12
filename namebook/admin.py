@@ -1,0 +1,5 @@
+from namebook.models import *
+from django.contrib import admin
+
+admin.site.register(Entity)
+

@@ -10,7 +10,7 @@ class Entity(models.Model):
 
     name = models.CharField(max_length=10)
     type = models.IntegerField(choices=ENTITY_TYPES, null=True)
-    categories = models.ManyToManyField('self', related_name="children")
+    categories = models.ManyToManyField('self', related_name="children", blank=True)
     text = models.TextField(blank=True)
     redirect = models.ForeignKey('self', blank=True, null=True)
 

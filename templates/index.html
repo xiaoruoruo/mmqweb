@@ -1,0 +1,22 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>mmqweb</title>
+        <link rel=stylesheet type=text/css href='media/mmqweb.css'>
+    </head>
+    <body>
+        <div id="hl_tournament">
+            <h2>近期赛事</h2>
+            <h3>{{ tournament.name }}</h3>
+            <a href="{% url mmqweb.game.views.tournament_edit tid=tournament.id %}">编辑</a>
+            <a href="{% url mmqweb.game.views.tournament_matches tid=tournament.id %}">全部比赛</a>
+            <pre>{{ tournament.text }}</pre>
+            <table>
+                <tr><th>排名</th><th>选手</th></tr>
+                {% for rank, player, comment in tournament.result %}
+                <tr><td>{{ rank }}</td><td>{{ player }}</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+    </body>
+</html>

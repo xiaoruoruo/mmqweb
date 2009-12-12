@@ -24,12 +24,12 @@ class Tournament(Model, Extension):
 
     name = CharField(max_length=50)
     type = IntegerField(choices=TOURNAMENT_TYPES, null=True)
-    participants = ManyToManyField(Entity)
+    participants = ManyToManyField(Entity, blank=True)
     text = TextField(blank=True)
     extra = TextField(default="{}") # json record
 
     def __unicode__(self):
-        return u"%s" %(name)
+        return u"%s" %(self.name)
 
     def addMatch(self, source):
         return parser.parseMatch(source, self)
