@@ -35,7 +35,7 @@ class Tournament(Model, Extension):
             )
 
     name = CharField(max_length=50)
-    type = IntegerField(choices=TOURNAMENT_TYPES, null=True)
+    type = IntegerField(choices=TOURNAMENT_TYPES, null=True, blank=True)
     participants = ManyToManyField(Entity, blank=True)
     text = TextField(blank=True)
     extra = TextField(default="{}") # json record
@@ -61,13 +61,14 @@ class Tournament(Model, Extension):
     def ranking(self):
         if self.match_set.count()==0: return []
         if self.type is None:
-            raise ValueError("未指定比赛形式")
+            raise ValueError(u"未指定比赛形式")
         if self.type==1:
             rank = ranker.RoundRobinRanker(self.get_ranking_targets(), self.match_set.all())
             return rank.result()
         else:
             raise NotImplementedError
     
+    # TODO 如果比赛有双打，target如何推出？
     def get_ranking_targets(self):
         list=[]
         targets = self.xget("ranking_targets")

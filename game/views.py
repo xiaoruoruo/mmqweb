@@ -1,5 +1,6 @@
 # encoding:utf-8
 import re
+import logging
 
 from django.shortcuts import get_object_or_404, render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
@@ -19,8 +20,13 @@ class MatchTextForm(forms.Form):
 def index(request):
     t = Tournament.objects.order_by('-id')[0]
     match_count = t.match_set.count()
+    try:
+        ranking = t.ranking()
+    except Exception as e:
+        ranking = None
+        logging.error(unicode(e))
     return render_to_response("index.html",
-                              {'tournament':t, 'match_count':match_count, 'ranking':t.ranking()
+                              {'tournament':t, 'match_count':match_count, 'ranking':ranking
                               }, RequestContext(request))
 
 @permission_required('game.change_tournament')

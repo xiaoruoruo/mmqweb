@@ -15,7 +15,7 @@ class Entity(models.Model):
     redirect = models.ForeignKey('self', blank=True, null=True)
 
     def __unicode__(self):
-        return self.name
+        return unicode(self.name)
     
     def alt_names(self):
         "返回该实体的别名序列，即redirect到该实体的实体"

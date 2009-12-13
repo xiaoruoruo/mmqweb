@@ -8,6 +8,7 @@
     {% endif %}
     <a href="{% url mmqweb.game.views.tournament_matches tid=tournament.id %}">全部{{match_count}}场比赛</a>
     <pre>{{ tournament.text|safe }}</pre>
+    {% if ranking %}
     <h4>排名</h4>
     <table border="1px">
         <tr><th></th><th width="100px">选手</th><th>详情</th></tr>
@@ -15,5 +16,6 @@
         <tr><td align="center">{{ rank }}</td><td align="center">{{ player }}</td><td>{{ comment }}</td></tr>
         {% endfor %}
     </table>
+    {% endif %}
 </div>
 {% endblock %}

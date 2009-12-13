@@ -21,10 +21,11 @@ class RoundRobinRanker(Ranker):
             cb = set(c for c in b.categories.all() if c in self.target_points)
             cs = cs.intersection(cb) #计算a和b共同属于的集合
             if (a, b) in self.target_points: cs.add((a, b)) #加入双打双方作为一个积分对象
+        
         if len(cs)>1:
-            raise ValueError("玩家属于多个积分组")
+            raise ValueError(u"玩家%s属于多个积分组" % a)# TODO 如果是双打，把玩家b也加上
         if len(cs)==0:
-            raise ValueError("玩家不属于任何积分组")
+            raise ValueError(u"玩家%s不属于任何积分组" % a)
         return cs.pop()
         
     def __init__(self, targets, matches):
