@@ -3,7 +3,9 @@
 <div id="hl_tournament">
     <h2>近期赛事</h2>
     <h3>{{ tournament.name }}</h3>
+    {% if perms.game.change_template %}
     <a href="{% url mmqweb.game.views.tournament_edit tid=tournament.id %}">编辑</a>
+    {% endif %}
     <a href="{% url mmqweb.game.views.tournament_matches tid=tournament.id %}">全部{{match_count}}场比赛</a>
     <pre>{{ tournament.text }}</pre>
     <h4>排名</h4>

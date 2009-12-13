@@ -21,7 +21,7 @@ def index(request):
                               {'tournament':t, 'match_count':match_count, 'ranking':t.ranking()
                               }, RequestContext(request))
 
-@permission_required('game.tournament_edit')
+@permission_required('game.change_tournament')
 def tournament_edit(request, tid, text_status="", addmatch_status="", match_text=""):
     t = Tournament.objects.get(id=tid)
     match_count = t.match_set.count()
@@ -37,7 +37,7 @@ def tournament_matches(request, tid):
     t = Tournament.objects.get(id=tid)
     return render_to_response("matches.html", {'tournament':t,'matches':t.match_set.all()}, RequestContext(request))
     
-@permission_required('game.tournament_edit')
+@permission_required('game.change_tournament')
 def tournament_edit_text(request, tid):
     t = Tournament.objects.get(id=tid)
     status=u""
@@ -51,7 +51,7 @@ def tournament_edit_text(request, tid):
             status=u"修改失败？？"
     return tournament_edit(request, tid, text_status=status)
 
-@permission_required('game.tournament_edit')
+@permission_required('game.change_tournament')
 def tournament_add_matches(request, tid):
     t = Tournament.objects.get(id=tid)
     status = u""
