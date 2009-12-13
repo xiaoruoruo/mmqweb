@@ -4,7 +4,7 @@
 {% block content %}
 <h2>{{ tournament.name }} - 比赛列表</h2>
 {% for match in matches %}
-<div class="match"><pre>{{ match }}</pre></div>
+<div class="match"><pre>{{ match.asHtml|safe }}</pre></div>
 {% endfor %}
 
 {% endblock %}

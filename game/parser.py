@@ -6,7 +6,7 @@ import models
 class ParseError(Exception):
     pass
 
-pattern = re.compile(r"\s*(?P<p1a>\w+)([\s、，,]+(?P<p1b>\w+))?:\s*(?P<p2a>\w+)([\s、，,]+(?P<p2b>\w+))?\s+(?P<games>.+)", re.UNICODE) # 第一行语法
+pattern = re.compile(ur"\s*(?P<p1a>\w+)([\s、，,]+(?P<p1b>\w+))?(:|vs|胜|负|对)\s*(?P<p2a>\w+)([\s、，,]+(?P<p2b>\w+))?\s+(?P<games>.+)", re.UNICODE | re.IGNORECASE) # 第一行语法
 score_pattern = re.compile(r"(\d+):(\d+)") # 分数语法
 def parseMatch(source, tournament):
     """

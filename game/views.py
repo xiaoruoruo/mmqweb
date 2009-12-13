@@ -1,4 +1,6 @@
 # encoding:utf-8
+import re
+
 from django.shortcuts import get_object_or_404, render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
 from django import forms
@@ -13,7 +15,7 @@ class TextForm(forms.Form):
     text = forms.CharField(label="", widget=forms.Textarea(attrs={'rows':'10', 'cols':'80'}))
 class MatchTextForm(forms.Form):
     source = forms.CharField(label="", widget=forms.Textarea(attrs={'rows':'15', 'cols':'80'}))
-    
+
 def index(request):
     t = Tournament.objects.order_by('-id')[0]
     match_count = t.match_set.count()

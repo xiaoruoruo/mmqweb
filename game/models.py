@@ -14,6 +14,18 @@ class Extension:
         r[key] = val
         self.extra = json.dumps(r)
 
+re_linkURL=re.compile(r'https?://([-\w\.]+)+(:\d+)?(/[-\w/_\.]*)?(\?\S+)?')
+def replURL(m):
+    # Replace picture URLs with img tag, replace bbs links with href tag
+    url = m.group(0)
+    ext = url[url.rfind('.')+1:]
+    if ext in ['jpg','jpeg','png','bmp','svg']:
+        return '<img src="%s">' % url
+    elif url.startswith('http://bbs.sjtu.edu.cn/'):
+        return '<a href="%s">%s</a>' % (url, url)
+    else:
+        return url
+
 class Tournament(Model, Extension):
     "一次赛事，由许多场比赛Match组成"
 
@@ -31,6 +43,9 @@ class Tournament(Model, Extension):
     def __unicode__(self):
         return u"%s" %(self.name)
 
+    def textAsHtml(self):
+        return re_linkURL.sub(replURL, self.text)
+
     def addMatch(self, source):
         return parser.parseMatch(source, self)
 
@@ -44,6 +59,7 @@ class Tournament(Model, Extension):
             return p
 
     def ranking(self):
+        if self.match_set.count()==0: return []
         if self.type is None:
             raise ValueError("未指定比赛形式")
         if self.type==1:
@@ -75,7 +91,7 @@ class Match(Model, Extension):
     text = TextField(blank=True)
     extra = TextField(default="{}") # json record
 
-    def __unicode__(self):
+    def title(self):
         p1, p2 = self.player1(), self.player2()
         if self.winner() == 1:
             p= p1 + u" 胜 " + p2
@@ -83,10 +99,18 @@ class Match(Model, Extension):
             p= p1 + u" 负 " + p2
         else:
             p= p1 + u" 对 " + p2
-
         scores = " ".join([unicode(game) for game in self.game_set.all()])
-        return p+" " + scores + "\n" + self.text
+        return p+" " + scores
+
+    def __unicode__(self):
+        return self.title() + "\n" + self.text
     
+    def asHtml(self):
+        return self.title() + "\n" + self.textAsHtml()
+
+    def textAsHtml(self):
+        return re_linkURL.sub(replURL, self.text)
+
     def player1(self):
         p1 = unicode(self.player1a.name)
         if self.player1b: p1 += u" " + unicode(self.player1b.name)
