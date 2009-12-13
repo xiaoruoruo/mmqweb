@@ -72,7 +72,7 @@ class Match(Model, Extension):
     player1b = ForeignKey(Entity, related_name="player1b", null=True, blank=True)
     player2a = ForeignKey(Entity, related_name="player2a")
     player2b = ForeignKey(Entity, related_name="player2b", null=True, blank=True)
-    comment = TextField(blank=True)
+    text = TextField(blank=True)
     extra = TextField(default="{}") # json record
 
     def __unicode__(self):
@@ -85,7 +85,7 @@ class Match(Model, Extension):
             p= p1 + u" 对 " + p2
 
         scores = " ".join([unicode(game) for game in self.game_set.all()])
-        return p+" " + scores + "\n" + self.comment
+        return p+" " + scores + "\n" + self.text
     
     def player1(self):
         p1 = unicode(self.player1a.name)

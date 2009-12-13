@@ -20,7 +20,7 @@ class SimpleTest(TestCase):
 
         self.assertEquals(self.t, m.tournament)
         self.assertEquals(2, self.t.participants.count())
-        self.assertTrue(len(m.comment) > 10)
+        self.assertTrue(len(m.text) > 10)
         self.redwolf = m.player1a
         self.assertEquals(u"老大", self.redwolf.name)
         self.assertEquals(self.mmqtao, m.player2a)

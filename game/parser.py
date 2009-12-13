@@ -19,7 +19,7 @@ source例子见tests.py
     match.tournament = tournament
     if len(lines) > 1: 
         # 注释评论
-        match.comment = lines[1]
+        match.text = lines[1]
         # TODO 识别评论中的标注数据[attr:val]
 
 
