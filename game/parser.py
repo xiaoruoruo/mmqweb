@@ -25,16 +25,18 @@ source例子见tests.py
 
     m = pattern.match(lines[0])
     if m:
-        player_strs = [m.group("p1a"), m.group("p1b"), m.group("p2a"), m.group("p2b")]
+        player_strs = [(m.group("p1a"), m.group("p1b")), (m.group("p2a"), m.group("p2b"))]
         players = []
         for player_str in player_strs:
-            if player_str is None: 
-                players.append(None)
-                continue
-            player = tournament.get_or_add_participant(player_str)
+            name = player_str[0]
+            if player_str[1]:
+                name += u" " + player_str[1]
+            player = tournament.get_participant(name)
+            if not player:
+                raise ParseError(u"未报名选手：%s" % name)
             players.append(player)
 
-        match.player1a, match.player1b, match.player2a, match.player2b = players
+        match.player1, match.player2 = players
         match.save()
 
         # 识别局分

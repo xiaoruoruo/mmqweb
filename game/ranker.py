@@ -33,8 +33,8 @@ class RoundRobinRanker(Ranker):
         self.target_points=p
         self.matches = {}
         for match in matches:
-            t1 = self.find_target(match.player1a, match.player1b)
-            t2 = self.find_target(match.player2a, match.player2b)
+            t1 = self.find_target(match.player1.playera, match.player1.playerb)
+            t2 = self.find_target(match.player2.playera, match.player2.playerb)
             self.matches[(t1, t2)] = match.winner()
             if match.winner()==1:
                 p[t1]['match_win'] += 1

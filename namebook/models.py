@@ -8,11 +8,16 @@ class Entity(models.Model):
             (3, "团体"),
             )
 
+    #主要属性
     name = models.CharField(max_length=10)
     type = models.IntegerField(choices=ENTITY_TYPES, null=True)
-    categories = models.ManyToManyField('self', related_name="children", blank=True)
     text = models.TextField(blank=True)
+
+    #重定向
     redirect = models.ForeignKey('self', blank=True, null=True)
+
+    #冗余属性
+    categories = models.ManyToManyField('self', related_name="children", blank=True)
 
     def __unicode__(self):
         return unicode(self.name)

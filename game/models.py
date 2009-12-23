@@ -36,7 +36,6 @@ class Tournament(Model, Extension):
 
     name = CharField(max_length=50)
     type = IntegerField(choices=TOURNAMENT_TYPES, null=True, blank=True)
-    participants = ManyToManyField(Entity, blank=True)
     text = TextField(blank=True)
     extra = TextField(default="{}") # json record
 
@@ -49,14 +48,28 @@ class Tournament(Model, Extension):
     def addMatch(self, source):
         return parser.parseMatch(source, self)
 
-    def get_or_add_participant(self, name):
-        p = self.participants.filter(name__exact=name)
+    def add_participant(self, playera, playerb, represent, displayname=None):
+        p = Participation()
+        p.tournament = self
+        p.playera = playera
+        p.playerb = playerb
+        p.represent = represent
+        if displayname:
+            p.displayname = displayname
+        else:
+            name = playera.name
+            if playerb:
+                name += u" " + playerb.name
+            p.displayname = name
+        p.save()
+        return p
+
+    def get_participant(self, name):
+        p = self.participants.filter(displayname__exact=name)
         if p:
             return p[0]
         else:
-            p = Entity.objects.create(name=name)
-            self.participants.add(p)
-            return p
+            return None
 
     def ranking(self):
         if self.match_set.count()==0: return []
@@ -72,7 +85,7 @@ class Tournament(Model, Extension):
     def get_ranking_targets(self):
         list=[]
         targets = self.xget("ranking_targets")
-        if targets is None: return self.participants.all() #若未set过，返回所有participants
+        if targets is None: return [x.get_entity() for x in self.participants.all()] #若未set过，返回所有participants
         for id in targets:
             list.append(Entity.objects.get(id=id))
         return list
@@ -80,20 +93,33 @@ class Tournament(Model, Extension):
         ids = [t.id for t in targets]
         self.xset("ranking_targets",  ids)
         
+class Participation(Model, Extension):
+    displayname = CharField(max_length=50)
+    playera = ForeignKey(Entity, related_name='playera')
+    playerb = ForeignKey(Entity, related_name='playerb', null=True, blank=True)
+    represent = ForeignKey(Entity, related_name='represent', null=True, blank=True)
+    tournament = ForeignKey(Tournament, related_name='participants')
+
+    def __unicode__(self):
+        return self.displayname
+
+    def get_entity(self):
+        if self.represent:
+            return self.represent
+        return self.playera
+
 class Match(Model, Extension):
     "一场比赛，通常为三局两胜制"
 
     tournament = ForeignKey(Tournament, null=True)
     result = IntegerField(null=True, blank=True) # 比赛结果，1,2代表赢家
-    player1a = ForeignKey(Entity, related_name="player1a")
-    player1b = ForeignKey(Entity, related_name="player1b", null=True, blank=True)
-    player2a = ForeignKey(Entity, related_name="player2a")
-    player2b = ForeignKey(Entity, related_name="player2b", null=True, blank=True)
+    player1 = ForeignKey(Participation, related_name="player1")
+    player2 = ForeignKey(Participation, related_name="player2")
     text = TextField(blank=True)
     extra = TextField(default="{}") # json record
 
     def title(self):
-        p1, p2 = self.player1(), self.player2()
+        p1, p2 = unicode(self.player1), unicode(self.player2)
         if self.winner() == 1:
             p= p1 + u" 胜 " + p2
         elif self.winner() == 2:
@@ -112,15 +138,6 @@ class Match(Model, Extension):
     def textAsHtml(self):
         return re_linkURL.sub(replURL, self.text)
 
-    def player1(self):
-        p1 = unicode(self.player1a.name)
-        if self.player1b: p1 += u" " + unicode(self.player1b.name)
-        return p1
-    def player2(self):
-        p2 = unicode(self.player2a.name)
-        if self.player1b: p2 += u" " + unicode(self.player2b.name)
-        return p2
-        
     def winner(self):
         "set or guess the result"
         if not self.result:
