@@ -18,16 +18,20 @@ class MatchTextForm(forms.Form):
     source = forms.CharField(label="", widget=forms.Textarea(attrs={'rows':'15', 'cols':'80'}))
 
 def index(request):
-    t = Tournament.objects.order_by('-id')[0]
-    match_count = t.match_set.count()
-    try:
-        ranking = t.ranking()
-    except Exception as e:
-        ranking = None
-        logging.error(unicode(e))
-    return render_to_response("index.html",
+    t = Tournament.objects.order_by('-id')
+    if t.count()>0:
+        t = t[0]
+        match_count = t.match_set.count()
+        try:
+            ranking = t.ranking()
+        except Exception as e:
+            ranking = None
+            logging.error(unicode(e))
+        return render_to_response("index.html",
                               {'tournament':t, 'match_count':match_count, 'ranking':ranking
                               }, RequestContext(request))
+    else:
+        return render_to_response("index.html", {}, RequestContext(request))
 
 @permission_required('game.change_tournament')
 def tournament_edit(request, tid, text_status="", addmatch_status="", match_text=""):
