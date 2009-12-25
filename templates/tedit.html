@@ -2,18 +2,19 @@
 {% block title %}编辑{{ tournament.name }} - mmqweb{% endblock %}
 {% block head %}
 <script type="text/javascript">
-    function edit_text() {
-        $('#form_text').css('display','block');
-        $('#text').css('display','none');
-        $('#text_status').css('display','none');
-    }
+function edit_text() {
+    $('#form_text').css('display','block');
+    $('#text').css('display','none');
+    $('#text_status').css('display','none');
+}
+function add_match() {
+    $("#add_match").css('display','block');
+}
 </script>
 {% endblock %}
 
 {% block content %}
 <h2>{{ tournament.name }}</h2>
-<a href="{% url mmqweb.game.views.tournament_matches tid=tournament.id %}">查看全部{{match_count}}场比赛</a>
-<br/>
 <h4>简介文字：</h4>
 <a href="javascript:edit_text();">编辑</a> 
 <span id="text">{{ form_text.initial.text }}</span>
@@ -24,8 +25,19 @@
 <br/>
 <span id="text_status">{{ text_status }}</span>
 
+<h4>参赛选手</h4>
+{% if participation_list %}
+{% for p in participation_list %}
+{{ p }}
+{% endfor %}
+<br/>
+{% endif %}
+<a href="{% url mmqweb.game.views.tournament_add_participation tid=tournament.id %}">增加参赛选手</a>
 
-<h4>增加比赛记录：</h4>
+<h4>比赛记录</h4>
+<a href="{% url mmqweb.game.views.tournament_matches tid=tournament.id %}">查看全部{{match_count}}场比赛</a>
+<a href="javascript:add_match();">增加比赛记录</a>
+<div id="add_match" style="display: none">
 <div class="hint" style="font-size: 9pt">
     在下面的文本框中可以一次输入多条比赛记录，比赛之间用空行空开，每条记录至少一行，格式如下：<br/>
     <blockquote>
@@ -38,4 +50,5 @@
     <input type="submit" value="确定" />
     {{ addmatch_status }}
 </form>
+</div>
 {% endblock %}

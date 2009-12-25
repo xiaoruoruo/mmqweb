@@ -105,7 +105,7 @@ class Participation(Model, Extension):
         else:
             name = unicode(self.playera)
             if self.playerb:
-                name += u" " + unicode(self.playerb)
+                name += u"、" + unicode(self.playerb)
             return name
 
     def get_entity(self):

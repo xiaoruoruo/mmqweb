@@ -35,10 +35,12 @@ def tournament_edit(request, tid, text_status="", addmatch_status="", match_text
     match_count = t.match_set.count()
     form_text = TextForm(initial={'text':t.text})
     form_match = MatchTextForm(initial={'source':match_text})
+    p_list = t.participants.all()
     return render_to_response("tedit.html", 
                               {'tournament':t, 'match_count':match_count, 
                               'form_text':form_text, 'text_status':text_status, 
-                              'form_match':form_match, 'addmatch_status':addmatch_status
+                              'form_match':form_match, 'addmatch_status':addmatch_status,
+                              'participation_list': p_list,
                               }, RequestContext(request))
 
 def tournament_matches(request, tid):
