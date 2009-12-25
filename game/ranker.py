@@ -12,29 +12,22 @@ class Ranker:
         raise NotImplementedError
     
 class RoundRobinRanker(Ranker):
-    def find_target(self, a, b=None):
-        "a,b: Entity"
-        ca = set(a.categories.all()) # a所属的集合
-        if b is None: ca.add(a) # 单打，则把他自己作为个人加入集合
-        cs = ca.intersection(self.target_points.keys())
-        if b:
-            cb = set(c for c in b.categories.all() if c in self.target_points)
-            cs = cs.intersection(cb) #计算a和b共同属于的集合
-            if (a, b) in self.target_points: cs.add((a, b)) #加入双打双方作为一个积分对象
-        
-        if len(cs)>1:
-            raise ValueError(u"玩家%s属于多个积分组" % a)# TODO 如果是双打，把玩家b也加上
-        if len(cs)==0:
+    def find_target(self, a):
+        "given Participation a, return a Participation in targets"
+        if a.represent:
+            raise NotImplementedError
+        if a in self.target_points:
+            return a
+        else:
             raise ValueError(u"玩家%s不属于任何积分组" % a)
-        return cs.pop()
         
     def __init__(self, targets, matches):
         p = dict((target, {'match_win':0, 'game_win':0, 'game_lose':0,'score_win':0, 'score_lose':0}) for target in targets)
         self.target_points=p
         self.matches = {}
         for match in matches:
-            t1 = self.find_target(match.player1.playera, match.player1.playerb)
-            t2 = self.find_target(match.player2.playera, match.player2.playerb)
+            t1 = self.find_target(match.player1)
+            t2 = self.find_target(match.player2)
             self.matches[(t1, t2)] = match.winner()
             if match.winner()==1:
                 p[t1]['match_win'] += 1

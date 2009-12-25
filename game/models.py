@@ -81,11 +81,10 @@ class Tournament(Model, Extension):
         else:
             raise NotImplementedError
     
-    # TODO 如果比赛有双打，target如何推出？
     def get_ranking_targets(self):
         list=[]
         targets = self.xget("ranking_targets")
-        if targets is None: return [x.get_entity() for x in self.participants.all()] #若未set过，返回所有participants
+        if targets is None: return set(x.get_target() for x in self.participants.all()) #若未set过，返回所有participants
         for id in targets:
             list.append(Entity.objects.get(id=id))
         return list
@@ -108,10 +107,10 @@ class Participation(Model, Extension):
                 name += u"、" + unicode(self.playerb)
             return name
 
-    def get_entity(self):
+    def get_target(self):
         if self.represent:
             return self.represent
-        return self.playera
+        return self
 
 class Match(Model, Extension):
     "一场比赛，通常为三局两胜制"
