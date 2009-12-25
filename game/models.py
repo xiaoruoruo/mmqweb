@@ -101,7 +101,12 @@ class Participation(Model, Extension):
     tournament = ForeignKey(Tournament, related_name='participants')
 
     def __unicode__(self):
-        return self.displayname
+        if self.displayname: return self.displayname
+        else:
+            name = unicode(self.playera)
+            if self.playerb:
+                name += u" " + unicode(self.playerb)
+            return name
 
     def get_entity(self):
         if self.represent:

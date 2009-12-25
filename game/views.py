@@ -16,9 +16,6 @@ class TextForm(forms.Form):
     text = forms.CharField(label="", widget=forms.Textarea(attrs={'rows':'10', 'cols':'80'}))
 class MatchTextForm(forms.Form):
     source = forms.CharField(label="", widget=forms.Textarea(attrs={'rows':'15', 'cols':'80'}))
-class ParticipationForm(forms.ModelForm):
-    class Meta:
-        model = Participation
 
 def index(request):
     t = Tournament.objects.order_by('-id')[0]
@@ -77,28 +74,41 @@ def tournament_add_matches(request, tid):
                 status=u"错误：%s" % (unicode(e),  )
                 return tournament_edit(request, tid, addmatch_status=status, match_text=form.cleaned_data['source'])
 
-# TODO
+@transaction.commit_on_success
 def tournament_add_participation(request, tid=None):
     t = Tournament.objects.get(id=tid)
-    
-    name = None
-    if request.method == 'GET':
-        name = request.GET.get('pname')
-
-        form = ParticipationForm()
-        form.tournament = t
-
-    if not name: # name is not specified
-        pass
-    elif request.method == 'GET': # only name is specified
-        form.displayname = name
-        form.playera = forms.ModelChoiceField(queryset=Entity.objects.filter(name__exact=name), empty_label=None)
-    else: # ready to commit
-        form = ParticipationForm(request.POST)
+    status=u""
+    if request.method == 'POST':
+        form = TextForm(request.POST)
         if form.is_valid():
-            form.save()
-            form = None
-    return render_to_response("add_participation.html", {'tournament':t, 'form': form})
+            text=form.cleaned_data['text']
+            count = 0
+            for line in text.split('\n'):
+                if not line: continue
+                m = re.match(r"(?P<a>\w+)([,，、](?P<b>\w+))?(?P<g>\w+)?", line, re.UNICODE)
+                if m:
+                    a,b,g = m.group('a'), m.group('b'), m.group('g')
+                    # TODO resolve entity instead of universally create one
+                    pa = Entity(name=a)
+                    pa.save()
+                    if b: 
+                        pb = Entity(name=b)
+                        pb.save()
+                    p = Participation(tournament = t, playera = pa)
+                    if b: p.playerb = pb
+                    if g: p.represent = Entity.objects.filter(name__exact=g)
+                    p.save()
+                    count += 1
+                else:
+                    status = u"格式错误：%s" % line
+            if not status:
+                status=u"成功添加%d位(对)参赛人员！" % count
+                form = TextForm()
+        else:
+            status=u"失败？？"
+    else:
+        form = TextForm()
+    return render_to_response("add_participation.html", {'tournament':t, 'form': form, 'status': status})
 
 @transaction.commit_on_success
 def do_add_matches(tournament, source):

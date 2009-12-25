@@ -3,10 +3,24 @@
 
 {% block content %}
 {% if form %}
+<div class="hint" style="font-size: 9pt">
+    每行一个参赛选手，双打搭档间用逗号隔开。<br/>
+    <blockquote>
+        老大<br/>
+        套长<br/>
+        原原,配配<br/>
+    </blockquote>
+    在团体赛中，可在每行最后写上代表队。<br/>
+    <blockquote>
+        背心 机动<br/>
+        磊磊 电院<br/>
+    </blockquote>
+</div>
 
 <form action="{% url mmqweb.game.views.tournament_add_participation tid=tournament.id %}" method="POST">
     {{ form.as_p }}
     <input type="submit" value="增加" />
+    {{ status }}
 </form>
 
 {% endif %}
