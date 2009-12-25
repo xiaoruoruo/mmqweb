@@ -1,16 +1,29 @@
 {% extends "base.html" %}
 {% block title %}编辑{{ tournament.name }} - mmqweb{% endblock %}
+{% block head %}
+<script type="text/javascript">
+    function edit_text() {
+        $('#form_text').css('display','block');
+        $('#text').css('display','none');
+        $('#text_status').css('display','none');
+    }
+</script>
+{% endblock %}
 
 {% block content %}
 <h2>{{ tournament.name }}</h2>
 <a href="{% url mmqweb.game.views.tournament_matches tid=tournament.id %}">查看全部{{match_count}}场比赛</a>
 <br/>
 <h4>简介文字：</h4>
-<form action="{% url mmqweb.game.views.tournament_edit_text tid=tournament.id %}" method="POST">
+<a href="javascript:edit_text();">编辑</a> 
+<span id="text">{{ form_text.initial.text }}</span>
+<form id="form_text" action="{% url mmqweb.game.views.tournament_edit_text tid=tournament.id %}" method="POST" style="display:none">
     {{ form_text.as_p }}
     <input type="submit" value="修改" />
-    {{ text_status }}
 </form>
+<br/>
+<span id="text_status">{{ text_status }}</span>
+
 
 <h4>增加比赛记录：</h4>
 <div class="hint" style="font-size: 9pt">
