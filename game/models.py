@@ -98,7 +98,7 @@ class Participation(Model, Extension):
     playera = ForeignKey(Entity, related_name='playera')
     playerb = ForeignKey(Entity, related_name='playerb', null=True, blank=True)
     represent = ForeignKey(Entity, related_name='represent', null=True, blank=True)
-    tournament = ForeignKey(Tournament, related_name='participants')
+    tournament = ForeignKey(Tournament, related_name='participants', null=True, blank=True)
 
     def __unicode__(self):
         if self.displayname: return self.displayname
