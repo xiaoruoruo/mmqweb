@@ -85,6 +85,7 @@ class Tournament(Model, Extension):
         list=[]
         targets = self.xget("ranking_targets")
         if targets is None: return set(x.get_target() for x in self.participants.all()) #若未set过，返回所有participants
+        # TODO in double game, there are id tuples
         for id in targets:
             list.append(Entity.objects.get(id=id))
         return list
@@ -108,9 +109,13 @@ class Participation(Model, Extension):
             return name
 
     def get_target(self):
+        "return Entity or Entity tuple"
         if self.represent:
             return self.represent
-        return self
+        if self.playerb:
+            return (self.playera, self.playerb)
+        else:
+            return self.playera
 
 class Match(Model, Extension):
     "一场比赛，通常为三局两胜制"

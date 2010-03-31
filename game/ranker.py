@@ -13,21 +13,20 @@ class Ranker:
     
 class RoundRobinRanker(Ranker):
     def find_target(self, a):
-        "given Participation a, return a Participation in targets"
-        if a.represent:
-            raise NotImplementedError
+        "given Participation a, return an object in targets"
         if a in self.target_points:
             return a
         else:
-            raise ValueError(u"玩家%s不属于任何积分组" % a)
+            print u"玩家%s不属于任何积分组" % a
+            raise ValueError()  # how to raise unicode Exception?
         
     def __init__(self, targets, matches):
         p = dict((target, {'match_win':0, 'game_win':0, 'game_lose':0,'score_win':0, 'score_lose':0}) for target in targets)
         self.target_points=p
         self.matches = {}
         for match in matches:
-            t1 = self.find_target(match.player1)
-            t2 = self.find_target(match.player2)
+            t1 = self.find_target(match.player1.get_target())
+            t2 = self.find_target(match.player2.get_target())
             self.matches[(t1, t2)] = match.winner()
             if match.winner()==1:
                 p[t1]['match_win'] += 1

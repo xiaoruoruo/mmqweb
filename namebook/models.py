@@ -9,7 +9,7 @@ class Entity(models.Model):
             )
 
     #主要属性
-    name = models.CharField(max_length=10)
+    name = models.CharField(max_length=50)
     type = models.IntegerField(choices=ENTITY_TYPES, null=True)
     text = models.TextField(blank=True)
 
