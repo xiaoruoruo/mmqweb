@@ -38,6 +38,7 @@ class Tournament(Model, Extension):
     type = IntegerField(choices=TOURNAMENT_TYPES, null=True, blank=True)
     text = TextField(blank=True)
     extra = TextField(default="{}") # json record
+    participants= ManyToManyField('Participation', related_name='tournaments')
 
     def __unicode__(self):
         return u"%s" %(self.name)
@@ -50,7 +51,6 @@ class Tournament(Model, Extension):
 
     def add_participant(self, playera, playerb, represent, displayname=None):
         p = Participation()
-        p.tournament = self
         p.playera = playera
         p.playerb = playerb
         p.represent = represent
@@ -62,6 +62,7 @@ class Tournament(Model, Extension):
                 name += u" " + playerb.name
             p.displayname = name
         p.save()
+        self.participants.add(p)
         return p
 
     def get_participant(self, name):
@@ -98,7 +99,6 @@ class Participation(Model, Extension):
     playera = ForeignKey(Entity, related_name='playera')
     playerb = ForeignKey(Entity, related_name='playerb', null=True, blank=True)
     represent = ForeignKey(Entity, related_name='represent', null=True, blank=True)
-    tournament = ForeignKey(Tournament, related_name='participants', null=True, blank=True)
 
     def __unicode__(self):
         if self.displayname: return self.displayname
@@ -120,7 +120,8 @@ class Participation(Model, Extension):
 class Match(Model, Extension):
     "一场比赛，通常为三局两胜制"
 
-    tournament = ForeignKey(Tournament, null=True)
+    tournament = ForeignKey(Tournament, null=True, blank=True)
+    parent_match = ForeignKey('self', related_name="sub_matches", null=True, blank=True) # parent match
     result = IntegerField(null=True, blank=True) # 比赛结果，1,2代表赢家
     player1 = ForeignKey(Participation, related_name="player1")
     player2 = ForeignKey(Participation, related_name="player2")

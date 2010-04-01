@@ -2,6 +2,9 @@
 from django.db import models
 
 class Entity(models.Model):
+    Man = 1
+    Woman = 2
+    Team = 3
     ENTITY_TYPES=(
             (1, "男生"),
             (2, "女生"),
