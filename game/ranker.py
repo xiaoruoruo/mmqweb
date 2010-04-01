@@ -18,7 +18,7 @@ class RoundRobinRanker(Ranker):
         if a in self.target_points:
             return a
         elif add:
-            self.target_points[a] = RoundRobinRanker.stats_template
+            self.target_points[a] = dict(RoundRobinRanker.stats_template)
             return a
         else:
             print u"玩家不属于任何积分组",
@@ -27,7 +27,7 @@ class RoundRobinRanker(Ranker):
         
     def __init__(self, targets, matches):
         if targets is not None:
-            p = dict((target, RoundRobinRanker.stats_template) for target in targets)
+            p = dict((target, dict(RoundRobinRanker.stats_template)) for target in targets)
             add = False
         else:
             p={}
@@ -38,10 +38,11 @@ class RoundRobinRanker(Ranker):
         for match in matches:
             t1 = self.find_target(match.get_target(1), add)
             t2 = self.find_target(match.get_target(2), add)
-            self.matches[(t1, t2)] = match.winner()
-            if match.winner()==1:
+            self.matches[(t1, t2)] = w = match.winner()
+            #print t1,"VS",t2,w
+            if w==1:
                 p[t1]['match_win'] += 1
-            elif match.winner()==2:
+            elif w==2:
                 p[t2]['match_win'] += 1
             
             for game in match.game_set.all():
@@ -55,6 +56,7 @@ class RoundRobinRanker(Ranker):
                 p[t1]['score_lose'] += game.score2
                 p[t2]['score_lose'] += game.score1
                 p[t2]['score_win'] += game.score2
+        #print p
                 
     def result(self):
         result = []
@@ -103,7 +105,7 @@ class RoundRobinRanker(Ranker):
                             else:
                                 #真的比不出来了
                                 for g2i in g2:
-                                    result.append((g2i[0], g2i[1], u"并列"))
+                                    result.append((g2i[0], g2i[1], u"并列, %s" % str_score))
             
         return result
     

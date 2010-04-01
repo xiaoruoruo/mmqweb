@@ -5,12 +5,14 @@ from game.models import *
 from game import parser
 from game import ranker
 
+import random
+
 class SimpleTest(TestCase):
     def setUp(self):
         self.mmqtao=Entity.objects.create(name=u"套长")
         self.redwolf=Entity.objects.create(name=u"老大")
 
-        t=Tournament.objects.create(name=u"测试赛", type=1)
+        t=Tournament.objects.create(name=u"测试赛", type=2)
         self.t = t
 
         t.add_participant(self.mmqtao, None, None)
@@ -71,19 +73,56 @@ class Tizong(TestCase):
         t.append(Tournament.objects.create(name=u"2010年体总杯羽毛球赛小组赛E组", type=2))
         t[-1].set_ranking_targets(teamsE[17:21])
 
-class RealTeamMatch(TestCase):
-    "http://www.tournamentsoftware.com/sport/teammatch.aspx?id=991DFE99-023B-4853-8AF6-39255247D465&match=12"
+class VirtualTournament(TestCase):
     def test(self):
-        return
-        team1 = Entity.objects.create(name="Malaysia", type=Entity.Team)
-        team2 = Entity.objects.create(name="Korea", type=Entity.Team)
-        kkk = Entity.objects.create(name="Kean Keat Koo", type=Entity.Man)
-        ptw = Entity.objects.create(name="Pei Tty Wong", type=Entity.Woman)
-        
-        match1 = Match.objects.create()
-        match1.player1 = Participation.objects.create(playera = team1)
-        match1.player2 = Participation.objects.create(playera = team2)
-        match1.result = 2
+        t = Tournament.objects.create(name=u"Virtual Tournament", type=2)
 
-        match11 = Match.objects.create()
-        match11.player1 = Participation.objects.create(playera = kkk, playerb = ptw, represent=team1)
+        teams = []
+        for i in range(4):
+            teams.append( Entity.objects.create(name="Team %d" % i, type=Entity.Team) )
+
+        player_count = 0
+        teamplayer = []
+        for team in teams:
+            players = []
+            for i in range(8): # 8 participants per team
+                p = Entity.objects.create(name="Player %d" % player_count)
+                player_count += 1
+                t.add_participant(p, team)
+                players.append(p)
+            teamplayer.append(players)
+        
+        for i in range(4):
+            for j in range(i+1,4):
+                # team i vs team j
+                ms = []
+                for k in range(2):
+                    m = Match()
+                    m.tournament = t
+                    m.player11 = teamplayer[i][k]
+                    m.player21 = teamplayer[j][k]
+                    m.result = random.randint(1,2)
+                    m.save()
+                    ms.append(m)
+                for k in range(3):
+                    m = Match()
+                    m.tournament = t
+                    m.player11 = teamplayer[i][2+k*2]
+                    m.player12 = teamplayer[i][3+k*2]
+                    m.player21 = teamplayer[j][2+k*2]
+                    m.player22 = teamplayer[j][3+k*2]
+                    m.result = random.randint(1,2)
+                    m.save()
+                    ms.append(m)
+                for m in ms:
+                    g = Game()
+                    g.match = m
+                    if m.result == 1:
+                        g.score1, g.score2 = 21, random.randint(0,20)
+                    else:
+                        g.score2, g.score1 = 21, random.randint(0,20)
+                    g.save()
+
+        for i,e,s in t.ranking():
+            #print i,e,s
+            pass

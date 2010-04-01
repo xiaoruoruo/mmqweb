@@ -75,7 +75,7 @@ class Tournament(Model, Extension):
         if self.match_set.count()==0: return []
         if self.type is None:
             raise ValueError(u"未指定比赛形式")
-        if self.type==1:
+        if self.type==2:
             rank = ranker.RoundRobinRanker(self.get_ranking_targets(), self.match_set.all())
             return rank.result()
         else:
