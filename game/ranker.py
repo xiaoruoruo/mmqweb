@@ -12,21 +12,32 @@ class Ranker:
         raise NotImplementedError
     
 class RoundRobinRanker(Ranker):
-    def find_target(self, a):
+    stats_template = {'match_win':0, 'game_win':0, 'game_lose':0,'score_win':0, 'score_lose':0}
+    def find_target(self, a, add=False):
         "given Participation a, return an object in targets"
         if a in self.target_points:
             return a
+        elif add:
+            self.target_points[a] = RoundRobinRanker.stats_template
+            return a
         else:
-            print u"玩家%s不属于任何积分组" % a
+            print u"玩家不属于任何积分组",
+            print a
             raise ValueError()  # how to raise unicode Exception?
         
     def __init__(self, targets, matches):
-        p = dict((target, {'match_win':0, 'game_win':0, 'game_lose':0,'score_win':0, 'score_lose':0}) for target in targets)
+        if targets is not None:
+            p = dict((target, RoundRobinRanker.stats_template) for target in targets)
+            add = False
+        else:
+            p={}
+            add = True
+
         self.target_points=p
         self.matches = {}
         for match in matches:
-            t1 = self.find_target(match.player1.get_target())
-            t2 = self.find_target(match.player2.get_target())
+            t1 = self.find_target(match.get_target(1), add)
+            t2 = self.find_target(match.get_target(2), add)
             self.matches[(t1, t2)] = match.winner()
             if match.winner()==1:
                 p[t1]['match_win'] += 1
