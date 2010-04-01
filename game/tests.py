@@ -12,7 +12,7 @@ class SimpleTest(TestCase):
         self.mmqtao=Entity.objects.create(name=u"套长")
         self.redwolf=Entity.objects.create(name=u"老大")
 
-        t=Tournament.objects.create(name=u"测试赛", type=2)
+        t=Tournament.objects.create(name=u"测试赛")
         self.t = t
 
         t.add_participant(self.mmqtao, None, None)
@@ -46,8 +46,6 @@ class SimpleTest(TestCase):
         self.assertEquals(2, result[1][0])
         self.assertEquals(self.mmqtao, result[1][1])
 
-        self.assertEquals(result, self.t.ranking())
-
 class Tizong(TestCase):
     teams = ["电子信息与电气工程学院","农业与生物学院","国际教育学院","理学院物理系","生命科学技术学院",
              "外国语学院","环境科学与工程学院","交大密西根学院","软件学院","航空航天学院",
@@ -62,20 +60,15 @@ class Tizong(TestCase):
         self.assertEquals(21, Entity.objects.filter(type=Entity.Team).count()) # 21 teams
 
         t = []
-        t.append(Tournament.objects.create(name=u"2010年体总杯羽毛球赛小组赛A组", type=2))
-        t[-1].set_ranking_targets(teamsE[0:4])
-        t.append(Tournament.objects.create(name=u"2010年体总杯羽毛球赛小组赛B组", type=2))
-        t[-1].set_ranking_targets(teamsE[4:8])
-        t.append(Tournament.objects.create(name=u"2010年体总杯羽毛球赛小组赛C组", type=2))
-        t[-1].set_ranking_targets(teamsE[8:13])
-        t.append(Tournament.objects.create(name=u"2010年体总杯羽毛球赛小组赛D组", type=2))
-        t[-1].set_ranking_targets(teamsE[13:17])
-        t.append(Tournament.objects.create(name=u"2010年体总杯羽毛球赛小组赛E组", type=2))
-        t[-1].set_ranking_targets(teamsE[17:21])
+        t.append(Tournament.objects.create(name=u"2010年体总杯羽毛球赛小组赛A组"))
+        t.append(Tournament.objects.create(name=u"2010年体总杯羽毛球赛小组赛B组"))
+        t.append(Tournament.objects.create(name=u"2010年体总杯羽毛球赛小组赛C组"))
+        t.append(Tournament.objects.create(name=u"2010年体总杯羽毛球赛小组赛D组"))
+        t.append(Tournament.objects.create(name=u"2010年体总杯羽毛球赛小组赛E组"))
 
 class VirtualTournament(TestCase):
     def test(self):
-        t = Tournament.objects.create(name=u"Virtual Tournament", type=2)
+        t = Tournament.objects.create(name=u"Virtual Tournament")
 
         teams = []
         for i in range(4):
@@ -92,6 +85,7 @@ class VirtualTournament(TestCase):
                 players.append(p)
             teamplayer.append(players)
         
+        mss = []
         for i in range(4):
             for j in range(i+1,4):
                 # team i vs team j
@@ -122,7 +116,13 @@ class VirtualTournament(TestCase):
                     else:
                         g.score2, g.score1 = 21, random.randint(0,20)
                     g.save()
+                mss.extend(ms)
 
-        for i,e,s in t.ranking():
+        r = Ranking()
+        r.type = 2
+        r.name = "Virtual Ranking"
+        r.save()
+        map(lambda x: r.matches.add(x), mss)
+        for i,e,s in r.ranking():
             #print i,e,s
             pass

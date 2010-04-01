@@ -29,13 +29,7 @@ def replURL(m):
 class Tournament(Model, Extension):
     "一次赛事，由许多场比赛Match组成"
 
-    TOURNAMENT_TYPES= (
-            (1, "单淘汰"),
-            (2, "单循环"),
-            )
-
     name = CharField(max_length=50)
-    type = IntegerField(choices=TOURNAMENT_TYPES, null=True, blank=True)
     text = TextField(blank=True)
     extra = TextField(default="{}") # json record
     participants= ManyToManyField('Participation', related_name='tournaments')
@@ -71,28 +65,6 @@ class Tournament(Model, Extension):
         else:
             return None
 
-    def ranking(self):
-        if self.match_set.count()==0: return []
-        if self.type is None:
-            raise ValueError(u"未指定比赛形式")
-        if self.type==2:
-            rank = ranker.RoundRobinRanker(self.get_ranking_targets(), self.match_set.all())
-            return rank.result()
-        else:
-            raise NotImplementedError
-    
-    def get_ranking_targets(self):
-        list=[]
-        targets = self.xget("ranking_targets")
-        if targets is None: return None
-        # TODO in double game, there are id tuples
-        for id in targets:
-            list.append(Entity.objects.get(id=id))
-        return list
-    def set_ranking_targets(self, targets):
-        ids = [t.id for t in targets]
-        self.xset("ranking_targets",  ids)
-        
 class Participation(Model, Extension):
     displayname = CharField(max_length=50, blank=True)
     player = ForeignKey(Entity, related_name='player')
@@ -106,6 +78,40 @@ class Participation(Model, Extension):
             self.displayname = unicode(self.player)
         super(Participation, self).save(*args, **kwargs)
 
+class Ranking(Model, Extension):
+    RANKING_TYPES = (
+            (1, "单淘汰"),
+            (2, "单循环"),
+            (3, "2n-1局n胜"),
+            (4, "个人排名"),
+            )
+    type = IntegerField(choices=RANKING_TYPES)
+    name = CharField(max_length=50)
+    matches = ManyToManyField('Match')
+
+    """
+    def get_ranking_targets(self):
+        list=[]
+        targets = self.xget("ranking_targets")
+        if targets is None: return None
+        # TODO in double game, there are id tuples
+        for id in targets:
+            list.append(Entity.objects.get(id=id))
+        return list
+    def set_ranking_targets(self, targets):
+        ids = [t.id for t in targets]
+        self.xset("ranking_targets",  ids)
+    """
+        
+    def ranking(self):
+        if self.matches.count()==0: return []
+        if self.type==2:
+            # self.get_tournament().get_ranking_targets()
+            rank = ranker.RoundRobinRanker(None, self.matches.all())
+            return rank.result()
+        else:
+            raise NotImplementedError
+    
 class Match(Model, Extension):
     """一场比赛，通常为三局两胜制。
     也可能是，两个团体之间的一次比赛，通常五个项目五局三胜，每一局是一个Match
