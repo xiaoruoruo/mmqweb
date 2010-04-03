@@ -119,6 +119,7 @@ class MatchGroup(Model, Extension):
     name = CharField(max_length=50)
     tournament = ForeignKey(Tournament)
     ranking = ForeignKey(Ranking, null=True, blank=True)
+    view_name = CharField(max_length=50, blank=True)
 
     def addMatch(self, source):
         return parser.parseMatch(source, self)

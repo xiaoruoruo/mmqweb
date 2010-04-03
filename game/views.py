@@ -8,6 +8,7 @@ from django import forms
 from django.db import transaction
 from django.contrib.auth.decorators import permission_required
 from django.template import RequestContext
+from django.template.loader import render_to_string
 
 from models import *
 import parser
@@ -17,14 +18,23 @@ class TextForm(forms.Form):
 class MatchTextForm(forms.Form):
     source = forms.CharField(label="", widget=forms.Textarea(attrs={'rows':'15', 'cols':'80'}))
 
+
 def index(request):
     t = Tournament.objects.order_by('-id')
     if t.count()>0:
         t = t[0]
-        match_count = t.match_set.count()
-        ranking = None
+        groups = t.matchgroup_set.all()
+        group_views = []
+        for group in groups:
+            view = find_match_group_view(group.view_name)
+            try:
+                v = view(group)
+            except e:
+                v = unicode(e)
+            group_views.append(v)
         return render_to_response("index.html",
-                              {'tournament':t, 'match_count':match_count, 'ranking':ranking
+                              {'tournament':t, 
+                               'group_views':group_views
                               }, RequestContext(request))
     else:
         return render_to_response("index.html", {}, RequestContext(request))
@@ -133,3 +143,15 @@ def parse_blocks(source):
             else:
                 block = line
     if block: yield block
+
+# MatchGroup views
+def find_match_group_view(name):
+    for v in match_group_views:
+        if v.__name__ == name:
+            return v
+    return MG_default
+def MG_default(mg):
+    return render_to_string('MG_default.html', {'count': mg.match_set.count()})
+def MG_roundRobin(mg):
+    pass
+match_group_views = [MG_default, MG_roundRobin]

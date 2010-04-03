@@ -7,8 +7,10 @@
         {% if perms.game.change_tournament %}
         <a href="{% url mmqweb.game.views.tournament_edit tid=tournament.id %}">编辑</a>
         {% endif %}
-        <a href="{% url mmqweb.game.views.tournament_matches tid=tournament.id %}">全部{{match_count}}场比赛</a>
         <pre>{{ tournament.text|safe }}</pre>
+        {% for group in group_views %}
+        <div>{{ group|safe }}</div>
+        {% endfor %}
         {% if ranking %}
         <h4>排名</h4>
         <table border="1px">
