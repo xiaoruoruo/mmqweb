@@ -70,6 +70,8 @@ class Tizong(TestCase):
 class VirtualTournament:
     def test(self):
         t = Tournament.objects.create(name=u"Virtual Tournament")
+        r = Ranking.objects.create(name = "Virtual Ranking", type = 2)
+        tg = MatchGroup.objects.create(name=u"The Group", tournament = t, ranking = r)
 
         teams = []
         for i in range(4):
@@ -93,7 +95,7 @@ class VirtualTournament:
                 ms = []
                 for k in range(2):
                     m = Match()
-                    m.tournament = t
+                    m.match_group = tg
                     m.player11 = teamplayer[i][k]
                     m.player21 = teamplayer[j][k]
                     m.result = random.randint(1,2)
@@ -101,7 +103,7 @@ class VirtualTournament:
                     ms.append(m)
                 for k in range(3):
                     m = Match()
-                    m.tournament = t
+                    m.match_group = tg
                     m.player11 = teamplayer[i][2+k*2]
                     m.player12 = teamplayer[i][3+k*2]
                     m.player21 = teamplayer[j][2+k*2]
@@ -119,11 +121,6 @@ class VirtualTournament:
                     g.save()
                 mss.extend(ms)
 
-        r = Ranking()
-        r.type = 2
-        r.name = "Virtual Ranking"
-        r.save()
-        map(lambda x: r.matches.add(x), mss)
         for i,e,s in r.ranking():
             #print i,e,s
             pass

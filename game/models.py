@@ -101,11 +101,11 @@ class Ranking(Model, Extension):
     """
         
     def ranking(self):
-        if self.matches.count()==0: return []
         if self.type==2:
             # self.get_tournament().get_ranking_targets()
+            #print("Match groups: %d" % self.matchgroup_set.count())
             if self.matchgroup_set.count() > 0:
-                matches = self.matchgroup_set.objects[0].match_set.all()
+                matches = self.matchgroup_set.all()[0].match_set.all()
             else:
                 matches = self.matches.all()
             rank = ranker.RoundRobinRanker(None, matches)
