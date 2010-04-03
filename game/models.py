@@ -40,9 +40,6 @@ class Tournament(Model, Extension):
     def textAsHtml(self):
         return re_linkURL.sub(replURL, self.text)
 
-    def addMatch(self, source):
-        return parser.parseMatch(source, self)
-
     def add_participant(self, player, represent, displayname=None):
         p = Participation()
         p.player = player
@@ -86,7 +83,7 @@ class Ranking(Model, Extension):
             (4, "个人排名"),
             )
     type = IntegerField(choices=RANKING_TYPES)
-    name = CharField(max_length=50)
+    name = CharField(max_length=50, blank=True)
     matches = ManyToManyField('Match')
 
     """
@@ -107,18 +104,34 @@ class Ranking(Model, Extension):
         if self.matches.count()==0: return []
         if self.type==2:
             # self.get_tournament().get_ranking_targets()
-            rank = ranker.RoundRobinRanker(None, self.matches.all())
+            if self.matchgroup_set.count() > 0:
+                matches = self.matchgroup_set.objects[0].match_set.all()
+            else:
+                matches = self.matches.all()
+            rank = ranker.RoundRobinRanker(None, matches)
             return rank.result()
         else:
             raise NotImplementedError
     
+class MatchGroup(Model, Extension):
+    """一些比赛Match的集合，有确定的ranking模式，以一种形式展现在网页上。
+    """
+    name = CharField(max_length=50)
+    tournament = ForeignKey(Tournament)
+    ranking = ForeignKey(Ranking, null=True, blank=True)
+
+    def addMatch(self, source):
+        return parser.parseMatch(source, self)
+
+    def __unicode__(self):
+        return self.name
+
 class Match(Model, Extension):
     """一场比赛，通常为三局两胜制。
     也可能是，两个团体之间的一次比赛，通常五个项目五局三胜，每一局是一个Match
     """
 
-    tournament = ForeignKey(Tournament, null=True, blank=True)
-    parent_match = ForeignKey('self', related_name="sub_matches", null=True, blank=True) # parent match
+    match_group = ForeignKey(MatchGroup, null=True, blank=True)
     result = IntegerField(null=True, blank=True) # 比赛结果，1,2代表赢家
 
     Team, Singles, Doubles = 1,2,3
@@ -206,8 +219,7 @@ class Match(Model, Extension):
         return p
 
     def get_tournament(self):
-        if self.tournament: return self.tournament
-        if self.parent_match: return self.parent_match.get_tournament()
+        if self.match_group: return self.match_group.tournament
         return None
 
     def save(self, *args, **kwargs):

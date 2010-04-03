@@ -8,7 +8,7 @@ class ParseError(Exception):
 
 pattern = re.compile(ur"\s*(?P<p1a>\w+)([\s、，,]+(?P<p1b>\w+))?(:|vs|胜|负|对)\s*(?P<p2a>\w+)([\s、，,]+(?P<p2b>\w+))?\s+(?P<games>.+)", re.UNICODE | re.IGNORECASE) # 第一行语法
 score_pattern = re.compile(r"(\d+):(\d+)") # 分数语法
-def parseMatch(source, tournament):
+def parseMatch(source, match_group):
     """
 解析source中的文本，成功则创建相应的Match和Game，保存，返回Match。
 source例子见tests.py
@@ -16,7 +16,11 @@ source例子见tests.py
 
     lines = source.replace(u"：",u":").split(u"\n",1)
     match = models.Match()
-    match.tournament = tournament
+    if match_group:
+        match.match_group = match_group
+        tournament = match_group.tournament
+    else:
+        tournament = None
     if len(lines) > 1: 
         # 注释评论
         match.text = lines[1]
@@ -30,6 +34,7 @@ source例子见tests.py
         for player_str in player_strs:
             if player_str:
                 name = player_str
+                # TODO handle free match without a tournament
                 player = tournament.get_participant(name)
                 if not player:
                     raise ParseError(u"未报名选手：%s" % name)
