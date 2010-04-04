@@ -71,7 +71,7 @@ class VirtualTournament:
     def test(self):
         t = Tournament.objects.create(name=u"Virtual Tournament")
         r = Ranking.objects.create(name = "Virtual Ranking", type = 2)
-        tg = MatchGroup.objects.create(name=u"The Group", tournament = t, ranking = r)
+        tg = MatchGroup.objects.create(name=u"The Group", tournament = t, ranking = r, view_name = "roundrobin")
 
         teams = []
         for i in range(4):

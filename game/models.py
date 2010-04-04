@@ -133,6 +133,7 @@ class Match(Model, Extension):
     """
 
     match_group = ForeignKey(MatchGroup, null=True, blank=True)
+    parent_match = ForeignKey('self', null=True, blank=True)
     result = IntegerField(null=True, blank=True) # 比赛结果，1,2代表赢家
 
     Team, Singles, Doubles = 1,2,3
@@ -152,6 +153,7 @@ class Match(Model, Extension):
     extra = TextField(default="{}") # json record
 
     def player1_str(self):
+        # TODO should use Participation's displayname
         s = unicode(self.player11)
         if self.player12: s += u"/" + unicode(self.player12)
         return s
@@ -221,6 +223,7 @@ class Match(Model, Extension):
 
     def get_tournament(self):
         if self.match_group: return self.match_group.tournament
+        if self.parent_match: return self.parent_match.get_tournament()
         return None
 
     def save(self, *args, **kwargs):
