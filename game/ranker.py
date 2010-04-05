@@ -38,12 +38,20 @@ class RoundRobinRanker(Ranker):
         for match in matches:
             t1 = self.find_target(match.get_target(1), add)
             t2 = self.find_target(match.get_target(2), add)
-            self.matches[(t1, t2)] = w = match.winner()
+            w = match.winner()
+            target_pair, score_i = (t1,t2), 0
+            if target_pair not in self.matches: 
+                if (t2,t1) in self.matches:
+                    target_pair,score_i = (t2,t1), 1
+                else:
+                    self.matches[(t1, t2)] = [0,0]
             #print t1,"VS",t2,w
             if w==1:
                 p[t1]['match_win'] += 1
+                self.matches[target_pair][score_i] += 1
             elif w==2:
                 p[t2]['match_win'] += 1
+                self.matches[target_pair][1-score_i] += 1
             
             for game in match.game_set.all():
                 if game.winner()==1:
@@ -113,15 +121,15 @@ class RoundRobinRanker(Ranker):
         # a胜b返回-1，b胜a返回1
         if (a, b) in self.matches:
             w=self.matches[(a, b)]
-            if w==1: 
+            if w[0]>w[1]: 
                 return -1
-            elif w==2:
+            elif w[0]<w[1]:
                 return 1
         elif (b, a) in self.matches:
             w=self.matches[(b, a)]
-            if w==1:
+            if w[0]>w[1]:
                 return 1
-            elif w==2:
+            elif w[0]<w[1]:
                 return -1
         return 0
         

@@ -122,7 +122,7 @@ class VirtualTournament:
                 mss.extend(ms)
 
         for i,e,s in r.ranking():
-            #print i,e,s
+            print i,e,s
             pass
 
 class VirtualTournamentTest(VirtualTournament,TestCase):

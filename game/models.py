@@ -101,6 +101,9 @@ class Ranking(Model, Extension):
     """
         
     def ranking(self):
+        return self.get_ranker().result()
+
+    def get_ranker(self):
         if self.type==2:
             # self.get_tournament().get_ranking_targets()
             #print("Match groups: %d" % self.matchgroup_set.count())
@@ -109,9 +112,10 @@ class Ranking(Model, Extension):
             else:
                 matches = self.matches.all()
             rank = ranker.RoundRobinRanker(None, matches)
-            return rank.result()
+            return rank
         else:
             raise NotImplementedError
+
     
 class MatchGroup(Model, Extension):
     """一些比赛Match的集合，有确定的ranking模式，以一种形式展现在网页上。
@@ -133,7 +137,7 @@ class Match(Model, Extension):
     """
 
     match_group = ForeignKey(MatchGroup, null=True, blank=True)
-    parent_match = ForeignKey('self', null=True, blank=True)
+#    parent_match = ForeignKey('self', related_name="sub_matches", null=True, blank=True)
     result = IntegerField(null=True, blank=True) # 比赛结果，1,2代表赢家
 
     Team, Singles, Doubles = 1,2,3
@@ -223,7 +227,7 @@ class Match(Model, Extension):
 
     def get_tournament(self):
         if self.match_group: return self.match_group.tournament
-        if self.parent_match: return self.parent_match.get_tournament()
+        #if self.parent_match: return self.parent_match.get_tournament()
         return None
 
     def save(self, *args, **kwargs):
