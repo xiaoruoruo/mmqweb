@@ -42,12 +42,12 @@ def index(request):
 @permission_required('game.change_tournament')
 def tournament_edit(request, tid, text_status="", addmatch_status="", match_text=""):
     t = Tournament.objects.get(id=tid)
-    match_count = t.match_set.count()
+    match_group_count = t.matchgroup_set.count()
     form_text = TextForm(initial={'text':t.text})
     form_match = MatchTextForm(initial={'source':match_text})
     p_list = t.participants.all()
     return render_to_response("tedit.html", 
-                              {'tournament':t, 'match_count':match_count, 
+                              {'tournament':t, 'match_group_count':match_group_count, 
                               'form_text':form_text, 'text_status':text_status, 
                               'form_match':form_match, 'addmatch_status':addmatch_status,
                               'participation_list': p_list,
@@ -154,4 +154,4 @@ def MG_default(mg):
     return render_to_string('MG_default.html', {'count': mg.match_set.count()})
 def MG_roundrobin(mg):
     pass
-match_group_views = [MG_default, MG_roundRobin]
+match_group_views = [MG_default, MG_roundrobin]

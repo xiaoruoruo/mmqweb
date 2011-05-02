@@ -1,0 +1,19 @@
+= 数据模型 =
+Tournament = {个人赛 | 团体赛, [参赛方], [比赛阶段]}
+参赛方 = 参赛人员 | 参赛团体
+参赛团体 = [参赛人员] # 多对多
+
+个人比赛阶段 = {排名系统，[Match]}
+团体比赛阶段 = {排名系统，[TeamMatch]} # 体总杯8强单淘汰，共7场
+
+排名系统 = 单淘汰 | 单循环 | PK模式 | 积分
+PK模式 = 2n-1局n胜 | KOB # 仅两方比赛
+
+TeamMatch = {TeamA, TeamB, time, PK模式, [Match], Winner}
+Match = {Player1, Player2, time, 2n-1局n胜, [Game], Winner}
+Game = {score1, score2}
+
+
+= Components =
+Ranker: 对一个排名系统一个
+Scheduler: 对一个比赛阶段，排时间表
