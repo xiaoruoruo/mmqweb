@@ -14,6 +14,6 @@ def index(request):
 def submit(request):
     if request.method != 'POST':
         raise Http404
-    print request.META['HTTP_HOST']
-    o = request.POST
-    print o
+    ip = request.META['HTTP_X_REAL_IP']
+    json = request.POST.keys()[0]
+    return HttpResponse(status=200)
