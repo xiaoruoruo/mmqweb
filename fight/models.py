@@ -1,3 +1,6 @@
-from django.db import models
+from django.db.models import *
 
-# Create your models here.
+class GameRecord(Model):
+    ip = CharField(max_length=40)
+    json = CharField(max_length=1000)
+    
