@@ -69,12 +69,13 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'mmqweb.urls'
 
-TEMPLATE_DIRS = (
+TEMPLATE_LOADERS = ('django.template.loaders.app_directories.Loader',)
+#TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(SITE_ROOT,"templates/")
-)
+#    os.path.join(SITE_ROOT,"templates/")
+#)
 
 INSTALLED_APPS = (
     'django.contrib.admin', 
@@ -83,6 +84,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'mmqweb.namebook',
+    'mmqweb.fight',
     'mmqweb.game',
 )
 
