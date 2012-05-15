@@ -36,3 +36,14 @@ class Entity(models.Model):
     def picURL(self):
         "text中出现的第一个URL，将其作为图片地址返回，否则返回None"
         raise NotImplementedError()
+
+class YssyRegistration(models.Model):
+    "用来维护注册队列，另一进程向这些id发密码"
+    yssyid = models.CharField(max_length=12)
+    date = models.DateField()
+    code = models.CharField(max_length=10)
+
+    def __unicode__(self):
+        return self.yssyid
+
+

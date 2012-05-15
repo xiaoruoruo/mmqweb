@@ -1,0 +1,6 @@
+<p>请输入你的水源ID，我们将会向该ID发送站内信，包含网站登录密码。</p>
+<form action="register" method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="提交" />
+</form>
+<p>{{ text }}</p>
