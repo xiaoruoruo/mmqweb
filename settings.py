@@ -56,9 +56,7 @@ SECRET_KEY = '+6w5l6e8gvpzl=a$&e&_40n4+t%*)!#nm$4!hn)lbvn4mi9v0d'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-#    'django.template.loaders.filesystem.load_template_source',
-    'django.template.loaders.app_directories.load_template_source',
-#     'django.template.loaders.eggs.load_template_source',
+    'django.template.loaders.app_directories.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -85,7 +83,7 @@ INSTALLED_APPS = (
     'south',
     'mmqweb.namebook',
     'mmqweb.fight',
-#    'mmqweb.game',
+    'mmqweb.game',
 )
 
 LOGIN_REDIRECT_URL = '/mmqweb/'

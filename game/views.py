@@ -32,30 +32,34 @@ def index(request):
             except e:
                 v = unicode(e)
             group_views.append(v)
-        return render_to_response("index.html",
+        return render_to_response("game_index.html",
                               {'tournament':t, 
                                'group_views':group_views
                               }, RequestContext(request))
     else:
-        return render_to_response("index.html", {}, RequestContext(request))
+        return render_to_response("game_index.html", {}, RequestContext(request))
 
 @permission_required('game.change_tournament')
 def tournament_edit(request, tid, text_status="", addmatch_status="", match_text=""):
     t = Tournament.objects.get(id=tid)
     match_group_count = t.matchgroup_set.count()
+    if match_group_count > 1:
+        raise NotImplementedError("need template work")
+    match_groups = t.matchgroup_set.all()
     form_text = TextForm(initial={'text':t.text})
     form_match = MatchTextForm(initial={'source':match_text})
     p_list = t.participants.all()
     return render_to_response("tedit.html", 
-                              {'tournament':t, 'match_group_count':match_group_count, 
+                              {'tournament':t,
+                               'match_groups' : match_groups,
                               'form_text':form_text, 'text_status':text_status, 
                               'form_match':form_match, 'addmatch_status':addmatch_status,
                               'participation_list': p_list,
                               }, RequestContext(request))
 
-def tournament_matches(request, tid):
-    t = Tournament.objects.get(id=tid)
-    return render_to_response("matches.html", {'tournament':t,'matches':t.match_set.all()}, RequestContext(request))
+def matches(request, mgid):
+    mg = MatchGroup.objects.get(id=mgid)
+    return render_to_response("matches.html", {'mg':mg,'matches':mg.match_set.all()}, RequestContext(request))
     
 @permission_required('game.change_tournament')
 def tournament_edit_text(request, tid):
@@ -124,9 +128,13 @@ def tournament_add_participation(request, tid=None):
 
 @transaction.commit_on_success
 def do_add_matches(tournament, source):
+    mgs = list(tournament.matchgroup_set.all())
+    if len(mgs) != 1:
+        raise NotImplementedError()
+    mg = mgs[0]
     count = 0
     for record in parse_blocks(source):
-        tournament.addMatch(record)
+        mg.addMatch(record)
         count+=1
     return count
 

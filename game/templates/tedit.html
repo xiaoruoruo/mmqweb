@@ -35,14 +35,16 @@ function add_match() {
 <a href="{% url mmqweb.game.views.tournament_add_participation tid=tournament.id %}">增加参赛选手</a>
 
 <h4>比赛记录</h4>
-<a href="{% url mmqweb.game.views.tournament_matches tid=tournament.id %}">查看全部{{match_count}}场比赛</a>
+{% for mg in match_groups %}
+<a href="{% url mmqweb.game.views.matches mgid=mg.id %}">查看全部{{ mg.match_set.count }}场比赛</a>
 <a href="javascript:add_match();">增加比赛记录</a>
+{% endfor %}
 <div id="add_match" style="display: none">
 <div class="hint" style="font-size: 9pt">
     在下面的文本框中可以一次输入多条比赛记录，比赛之间用空行空开，每条记录至少一行，格式如下：<br/>
     <blockquote>
     老大:套长 21:19 12:21 21:12<br/>
-    上面一行格式固定，这一行可以写评论。需要的话用[耗时:10]来表示各种结构化的数据，这样方便统计耗时最长的比赛。弃权，犯规等导致胜方需要特别说明的情况，在这里用[胜者:老大]表示。
+    上面一行格式固定，这一行可以写评论。需要的话用[耗时:10],[裁判:fish]来表示各种结构化的数据，这样方便统计耗时最长的比赛。弃权，犯规等导致胜方需要特别说明的情况，在这里用[胜者:老大]表示。
     </blockquote>
 </div>
 <form action="{% url mmqweb.game.views.tournament_add_matches tid=tournament.id %}" method="POST">

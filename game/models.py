@@ -27,12 +27,12 @@ def replURL(m):
         return url
 
 class Tournament(Model, Extension):
-    "一次赛事，由许多场比赛Match组成"
+    "一次正规赛事，包括参赛人员"
 
     name = CharField(max_length=50)
     text = TextField(blank=True)
     extra = TextField(default="{}") # json record
-    participants= ManyToManyField('Participation', related_name='tournaments')
+    participants= ManyToManyField('Participation', related_name='tournaments', blank=True)
 
     def __unicode__(self):
         return u"%s" %(self.name)
@@ -60,7 +60,12 @@ class Tournament(Model, Extension):
         if p:
             return p[0]
         else:
-            return None
+            # default to create participant, otherwise return None
+            ent = Entity.objects.filter(name__exact=name)
+            if not ent:
+                ent = Entity.objects.create(name=name)
+            p = self.add_participant(ent, None)
+            return p
 
 class Participation(Model, Extension):
     displayname = CharField(max_length=50, blank=True)
