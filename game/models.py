@@ -60,7 +60,7 @@ class Tournament(Model, Extension):
         if p:
             return p[0]
         else:
-            # default to create participant, otherwise return None
+            # default to create participant. Should the policy change, return None
             ent = Entity.objects.filter(name__exact=name)
             if not ent:
                 ent = Entity.objects.create(name=name)
@@ -81,6 +81,9 @@ class Participation(Model, Extension):
         super(Participation, self).save(*args, **kwargs)
 
 class Ranking(Model, Extension):
+    """
+    排名表，对于一个MatchGroup，以一种排名系统，增量计算每个实体的排名。
+    """
     RANKING_TYPES = (
             (1, "单淘汰"),
             (2, "单循环"),
@@ -89,7 +92,8 @@ class Ranking(Model, Extension):
             )
     type = IntegerField(choices=RANKING_TYPES)
     name = CharField(max_length=50, blank=True)
-    matches = ManyToManyField('Match')
+    mg = ForeignKey('MatchGroup')
+
 
     """
     def get_ranking_targets(self):
@@ -104,7 +108,7 @@ class Ranking(Model, Extension):
         ids = [t.id for t in targets]
         self.xset("ranking_targets",  ids)
     """
-        
+
     def ranking(self):
         return self.get_ranker().result()
 
@@ -121,13 +125,12 @@ class Ranking(Model, Extension):
         else:
             raise NotImplementedError
 
-    
+
 class MatchGroup(Model, Extension):
-    """一些比赛Match的集合，有确定的ranking模式，以一种形式展现在网页上。
+    """一些比赛Match的集合，以一种形式展现在网页上。
     """
     name = CharField(max_length=50)
     tournament = ForeignKey(Tournament)
-    ranking = ForeignKey(Ranking, null=True, blank=True)
     view_name = CharField(max_length=50, blank=True)
 
     def addMatch(self, source):
@@ -183,7 +186,7 @@ class Match(Model, Extension):
 
     def __unicode__(self):
         return self.title() + "\n" + self.text
-    
+
     def asHtml(self):
         return self.title() + "\n" + self.textAsHtml()
 
