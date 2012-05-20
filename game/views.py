@@ -159,7 +159,9 @@ def find_match_group_view(name):
             return v
     return MG_default
 def MG_default(mg):
-    return render_to_string('MG_default.html', {'count': mg.match_set.count()})
+    return render_to_string('MG_default.html', {
+        'mg': mg
+    })
 def MG_roundrobin(mg):
     pass
 match_group_views = [MG_default, MG_roundrobin]

@@ -2,7 +2,7 @@
 {% block content %}
 <div id="hl_tournament">
     {% if tournament %}
-        <h2>近期赛事</h2>
+    <!--        <h2>近期赛事</h2> -->
         <h3>{{ tournament.name }}</h3>
         {% if perms.game.change_tournament %}
         <a href="{% url mmqweb.game.views.tournament_edit tid=tournament.id %}">编辑</a>
