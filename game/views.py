@@ -29,8 +29,10 @@ def index(request):
             view = find_match_group_view(group.view_name)
             try:
                 v = view(group)
-            except e:
-                v = unicode(e)
+            except:
+                raise
+            # except e:
+            #     v = unicode(e)
             group_views.append(v)
         return render_to_response("game_index.html",
                               {'tournament':t, 
@@ -162,6 +164,14 @@ def MG_default(mg):
     return render_to_string('MG_default.html', {
         'mg': mg
     })
+def MG_naive(mg):
+    from mmqweb.game.ranker import NaiveRanker
+    ranker = NaiveRanker([], mg.match_set.all())
+    scores = ranker.print_by_type(Entity.Man) + ranker.print_by_type(Entity.Woman)
+    return render_to_string('MG_naive.html', {
+        'mg': mg,
+        'scores': scores,
+    })
 def MG_roundrobin(mg):
     pass
-match_group_views = [MG_default, MG_roundrobin]
+match_group_views = [MG_default, MG_roundrobin, MG_naive]

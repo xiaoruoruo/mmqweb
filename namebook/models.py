@@ -6,9 +6,9 @@ class Entity(models.Model):
     Woman = 2
     Team = 3
     ENTITY_TYPES=(
-            (1, "男生"),
-            (2, "女生"),
-            (3, "团体"),
+            (1, u"男生"),
+            (2, u"女生"),
+            (3, u"团体"),
             )
     ENTITY_TYPES_DICT = dict(ENTITY_TYPES)
 

@@ -7,11 +7,11 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^accounts/login/$', 'django.contrib.auth.views.login'), 
-    (r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page':'/mmqweb/'}), 
-    (r'^mmqweb/game/', include('mmqweb.game.urls')),
-    (r'^mmqweb/', include('mmqweb.fight.urls')),
+    (r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page':'/'}), 
+    (r'^game/', include('mmqweb.game.urls')),
+    (r'^', include('mmqweb.fight.urls')),
     #(r'^mmqweb/', include('mmqweb.namebook.urls')),
-    (r'^mmqweb/static/(?P<path>.*)$', 'django.views.static.serve',
+    (r'^static/(?P<path>.*)$', 'django.views.static.serve',
         {'document_root': '/home/xrsun/mmqweb/static'}),
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:

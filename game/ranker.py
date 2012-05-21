@@ -32,25 +32,23 @@ class NaiveRanker(Ranker):
 
         self.singles = singles
         self.doubles = doubles
-        self.print_by_type(Entity.Man)
-        self.print_by_type(Entity.Woman)
 
     def print_by_type(self, type):
         def run(scores):
             es = [ent for ent in scores.keys() if ent.type == type]
             es.sort(key=lambda e: scores[e], reverse=True)
-            for ent in es:
-                print ent.name, scores[ent]
-            print
+            return '\n'.join("%s %d" % (ent.name, scores[ent]) for ent in es) + '\n' + '\n'
 
-        print Entity.ENTITY_TYPES_DICT[type],
-        print u"单打"
-        run(self.singles)
+        s = u""
+        s += Entity.ENTITY_TYPES_DICT[type] + u" "
+        s += u"单打\n"
+        s += run(self.singles)
             
-        print Entity.ENTITY_TYPES_DICT[type],
-        print u"双打"
-        run(self.doubles)
+        s += Entity.ENTITY_TYPES_DICT[type] + u" "
+        s += u"双打\n"
+        s += run(self.doubles)
     
+        return s
 
             
 
