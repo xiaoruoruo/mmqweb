@@ -1,5 +1,8 @@
 # encoding: utf-8
 from itertools import groupby
+from collections import defaultdict
+
+from mmqweb.namebook.models import Entity
 
 class Ranker:
     def __init__(self, targets, matches):
@@ -11,6 +14,46 @@ class Ranker:
         "返回排好序的序列[(rank, target, comment), ...]"
         raise NotImplementedError
     
+class NaiveRanker(Ranker):
+    "fish promotes this naive ranking. It is not order relevant"
+    def __init__(self, targets, matches):
+        singles = defaultdict(int)
+        doubles = defaultdict(int)
+        for m in matches:
+            w = m.winner()
+            if not m.player12: # is singles
+                singles[m.player11] += 3 if w == 1 else 1
+                singles[m.player21] += 3 if w == 2 else 1
+            else:
+                doubles[m.player11] += 3 if w == 1 else 1
+                doubles[m.player12] += 3 if w == 1 else 1
+                doubles[m.player21] += 3 if w == 2 else 1
+                doubles[m.player22] += 3 if w == 2 else 1
+
+        self.singles = singles
+        self.doubles = doubles
+        self.print_by_type(Entity.Man)
+        self.print_by_type(Entity.Woman)
+
+    def print_by_type(self, type):
+        def run(scores):
+            es = [ent for ent in scores.keys() if ent.type == type]
+            es.sort(key=lambda e: scores[e], reverse=True)
+            for ent in es:
+                print ent.name, scores[ent]
+            print
+
+        print Entity.ENTITY_TYPES_DICT[type],
+        print u"单打"
+        run(self.singles)
+            
+        print Entity.ENTITY_TYPES_DICT[type],
+        print u"双打"
+        run(self.doubles)
+    
+
+            
+
 class RoundRobinRanker(Ranker):
     stats_template = {'match_win':0, 'game_win':0, 'game_lose':0,'score_win':0, 'score_lose':0}
     def find_target(self, a, add=False):

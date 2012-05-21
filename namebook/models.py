@@ -10,6 +10,7 @@ class Entity(models.Model):
             (2, "女生"),
             (3, "团体"),
             )
+    ENTITY_TYPES_DICT = dict(ENTITY_TYPES)
 
     #主要属性
     name = models.CharField(max_length=50)
