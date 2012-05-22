@@ -80,6 +80,16 @@ class Participation(Model, Extension):
             self.displayname = unicode(self.player)
         super(Participation, self).save(*args, **kwargs)
 
+class Rating(Model):
+    """
+    在match之后rating变成多少
+    教主：按照Rating.id排序，自然就是Match发生的顺序
+    """
+    player1 = ForeignKey(Entity, related_name="player1")
+    player2 = ForeignKey(Entity, related_name="player2", null=True, blank=True)
+    match = ForeignKey('Match')
+    rating = FloatField()
+
 class Ranking(Model, Extension):
     """
     排名表，对于一个MatchGroup，以一种排名系统，增量计算每个实体的排名。
