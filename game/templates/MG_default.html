@@ -1,1 +1,2 @@
-<a href="{% url mmqweb.game.views.matches mgid=mg.id %}">共{{ mg.match_set.count }}场比赛</a>
+{% load url from future %}
+<a href="{% url 'mmqweb.game.views.matches' mgid=mg.id %}">共{{ mg.match_set.count }}场比赛</a>

@@ -1,5 +1,6 @@
 # encoding: utf-8
 import json
+import re
 from django.db.models import *
 from namebook.models import Entity
 import parser
