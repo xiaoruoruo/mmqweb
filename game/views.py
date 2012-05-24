@@ -61,8 +61,7 @@ def tournament_edit(request, tid, text_status="", addmatch_status="", match_text
 
 def matches(request, mgid):
     mg = MatchGroup.objects.get(id=mgid)
-    matches = list(mg.match_set.all())
-    matches.sort(cmp=Match.__le__)
+    matches = sorted(mg.match_set.all())
     return render_to_response("matches.html", {'mg':mg,'matches':matches}, RequestContext(request))
     
 @permission_required('game.change_tournament')
