@@ -7,8 +7,8 @@ import parser
 import ranker
 
 class Extension:
-    def xget(self, key):
-        return json.loads(self.extra).get(key)
+    def xget(self, key, *default):
+        return json.loads(self.extra).get(key, *default)
 
     def xset(self, key, val):
         r = json.loads(self.extra)
@@ -81,15 +81,17 @@ class Participation(Model, Extension):
             self.displayname = unicode(self.player)
         super(Participation, self).save(*args, **kwargs)
 
-class Rating(Model):
+class PersonalRating(Model):
     """
     在match之后rating变成多少
     教主：按照Rating.id排序，自然就是Match发生的顺序
     """
-    player1 = ForeignKey(Entity, related_name="player1")
-    player2 = ForeignKey(Entity, related_name="player2", null=True, blank=True)
+    player = ForeignKey(Entity)
     match = ForeignKey('Match')
-    rating = FloatField()
+    rating_singles = FloatField()
+    rating_doubles = FloatField()
+    rating_mixed = FloatField()
+    mg = ForeignKey('MatchGroup')
 
 class Ranking(Model, Extension):
     """
@@ -174,6 +176,14 @@ class Match(Model, Extension):
 
     text = TextField(blank=True)
     extra = TextField(default="{}") # json record
+
+    def __le__(self, other):
+        time1 = self.xget(u'时间', None)
+        time2 = other.xget(u'时间', None)
+        print time1,time2, time1<time2
+        if time1 and time2:
+            return time1 < time2
+        return self.pk < other.pk
 
     def player1_str(self):
         # TODO should use Participation's displayname

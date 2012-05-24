@@ -14,6 +14,14 @@ class Ranker:
         "返回排好序的序列[(rank, target, comment), ...]"
         raise NotImplementedError
     
+class PersonalRanker(Ranker):
+    def __init__(self, mg):
+        self.mg = mg
+        self.matches = list(mg.match_set.all())
+    
+    def rank(self):
+        pass
+
 class NaiveRanker(Ranker):
     "fish promotes this naive ranking. It is not order relevant"
     def __init__(self, targets, matches):
