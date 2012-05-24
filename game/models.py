@@ -174,10 +174,9 @@ class Match(Model, Extension):
     text = TextField(blank=True)
     extra = TextField(default="{}") # json record
 
-    def __le__(self, other):
+    def __lt__(self, other):
         time1 = self.xget(u'时间', None)
         time2 = other.xget(u'时间', None)
-        print time1,time2, time1<time2
         if time1 and time2 and time1 != time2:
             return time1 < time2
         return self.pk < other.pk

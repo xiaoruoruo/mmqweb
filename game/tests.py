@@ -52,6 +52,16 @@ class SimpleTest(TestCase):
         self.assertEquals(u'10', self.m.xget(u'耗时'))
         self.assertEquals(u'老大', self.m.xget(u'胜者'))
 
+    def testSort(self):
+        m1=self.g.addMatch(u'''老大:套长 21：1\n[时间:2012年03月01日]''')
+        m2=self.g.addMatch(u'''老大:套长 21：2\n[时间:2012年03月02日]''')
+        self.assertTrue(m1 < m2)
+        ms = [m2,m1]
+        ms.sort()
+        self.assertEquals([m1, m2], ms)
+
+
+
 class Tizong(TestCase):
     teams = ["电子信息与电气工程学院","农业与生物学院","国际教育学院","理学院物理系","生命科学技术学院",
              "外国语学院","环境科学与工程学院","交大密西根学院","软件学院","航空航天学院",
