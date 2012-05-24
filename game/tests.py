@@ -24,6 +24,7 @@ class SimpleTest(TestCase):
     def test1(self):
         m=self.g.addMatch(u'''老大:套长 21：19 12：21 21：12
 上面一行格式固定，这一行可以写评论。用[耗时:10]来表示结构化的数据。弃权，犯规等导致胜方需要特别说明的情况，在这里用[胜者:老大]表示。''')
+        self.m = m
 
         self.assertEquals(self.t, m.match_group.tournament)
         self.assertTrue(len(m.text) > 10)
@@ -37,8 +38,7 @@ class SimpleTest(TestCase):
 
     def test2(self):
         self.test1()
-        self.assertEquals(1, self.g.match_set.count())
-        
+
         rank = ranker.RoundRobinRanker([self.redwolf, self.mmqtao], self.g.match_set.all())
         result = rank.result()
         self.assertEquals(2, len(result))
@@ -46,6 +46,11 @@ class SimpleTest(TestCase):
         self.assertEquals(self.redwolf, result[0][1])
         self.assertEquals(2, result[1][0])
         self.assertEquals(self.mmqtao, result[1][1])
+
+    def testExtra(self):
+        self.test1()
+        self.assertEquals(u'10', self.m.xget(u'耗时'))
+        self.assertEquals(u'老大', self.m.xget(u'胜者'))
 
 class Tizong(TestCase):
     teams = ["电子信息与电气工程学院","农业与生物学院","国际教育学院","理学院物理系","生命科学技术学院",
@@ -70,8 +75,8 @@ class Tizong(TestCase):
 class VirtualTournament:
     def test(self):
         t = Tournament.objects.create(name=u"Virtual Tournament")
-        r = Ranking.objects.create(name = "Virtual Ranking", type = 2)
-        tg = MatchGroup.objects.create(name=u"The Group", tournament = t, ranking = r, view_name = "roundrobin")
+        tg = MatchGroup.objects.create(name=u"The Group", tournament = t, view_name = "roundrobin")
+        r = Ranking.objects.create(name = "Virtual Ranking", type = 2, mg = tg)
 
         teams = []
         for i in range(4):
@@ -87,7 +92,7 @@ class VirtualTournament:
                 t.add_participant(p, team)
                 players.append(p)
             teamplayer.append(players)
-        
+
         mss = []
         for i in range(4):
             for j in range(i+1,4):

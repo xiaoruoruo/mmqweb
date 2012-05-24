@@ -129,10 +129,7 @@ class Ranking(Model, Extension):
         if self.type==2:
             # self.get_tournament().get_ranking_targets()
             #print("Match groups: %d" % self.matchgroup_set.count())
-            if self.matchgroup_set.count() > 0:
-                matches = self.matchgroup_set.all()[0].match_set.all()
-            else:
-                matches = self.matches.all()
+            matches = self.mg.match_set.all()
             rank = ranker.RoundRobinRanker(None, matches)
             return rank
         else:
@@ -181,7 +178,7 @@ class Match(Model, Extension):
         time1 = self.xget(u'时间', None)
         time2 = other.xget(u'时间', None)
         print time1,time2, time1<time2
-        if time1 and time2:
+        if time1 and time2 and time1 != time2:
             return time1 < time2
         return self.pk < other.pk
 
