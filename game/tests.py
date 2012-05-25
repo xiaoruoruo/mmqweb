@@ -142,3 +142,30 @@ class VirtualTournament:
 
 class VirtualTournamentTest(VirtualTournament,TestCase):
     pass
+
+class PersonalRankingTest(TestCase):
+    def setUp(self):
+        self.t = t = Tournament.objects.create(name=u"Personal Tournament")
+        self.tg = tg = MatchGroup.objects.create(name=u"The Group", tournament = t, view_name = "roundrobin")
+        self.r = Ranking.objects.create(name = "Ranking", type = 4, mg = tg)
+
+        matches = [
+            u'老大:套长 21：1\n[时间:2012年03月01日]',
+            u'老大:fish 1：21\n[时间:2012年03月02日]'
+                ]
+        for m in matches:
+            self.tg.addMatch(m)
+
+        self.assertEquals(len(matches), self.tg.match_set.count())
+
+    def test(self):
+        from mmqweb.game.ranker import FishPersonalRanker
+        ranker = FishPersonalRanker(self.r)
+        ranker.rank()
+        # for r in PersonalRating.objects.all():
+        #     print r
+        self.assertEquals(4, PersonalRating.objects.count())
+        self.assertEquals(4.0, ranker.rating(
+            Entity.objects.get(name=u'老大')).rating_singles)
+        self.assertEquals(3.0, ranker.rating(
+            Entity.objects.get(name=u'fish')).rating_singles)

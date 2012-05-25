@@ -3,8 +3,6 @@ import json
 import re
 from django.db.models import *
 from namebook.models import Entity
-import parser
-import ranker
 
 class Extension:
     def xget(self, key, *default):
@@ -90,8 +88,11 @@ class PersonalRating(Model):
     match = ForeignKey('Match')
     rating_singles = FloatField()
     rating_doubles = FloatField()
-    rating_mixed = FloatField()
-    mg = ForeignKey('MatchGroup')
+    ranking = ForeignKey('Ranking')
+
+    def __unicode__(self):
+        return u'%s在比赛%d后的积分：%.2f/%.2f' % (self.player, self.match.pk,
+                self.rating_singles, self.rating_doubles)
 
 class Ranking(Model, Extension):
     """
@@ -126,6 +127,7 @@ class Ranking(Model, Extension):
         return self.get_ranker().result()
 
     def get_ranker(self):
+        import ranker
         if self.type==2:
             # self.get_tournament().get_ranking_targets()
             #print("Match groups: %d" % self.matchgroup_set.count())
@@ -144,6 +146,7 @@ class MatchGroup(Model, Extension):
     view_name = CharField(max_length=50, blank=True)
 
     def addMatch(self, source):
+        import parser
         return parser.parseMatch(source, self)
 
     def __unicode__(self):

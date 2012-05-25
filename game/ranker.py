@@ -1,8 +1,10 @@
 # encoding: utf-8
 from itertools import groupby
 from collections import defaultdict
+from django.db import transaction
 
 from mmqweb.namebook.models import Entity
+from mmqweb.game.models import PersonalRating
 
 class Ranker:
     def __init__(self, targets, matches):
@@ -13,14 +15,61 @@ class Ranker:
     def result(self):
         "返回排好序的序列[(rank, target, comment), ...]"
         raise NotImplementedError
-    
+
 class PersonalRanker(Ranker):
-    def __init__(self, mg):
-        self.mg = mg
-        self.matches = list(mg.match_set.all())
-    
+    def __init__(self, ranking):
+        self.ranking = ranking
+        self.mg = ranking.mg
+        self.matches = sorted(self.mg.match_set.all())
+
+    @transaction.commit_on_success
     def rank(self):
-        pass
+        """
+        删除所有rating，重新排
+        """
+        PersonalRating.objects.filter(ranking=self.ranking).delete()
+        for m in self.matches:
+            self.update(m)
+
+    def rating(self, player):
+        "查询rating"
+        return PersonalRating.objects.filter(ranking=self.ranking,
+                player=player).order_by('-id')[0]
+
+    def update(self, match):
+        "match发生后更新相应排名"
+        raise NotImplementedError
+
+class FishPersonalRanker(PersonalRanker):
+    INIT_RATING = 0
+    def update(self, m):
+        w = m.winner()
+        if not m.player12: # is singles
+            self._update(m, m.player11, 3 if w == 1 else 1, 'singles')
+            self._update(m, m.player21, 3 if w == 2 else 1, 'singles')
+        else:
+            self._update(m, m.player11, 3 if w == 1 else 1, 'doubles')
+            self._update(m, m.player12, 3 if w == 1 else 1, 'doubles')
+            self._update(m, m.player21, 3 if w == 2 else 1, 'doubles')
+            self._update(m, m.player22, 3 if w == 2 else 1, 'doubles')
+
+    def _update(self, match, player, amount, kind):
+        pr = PersonalRating.objects.filter(ranking=self.ranking,
+                player=player).order_by('-id')[:1]
+        s = {}
+        s['singles'] = self.INIT_RATING
+        s['doubles'] = self.INIT_RATING
+        if pr:
+            pr = pr[0]
+            s['singles']= pr.rating_singles
+            s['doubles']= pr.rating_doubles
+        s[kind] += amount
+        pr = PersonalRating.objects.create(player=player, match=match,
+                ranking=self.ranking,
+                rating_singles = s['singles'],
+                rating_doubles = s['doubles'],
+                )
+        pr.save()
 
 class NaiveRanker(Ranker):
     "fish promotes this naive ranking. It is not order relevant"
@@ -51,14 +100,14 @@ class NaiveRanker(Ranker):
         s += Entity.ENTITY_TYPES_DICT[type] + u" "
         s += u"单打\n"
         s += run(self.singles)
-            
+
         s += Entity.ENTITY_TYPES_DICT[type] + u" "
         s += u"双打\n"
         s += run(self.doubles)
-    
+
         return s
 
-            
+
 
 class RoundRobinRanker(Ranker):
     stats_template = {'match_win':0, 'game_win':0, 'game_lose':0,'score_win':0, 'score_lose':0}
@@ -73,7 +122,7 @@ class RoundRobinRanker(Ranker):
             print u"玩家不属于任何积分组",
             print a
             raise ValueError()  # how to raise unicode Exception?
-        
+
     def __init__(self, targets, matches):
         if targets is not None:
             p = dict((target, dict(RoundRobinRanker.stats_template)) for target in targets)
@@ -89,7 +138,7 @@ class RoundRobinRanker(Ranker):
             t2 = self.find_target(match.get_target(2), add)
             w = match.winner()
             target_pair, score_i = (t1,t2), 0
-            if target_pair not in self.matches: 
+            if target_pair not in self.matches:
                 if (t2,t1) in self.matches:
                     target_pair,score_i = (t2,t1), 1
                 else:
@@ -101,7 +150,7 @@ class RoundRobinRanker(Ranker):
             elif w==2:
                 p[t2]['match_win'] += 1
                 self.matches[target_pair][1-score_i] += 1
-            
+
             for game in match.game_set.all():
                 if game.winner()==1:
                     p[t1]['game_win'] += 1
@@ -114,7 +163,7 @@ class RoundRobinRanker(Ranker):
                 p[t2]['score_lose'] += game.score1
                 p[t2]['score_win'] += game.score2
         #print p
-                
+
     def result(self):
         result = []
         board = list(self.target_points.keys())
@@ -163,14 +212,14 @@ class RoundRobinRanker(Ranker):
                                 #真的比不出来了
                                 for g2i in g2:
                                     result.append((g2i[0], g2i[1], u"并列, %s" % str_score))
-            
+
         return result
-    
+
     def cmp_winner(self, a, b):
         # a胜b返回-1，b胜a返回1
         if (a, b) in self.matches:
             w=self.matches[(a, b)]
-            if w[0]>w[1]: 
+            if w[0]>w[1]:
                 return -1
             elif w[0]<w[1]:
                 return 1
@@ -181,17 +230,17 @@ class RoundRobinRanker(Ranker):
             elif w[0]<w[1]:
                 return -1
         return 0
-        
+
     def cmp_match(self, a, b):
         # 比较胜场数
         return -self.target_points[a]['match_win'] + self.target_points[b]['match_win']
-    
+
     def cmp_game(self, a, b):
         # 比较净胜局数
         ga = self.target_points[a]['game_win'] - self.target_points[a]['game_lose']
         gb = self.target_points[b]['game_win'] - self.target_points[b]['game_lose']
         return gb-ga
-        
+
     def cmp_score(self, a, b):
         # 比较净胜分
         sa = self.target_points[a]['score_win'] - self.target_points[a]['score_lose']
