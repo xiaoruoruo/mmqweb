@@ -76,12 +76,12 @@ class EloPersonalRanker(PersonalRanker):
     def update(self, m):
         w = m.winner()
         if not m.player12: # is singles
-            self._update(m, m.player11, m.player21) if w == 1 else self._update(m, m.player21, m.player11)
+            self._update2(m, m.player11, m.player21) if w == 1 else self._update2(m, m.player21, m.player11)
         else:
-            self._update(m, m.player11, 3 if w == 1 else 1, 'doubles')
-            self._update(m, m.player12, 3 if w == 1 else 1, 'doubles')
-            self._update(m, m.player21, 3 if w == 2 else 1, 'doubles')
-            self._update(m, m.player22, 3 if w == 2 else 1, 'doubles')
+            if w == 1:
+                self._update4(m, m.player11, m.player12, m.player21, m.player22)
+            else:
+                self._update4(m, m.player21, m.player22, m.player11, m.player12)
 
     def getPlayerRating(self, player): # get player rating
         pr = PersonalRating.objects.filter(ranking = self.ranking,
@@ -104,7 +104,7 @@ class EloPersonalRanker(PersonalRanker):
         pr.save()
         return
 
-    def _update(self, match, playerA, playerB):
+    def _update2(self, match, playerA, playerB): 
         ratingA = self.getPlayerRating(playerA)
         ratingB = self.getPlayerRating(playerB)
         newRatingA = self.updateRank(ratingA['singles'], ratingB['singles'])[0]
@@ -116,6 +116,34 @@ class EloPersonalRanker(PersonalRanker):
         self.savePlayerRating(playerB, ratingB, match)
         return
 
+    def _update4(self, match, playerA1, playerA2, playerB1, playerB2):
+        ratingA1 = self.getPlayerRating(playerA1)
+        ratingA2 = self.getPlayerRating(playerA2)
+        ratingB1 = self.getPlayerRating(playerB1)
+        ratingB2 = self.getPlayerRating(playerB2)
+        groupRatingA = (ratingA1['doubles'] + ratingA2['doubles']) / 2
+        groupRatingB = (ratingB1['doubles'] + ratingB2['doubles']) / 2
+        newGroupRatingA = self.updateRank(groupRatingA, groupRatingB)[0]
+        newGroupRatingB = self.updateRank(groupRatingA, groupRatingB)[1]
+        
+        groupRatingUpdateA = newGroupRatingA - groupRatingA;
+        ratingUpdateA1 = groupRatingUpdateA * ratingA2['doubles'] / (ratingA1['doubles'] + ratingA2['doubles']) 
+        ratingUpdateA2 = groupRatingUpdateA - ratingUpdateA1;
+        
+        groupRatingUpdateB = newGroupRatingB - groupRatingB;
+        ratingUpdateB1 = groupRatingUpdateB * ratingB2['doubles'] / (ratingB1['doubles'] + ratingB2['doubles']) 
+        ratingUpdateB2 = groupRatingUpdateB - ratingUpdateB1;
+        
+        ratingA1['doubles'] += ratingUpdateA1
+        ratingA2['doubles'] += ratingUpdateA2
+        ratingB1['doubles'] += ratingUpdateB1
+        ratingB2['doubles'] += ratingUpdateB2
+        
+        self.savePlayerRating(playerA1, ratingA1, match)
+        self.savePlayerRating(playerB1, ratingB1, match)
+        self.savePlayerRating(playerA2, ratingA2, match)
+        self.savePlayerRating(playerB2, ratingB2, match)
+        return
 
     def updateRank(self, ratingA, ratingB): # assume A is winner
         expectionScoreForA = 1.0 / (1.0 + pow(10.0, (ratingB - ratingA) / 400))
