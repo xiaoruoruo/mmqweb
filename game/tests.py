@@ -164,8 +164,8 @@ class PersonalRankingTest(TestCase):
         from mmqweb.game.ranker import EloPersonalRanker
         ranker = EloPersonalRanker(self.r)
         ranker.rank()
-        for r in PersonalRating.objects.all():
-            print r
+        #for r in PersonalRating.objects.all():
+        #    print r
         self.assertEquals(12, PersonalRating.objects.count())
         rating_laoda = ranker.rating(
             Entity.objects.get(name=u'老大')).rating_singles

@@ -1,6 +1,5 @@
 # encoding: utf-8
 from itertools import groupby
-from collections import defaultdict
 from django.db import transaction
 
 from mmqweb.namebook.models import Entity
@@ -40,6 +39,24 @@ class PersonalRanker(Ranker):
         "match发生后更新相应排名"
         raise NotImplementedError
 
+    def print_by_type(self, type):
+        "输出所有最新积分"
+        def run(sd):
+            es = [ent for ent in Entity.objects.all() if ent.type == type and self.rating(ent)[sd]]
+            es.sort(key=lambda e: self.rating(e)[sd], reverse=True)
+            return '\n'.join("%s %.2f" % (ent.name, self.rating(ent)[sd]) for ent in es) + '\n' + '\n'
+
+        s = u""
+        s += Entity.ENTITY_TYPES_DICT[type] + u" "
+        s += u"单打\n"
+        s += run('singles')
+
+        s += Entity.ENTITY_TYPES_DICT[type] + u" "
+        s += u"双打\n"
+        s += run('doubles')
+        return s
+
+
 class FishPersonalRanker(PersonalRanker):
     INIT_RATING = 0
     def update(self, m):
@@ -57,17 +74,17 @@ class FishPersonalRanker(PersonalRanker):
         pr = PersonalRating.objects.filter(ranking=self.ranking,
                 player=player).order_by('-id')[:1]
         s = {}
-        s['singles'] = self.INIT_RATING
-        s['doubles'] = self.INIT_RATING
         if pr:
             pr = pr[0]
             s['singles']= pr.rating_singles
             s['doubles']= pr.rating_doubles
+        if kind not in s or s[kind] is None:
+            s[kind] = self.INIT_RATING
         s[kind] += amount
         pr = PersonalRating.objects.create(player=player, match=match,
                 ranking=self.ranking,
-                rating_singles = s['singles'],
-                rating_doubles = s['doubles'],
+                rating_singles = s.get('singles',None),
+                rating_doubles = s.get('doubles',None),
                 )
         pr.save()
 
@@ -87,8 +104,6 @@ class EloPersonalRanker(PersonalRanker):
         pr = PersonalRating.objects.filter(ranking = self.ranking,
                 player = player).order_by('-id')[:1]
         s = {}
-        s['singles'] = self.INIT_RATING
-        s['doubles'] = self.INIT_RATING
         if pr:
             pr = pr[0]
             s['singles'] = pr.rating_singles
@@ -98,17 +113,20 @@ class EloPersonalRanker(PersonalRanker):
     def savePlayerRating(self, player, rating, match): # save player rating
         pr = PersonalRating.objects.create(player=player, match=match,
                 ranking=self.ranking,
-                rating_singles = rating['singles'],
-                rating_doubles = rating['doubles'],
+                rating_singles = rating.get('singles',None),
+                rating_doubles = rating.get('doubles',None),
                 )
         pr.save()
         return
 
-    def _update2(self, match, playerA, playerB): 
+    def _update2(self, match, playerA, playerB):
         ratingA = self.getPlayerRating(playerA)
         ratingB = self.getPlayerRating(playerB)
-        newRatingA = self.updateRank(ratingA['singles'], ratingB['singles'])[0]
-        newRatingB = self.updateRank(ratingA['singles'], ratingB['singles'])[1]
+        for r in [ratingA, ratingB]:
+            if r.get('singles', None) is None:
+                r['singles'] = self.INIT_RATING
+
+        newRatingA, newRatingB  = self.updateRank(ratingA['singles'], ratingB['singles'])
 
         ratingA['singles'] = newRatingA
         ratingB['singles'] = newRatingB
@@ -121,24 +139,28 @@ class EloPersonalRanker(PersonalRanker):
         ratingA2 = self.getPlayerRating(playerA2)
         ratingB1 = self.getPlayerRating(playerB1)
         ratingB2 = self.getPlayerRating(playerB2)
+        for r in [ratingA1, ratingA2, ratingB1, ratingB2]:
+            if r.get('doubles', None) is None:
+                r['doubles'] = self.INIT_RATING
+
         groupRatingA = (ratingA1['doubles'] + ratingA2['doubles']) / 2
         groupRatingB = (ratingB1['doubles'] + ratingB2['doubles']) / 2
-        newGroupRatingA = self.updateRank(groupRatingA, groupRatingB)[0]
-        newGroupRatingB = self.updateRank(groupRatingA, groupRatingB)[1]
-        
+
+        newGroupRatingA, newGroupRatingB  = self.updateRank(groupRatingA, groupRatingB)
+
         groupRatingUpdateA = newGroupRatingA - groupRatingA;
-        ratingUpdateA1 = groupRatingUpdateA * ratingA2['doubles'] / (ratingA1['doubles'] + ratingA2['doubles']) 
+        ratingUpdateA1 = groupRatingUpdateA * ratingA2['doubles'] / (ratingA1['doubles'] + ratingA2['doubles'])
         ratingUpdateA2 = groupRatingUpdateA - ratingUpdateA1;
-        
+
         groupRatingUpdateB = newGroupRatingB - groupRatingB;
-        ratingUpdateB1 = groupRatingUpdateB * ratingB2['doubles'] / (ratingB1['doubles'] + ratingB2['doubles']) 
+        ratingUpdateB1 = groupRatingUpdateB * ratingB2['doubles'] / (ratingB1['doubles'] + ratingB2['doubles'])
         ratingUpdateB2 = groupRatingUpdateB - ratingUpdateB1;
-        
+
         ratingA1['doubles'] += ratingUpdateA1
         ratingA2['doubles'] += ratingUpdateA2
         ratingB1['doubles'] += ratingUpdateB1
         ratingB2['doubles'] += ratingUpdateB2
-        
+
         self.savePlayerRating(playerA1, ratingA1, match)
         self.savePlayerRating(playerB1, ratingB1, match)
         self.savePlayerRating(playerA2, ratingA2, match)
@@ -152,43 +174,6 @@ class EloPersonalRanker(PersonalRanker):
         newRatingA = ratingA + ratingDelta
         newRatingB = ratingB - ratingDelta
         return [newRatingA, newRatingB]
-
-class NaiveRanker(Ranker):
-    "fish promotes this naive ranking. It is not order relevant"
-    def __init__(self, targets, matches):
-        singles = defaultdict(int)
-        doubles = defaultdict(int)
-        for m in matches:
-            w = m.winner()
-            if not m.player12: # is singles
-                singles[m.player11] += 3 if w == 1 else 1
-                singles[m.player21] += 3 if w == 2 else 1
-            else:
-                doubles[m.player11] += 3 if w == 1 else 1
-                doubles[m.player12] += 3 if w == 1 else 1
-                doubles[m.player21] += 3 if w == 2 else 1
-                doubles[m.player22] += 3 if w == 2 else 1
-
-        self.singles = singles
-        self.doubles = doubles
-
-    def print_by_type(self, type):
-        def run(scores):
-            es = [ent for ent in scores.keys() if ent.type == type]
-            es.sort(key=lambda e: scores[e], reverse=True)
-            return '\n'.join("%s %d" % (ent.name, scores[ent]) for ent in es) + '\n' + '\n'
-
-        s = u""
-        s += Entity.ENTITY_TYPES_DICT[type] + u" "
-        s += u"单打\n"
-        s += run(self.singles)
-
-        s += Entity.ENTITY_TYPES_DICT[type] + u" "
-        s += u"双打\n"
-        s += run(self.doubles)
-
-        return s
-
 
 
 class RoundRobinRanker(Ranker):

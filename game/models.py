@@ -79,6 +79,7 @@ class Participation(Model, Extension):
             self.displayname = unicode(self.player)
         super(Participation, self).save(*args, **kwargs)
 
+NaN = float('nan')
 class PersonalRating(Model):
     """
     在match之后rating变成多少
@@ -86,13 +87,19 @@ class PersonalRating(Model):
     """
     player = ForeignKey(Entity)
     match = ForeignKey('Match')
-    rating_singles = FloatField()
-    rating_doubles = FloatField()
+    rating_singles = FloatField(null=True)
+    rating_doubles = FloatField(null=True)
     ranking = ForeignKey('Ranking')
 
     def __unicode__(self):
         return u'%s在比赛%d后的积分：%.2f/%.2f' % (self.player, self.match.pk,
-                self.rating_singles, self.rating_doubles)
+                self.rating_singles or NaN, self.rating_doubles or NaN)
+
+    def __getitem__(self, i):
+        if i == 'singles':
+            return self.rating_singles
+        elif i == 'doubles':
+            return self.rating_doubles
 
 class Ranking(Model, Extension):
     """
@@ -102,11 +109,15 @@ class Ranking(Model, Extension):
             (1, "单淘汰"),
             (2, "单循环"),
             (3, "2n-1局n胜"),
-            (4, "个人排名"),
+            (4, "个人排名(fish)"),
+            (5, "个人排名(elo)"),
             )
     type = IntegerField(choices=RANKING_TYPES)
     name = CharField(max_length=50, blank=True)
     mg = ForeignKey('MatchGroup')
+
+    def __unicode__(self):
+        return self.name
 
 
     """
@@ -134,6 +145,10 @@ class Ranking(Model, Extension):
             matches = self.mg.match_set.all()
             rank = ranker.RoundRobinRanker(None, matches)
             return rank
+        elif self.type==4:
+            return ranker.FishPersonalRanker(self)
+        elif self.type==5:
+            return ranker.EloPersonalRanker(self)
         else:
             raise NotImplementedError
 

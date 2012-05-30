@@ -166,13 +166,19 @@ def MG_default(mg):
         'mg': mg
     })
 def MG_naive(mg):
-    from mmqweb.game.ranker import NaiveRanker
-    ranker = NaiveRanker([], mg.match_set.all())
-    scores = ranker.print_by_type(Entity.Man) + ranker.print_by_type(Entity.Woman)
-    return render_to_string('MG_naive.html', {
-        'mg': mg,
-        'scores': scores,
-    })
+    ss = []
+    ss.append(render_to_string('MG_default.html', {
+        'mg': mg
+    }))
+    for ranking in mg.ranking_set.all():
+        ranker = ranking.get_ranker()
+        scores = ranker.print_by_type(Entity.Man) + ranker.print_by_type(Entity.Woman)
+        ss.append(render_to_string('MG_naive.html', {
+            'name': ranking.name,
+            'scores': scores,
+        }))
+    return ''.join(ss)
+
 def MG_roundrobin(mg):
     pass
 match_group_views = [MG_default, MG_roundrobin, MG_naive]

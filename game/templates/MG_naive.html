@@ -1,6 +1,5 @@
 {% load url from future %}
-<a href="{% url 'mmqweb.game.views.matches' mgid=mg.id %}">共{{ mg.match_set.count }}场比赛</a>
-<h4>积分(fish系统)</h4>
+<h4>{{ name }}</h4>
 <pre>
 {{ scores }}
 </pre>
