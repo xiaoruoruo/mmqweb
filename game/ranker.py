@@ -71,6 +71,60 @@ class FishPersonalRanker(PersonalRanker):
                 )
         pr.save()
 
+class EloPersonalRanker(PersonalRanker):
+    INIT_RATING = 1200
+    def update(self, m):
+        w = m.winner()
+        if not m.player12: # is singles
+            self._update(m, m.player11, m.player21) if w == 1 else self._update(m, m.player21, m.player11)
+        else:
+            self._update(m, m.player11, 3 if w == 1 else 1, 'doubles')
+            self._update(m, m.player12, 3 if w == 1 else 1, 'doubles')
+            self._update(m, m.player21, 3 if w == 2 else 1, 'doubles')
+            self._update(m, m.player22, 3 if w == 2 else 1, 'doubles')
+
+    def getPlayerRating(self, player): # get player rating
+        pr = PersonalRating.objects.filter(ranking = self.ranking,
+                player = player).order_by('-id')[:1]
+        s = {}
+        s['singles'] = self.INIT_RATING
+        s['doubles'] = self.INIT_RATING
+        if pr:
+            pr = pr[0]
+            s['singles'] = pr.rating_singles
+            s['doubles'] = pr.rating_doubles
+        return s
+
+    def savePlayerRating(self, player, rating, match): # save player rating
+        pr = PersonalRating.objects.create(player=player, match=match,
+                ranking=self.ranking,
+                rating_singles = rating['singles'],
+                rating_doubles = rating['doubles'],
+                )
+        pr.save()
+        return
+
+    def _update(self, match, playerA, playerB):
+        ratingA = self.getPlayerRating(playerA)
+        ratingB = self.getPlayerRating(playerB)
+        newRatingA = self.updateRank(ratingA['singles'], ratingB['singles'])[0]
+        newRatingB = self.updateRank(ratingA['singles'], ratingB['singles'])[1]
+
+        ratingA['singles'] = newRatingA
+        ratingB['singles'] = newRatingB
+        self.savePlayerRating(playerA, ratingA, match)
+        self.savePlayerRating(playerB, ratingB, match)
+        return
+
+
+    def updateRank(self, ratingA, ratingB): # assume A is winner
+        expectionScoreForA = 1.0 / (1.0 + pow(10.0, (ratingB - ratingA) / 400))
+        K = 50 # maximum rating change
+        ratingDelta = (1.0 - expectionScoreForA) * K
+        newRatingA = ratingA + ratingDelta
+        newRatingB = ratingB - ratingDelta
+        return [newRatingA, newRatingB]
+
 class NaiveRanker(Ranker):
     "fish promotes this naive ranking. It is not order relevant"
     def __init__(self, targets, matches):

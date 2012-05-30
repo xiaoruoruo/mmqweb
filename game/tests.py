@@ -158,7 +158,20 @@ class PersonalRankingTest(TestCase):
 
         self.assertEquals(len(matches), self.tg.match_set.count())
 
-    def test(self):
+    def testElo(self):
+        from mmqweb.game.ranker import EloPersonalRanker
+        ranker = EloPersonalRanker(self.r)
+        ranker.rank()
+        for r in PersonalRating.objects.all():
+            print r
+        self.assertEquals(4, PersonalRating.objects.count())
+        rating_laoda = ranker.rating(
+            Entity.objects.get(name=u'老大')).rating_singles
+        rating_fish = ranker.rating(
+            Entity.objects.get(name=u'fish')).rating_singles
+        self.assertTrue(rating_fish > rating_laoda)
+
+    def testFish(self):
         from mmqweb.game.ranker import FishPersonalRanker
         ranker = FishPersonalRanker(self.r)
         ranker.rank()
