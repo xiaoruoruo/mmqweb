@@ -6,7 +6,7 @@ import models
 class ParseError(Exception):
     pass
 
-pattern = re.compile(ur"\s*(?P<p1a>\w+)([\s、，,/]+(?P<p1b>\w+))?(:|vs|胜|负|对)\s*(?P<p2a>\w+)([\s、，,/]+(?P<p2b>\w+))?\s+(?P<games>.+)", re.UNICODE | re.IGNORECASE) # 第一行语法
+pattern = re.compile(ur"\s*(?P<p1a>\w+)([\s、，,/]+(?P<p1b>\w+))?\s*(:|vs|胜|负|对)\s*(?P<p2a>\w+)([\s、，,/]+(?P<p2b>\w+))?\s+(?P<games>.+)", re.UNICODE | re.IGNORECASE) # 第一行语法
 score_pattern = re.compile(r"(-?\d+):(-?\d+)") # 分数语法
 sdata_pattern = re.compile(ur"\[(\w+):([^]]+)\]", re.UNICODE) # 标注数据
 
@@ -30,7 +30,7 @@ source例子见tests.py
         tournament = match_group.tournament
     else:
         tournament = None
-    if len(lines) > 1: 
+    if len(lines) > 1:
         updateText(match, lines[1])
 
     m = pattern.match(lines[0])

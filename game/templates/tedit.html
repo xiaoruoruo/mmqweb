@@ -1,5 +1,5 @@
-{% load url from future %}
 {% extends "base.html" %}
+{% load url from future %}
 {% block title %}编辑{{ tournament.name }} - mmqweb{% endblock %}
 {% block head %}
 <script type="text/javascript">
@@ -20,6 +20,7 @@ function add_match() {
 <a href="javascript:edit_text();">编辑</a> 
 <span id="text">{{ form_text.initial.text }}</span>
 <form id="form_text" action="{% url 'mmqweb.game.views.tournament_edit_text' tid=tournament.id %}" method="POST" style="display:none">
+    {% csrf_token %}
     {{ form_text.as_p }}
     <input type="submit" value="修改" />
 </form>
@@ -40,7 +41,7 @@ function add_match() {
 <a href="{% url 'mmqweb.game.views.matches' mgid=mg.id %}">查看全部{{ mg.match_set.count }}场比赛</a>
 <a href="javascript:add_match();">增加比赛记录</a>
 {% endfor %}
-<div id="add_match" style="display: none">
+<div id="add_match" style="{% if addmatch_status %} display: block {% else %} display: none {% endif %}">
 <div class="hint" style="font-size: 9pt">
     在下面的文本框中可以一次输入多条比赛记录，比赛之间用空行空开，每条记录至少一行，格式如下：<br/>
     <blockquote>
@@ -49,6 +50,7 @@ function add_match() {
     </blockquote>
 </div>
 <form action="{% url 'mmqweb.game.views.tournament_add_matches' tid=tournament.id %}" method="POST">
+    {% csrf_token %}
     {{ form_match.as_p }}
     <input type="submit" value="确定" />
     {{ addmatch_status }}

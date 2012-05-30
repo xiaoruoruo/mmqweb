@@ -35,7 +35,7 @@ def index(request):
             #     v = unicode(e)
             group_views.append(v)
         return render_to_response("game_index.html",
-                              {'tournament':t, 
+                              {'tournament':t,
                                'group_views':group_views
                               }, RequestContext(request))
     else:
@@ -51,10 +51,10 @@ def tournament_edit(request, tid, text_status="", addmatch_status="", match_text
     form_text = TextForm(initial={'text':t.text})
     form_match = MatchTextForm(initial={'source':match_text})
     p_list = t.participants.all()
-    return render_to_response("tedit.html", 
+    return render_to_response("tedit.html",
                               {'tournament':t,
                                'match_groups' : match_groups,
-                              'form_text':form_text, 'text_status':text_status, 
+                              'form_text':form_text, 'text_status':text_status,
                               'form_match':form_match, 'addmatch_status':addmatch_status,
                               'participation_list': p_list,
                               }, RequestContext(request))
@@ -63,7 +63,7 @@ def matches(request, mgid):
     mg = MatchGroup.objects.get(id=mgid)
     matches = sorted(mg.match_set.all())
     return render_to_response("matches.html", {'mg':mg,'matches':matches}, RequestContext(request))
-    
+
 @permission_required('game.change_tournament')
 def tournament_edit_text(request, tid):
     t = Tournament.objects.get(id=tid)
@@ -110,7 +110,7 @@ def tournament_add_participation(request, tid=None):
                     # TODO resolve entity instead of universally create one
                     pa = Entity(name=a)
                     pa.save()
-                    if b: 
+                    if b:
                         pb = Entity(name=b)
                         pb.save()
                     p = Participation(tournament = t, playera = pa)

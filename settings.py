@@ -16,7 +16,7 @@ SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 DATABASES = {
     'default': {
         'ENGINE' : 'django.db.backends.sqlite3',
-        'NAME' : os.path.join(SITE_ROOT, 'mmqweb.db') 
+        'NAME' : os.path.join(SITE_ROOT, 'mmqweb.db')
     }
 }
 
@@ -64,6 +64,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
 )
 
 ROOT_URLCONF = 'mmqweb.urls'
@@ -76,7 +77,7 @@ ROOT_URLCONF = 'mmqweb.urls'
 #)
 
 INSTALLED_APPS = (
-    'django.contrib.admin', 
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
