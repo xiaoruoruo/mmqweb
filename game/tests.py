@@ -151,7 +151,9 @@ class PersonalRankingTest(TestCase):
 
         matches = [
             u'老大:套长 21：1\n[时间:2012年03月01日]',
-            u'老大:fish 1：21\n[时间:2012年03月02日]'
+            u'老大:fish 1：21\n[时间:2012年03月02日]',
+            u'老大、猪头:fish、鱼头 21：1\n[时间:2012年03月02日]',
+            u'老大、fish:鱼头、猪头 21：1\n[时间:2012年03月02日]',
                 ]
         for m in matches:
             self.tg.addMatch(m)
@@ -164,12 +166,17 @@ class PersonalRankingTest(TestCase):
         ranker.rank()
         for r in PersonalRating.objects.all():
             print r
-        self.assertEquals(4, PersonalRating.objects.count())
+        self.assertEquals(12, PersonalRating.objects.count())
         rating_laoda = ranker.rating(
             Entity.objects.get(name=u'老大')).rating_singles
         rating_fish = ranker.rating(
             Entity.objects.get(name=u'fish')).rating_singles
+        rating_doubles_laoda = ranker.rating(
+            Entity.objects.get(name=u'老大')).rating_doubles
+        rating_doubles_zhutou = ranker.rating(
+            Entity.objects.get(name=u'猪头')).rating_doubles
         self.assertTrue(rating_fish > rating_laoda)
+        self.assertTrue(rating_doubles_laoda > rating_doubles_zhutou)
 
     def testFish(self):
         from mmqweb.game.ranker import FishPersonalRanker
@@ -177,7 +184,7 @@ class PersonalRankingTest(TestCase):
         ranker.rank()
         # for r in PersonalRating.objects.all():
         #     print r
-        self.assertEquals(4, PersonalRating.objects.count())
+        self.assertEquals(12, PersonalRating.objects.count())
         self.assertEquals(4.0, ranker.rating(
             Entity.objects.get(name=u'老大')).rating_singles)
         self.assertEquals(3.0, ranker.rating(
