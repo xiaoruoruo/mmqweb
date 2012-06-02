@@ -1,6 +1,7 @@
 # encoding: utf-8
 from itertools import groupby
 from django.db import transaction
+from django.db.models import Max
 
 from mmqweb.namebook.models import Entity
 from mmqweb.game.models import PersonalRating
@@ -42,9 +43,10 @@ class PersonalRanker(Ranker):
     def print_by_type(self, type):
         "输出所有最新积分"
         def run(sd):
-            es = [ent for ent in Entity.objects.all() if ent.type == type and self.rating(ent)[sd]]
-            es.sort(key=lambda e: self.rating(e)[sd], reverse=True)
-            return '\n'.join("%s %.2f" % (ent.name, self.rating(ent)[sd]) for ent in es) + '\n' + '\n'
+            subq = PersonalRating.objects.filter(ranking=self.ranking, player__type=type).values('player__id').annotate(Max('id')).values_list('id__max',flat=True)
+            rating_field = 'rating_%s' % sd
+            es = PersonalRating.objects.filter(id__in=subq).order_by('-'+rating_field).values_list('player__name', rating_field)
+            return '\n'.join("%s %.2f" % (name, rating) for name, rating in es if rating) + '\n' + '\n'
 
         s = u""
         s += Entity.ENTITY_TYPES_DICT[type] + u" "
