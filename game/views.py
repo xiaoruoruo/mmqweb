@@ -1,8 +1,7 @@
 # encoding:utf-8
 import re
-import logging
 
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_list_or_404, get_object_or_404, render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
 from django import forms
 from django.db import transaction
@@ -10,8 +9,9 @@ from django.contrib.auth.decorators import permission_required
 from django.template import RequestContext
 from django.template.loader import render_to_string
 
-from models import *
 import parser
+from game.models import Tournament, MatchGroup, Participation, Ranking, PersonalRating
+from namebook.models import Entity
 
 class TextForm(forms.Form):
     text = forms.CharField(label="", widget=forms.Textarea(attrs={'rows':'10', 'cols':'80'}))
@@ -171,14 +171,40 @@ def MG_naive(mg):
         'mg': mg
     }))
     for ranking in mg.ranking_set.all():
-        ranker = ranking.get_ranker()
-        scores = ranker.print_by_type(Entity.Man) + ranker.print_by_type(Entity.Woman)
-        ss.append(render_to_string('MG_naive.html', {
-            'name': ranking.name,
-            'scores': scores,
-        }))
+        ss.append(ranking_render(ranking))
     return ''.join(ss)
 
 def MG_roundrobin(mg):
     pass
 match_group_views = [MG_default, MG_roundrobin, MG_naive]
+
+# Ranking views
+def ranking_index(request, ranking_id):
+    r = get_object_or_404(Ranking, id=ranking_id)
+    html = ranking_render(r)
+    return render_to_response("ranking_index.html", {
+        'ranking_html': html,
+        }, RequestContext(request))
+
+def ranking_render(ranking):
+    if ranking.type == 4 or ranking.type == 5:
+        #ranker = ranking.get_ranker()
+        #scores = ranker.print_by_type(Entity.Man) + ranker.print_by_type(Entity.Woman)
+        #return render_to_string('ranking_simple.html', {
+        #    'name': ranking.name,
+        #    'scores': scores,
+        #})
+        return render_to_string('ranking_link.html', {
+            'ranking': ranking,
+            })
+
+def ranking_person(request, ranking_id, name):
+    "个人排名的积分变化过程显示，包括单双打"
+    rs = get_list_or_404(PersonalRating, ranking__id=ranking_id, player__name=name)
+    rs.reverse()
+    return render_to_response("ranking_person.html", {
+        'player': rs[0].player,
+        'ratings': rs,
+        }, RequestContext(request))
+
+    return HttpResponse('<br>'.join(unicode(r) for r in rs))

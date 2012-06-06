@@ -1,3 +1,7 @@
+body {
+    font-size:medium;
+}
+
 pre, textarea {
     font-family:"宋体";
     font-size:10.5pt;
@@ -8,3 +12,14 @@ pre, textarea {
 //    width: 250px;
 //    border-bottom:1px solid black;
 }
+
+.ranking_table {
+    float:left;
+    margin-right: 20px;
+}
+
+.ranking_table a {
+    color:#000033; 
+    text-decoration:none;
+}
+

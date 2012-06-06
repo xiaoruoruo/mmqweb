@@ -21,6 +21,7 @@ class PersonalRanker(Ranker):
         self.ranking = ranking
         self.mg = ranking.mg
         self.matches = sorted(self.mg.match_set.all())
+        self._result_cache = None
 
     @transaction.commit_on_success
     def rank(self):
@@ -42,21 +43,34 @@ class PersonalRanker(Ranker):
 
     def print_by_type(self, type):
         "输出所有最新积分"
-        def run(sd):
-            subq = PersonalRating.objects.filter(ranking=self.ranking, player__type=type).values('player__id').annotate(Max('id')).values_list('id__max',flat=True)
-            rating_field = 'rating_%s' % sd
-            es = PersonalRating.objects.filter(id__in=subq).order_by('-'+rating_field).values_list('player__name', rating_field)
-            return '\n'.join("%s %.2f" % (name, rating) for name, rating in es if rating) + '\n' + '\n'
+        type_s = 'M' if type == 1 else 'W'
 
         s = u""
         s += Entity.ENTITY_TYPES_DICT[type] + u" "
         s += u"单打\n"
-        s += run('singles')
+        s += '\n'.join("%s %.2f" % (name, rating) for name, rating, c in self.result()[type_s+'S']) + '\n' + '\n'
 
         s += Entity.ENTITY_TYPES_DICT[type] + u" "
         s += u"双打\n"
-        s += run('doubles')
+        s += '\n'.join("%s %.2f" % (name, rating) for name, rating, c in self.result()[type_s+'D']) + '\n' + '\n'
         return s
+
+    def result(self):
+        def run(type, sd):
+            Comment = ''
+            subq = PersonalRating.objects.filter(ranking=self.ranking, player__type=type).values('player__id').annotate(Max('id')).values_list('id__max',flat=True)
+            rating_field = 'rating_%s' % sd
+            es = PersonalRating.objects.filter(id__in=subq).order_by('-'+rating_field).values_list('player__name', rating_field)
+            return [(name, rating, Comment) for name, rating in es if rating]
+        if not self._result_cache:
+            self._result_cache = {
+                    'MS': run(Entity.Man, 'singles'),
+                    'MD': run(Entity.Man, 'doubles'),
+                    'WS': run(Entity.Woman, 'singles'),
+                    'WD': run(Entity.Woman, 'doubles'),
+                    }
+        return self._result_cache
+
 
 
 class FishPersonalRanker(PersonalRanker):

@@ -13,13 +13,6 @@
         <div>{{ group|safe }}</div>
         {% endfor %}
         {% if ranking %}
-        <h4>排名</h4>
-        <table border="1px">
-            <tr><th></th><th width="100px">选手</th><th>详情</th></tr>
-            {% for rank, player, comment in ranking %}
-            <tr><td align="center">{{ rank }}</td><td align="center">{{ player }}</td><td>{{ comment }}</td></tr>
-            {% endfor %}
-        </table>
         {% endif %}
     {% endif %}
 </div>

@@ -95,12 +95,6 @@ class PersonalRating(Model):
         return u'%s在比赛%d后的积分：%.2f/%.2f' % (self.player, self.match.pk,
                 self.rating_singles or NaN, self.rating_doubles or NaN)
 
-    def __getitem__(self, i):
-        if i == 'singles':
-            return self.rating_singles
-        elif i == 'doubles':
-            return self.rating_doubles
-
 class Ranking(Model, Extension):
     """
     排名表，对于一个MatchGroup，以一种排名系统，增量计算每个实体的排名。
