@@ -183,6 +183,7 @@ def ranking_index(request, ranking_id):
     r = get_object_or_404(Ranking, id=ranking_id)
     html = ranking_render(r)
     return render_to_response("ranking_index.html", {
+        'ranking': r,
         'ranking_html': html,
         }, RequestContext(request))
 
@@ -204,7 +205,6 @@ def ranking_person(request, ranking_id, name):
     rs.reverse()
     return render_to_response("ranking_person.html", {
         'player': rs[0].player,
+        'ranking': rs[0].ranking,
         'ratings': rs,
         }, RequestContext(request))
-
-    return HttpResponse('<br>'.join(unicode(r) for r in rs))

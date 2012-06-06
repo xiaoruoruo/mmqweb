@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load url from future %}
+{% block title %}{{ ranking.name }} - mmqweb{% endblock %}
 {% block content %}
 {{ ranking_html|safe }}
 {% endblock %}
