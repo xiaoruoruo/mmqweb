@@ -23,3 +23,6 @@ pre, textarea {
     text-decoration:none;
 }
 
+.ranking_table h5 {
+    text-align: center;
+}
