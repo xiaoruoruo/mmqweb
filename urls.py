@@ -9,7 +9,16 @@ import os
 import sys
 PROJECT_ROOT = os.path.dirname(__file__)
 
+import django
+admin_media_url = settings.STATIC_URL.lstrip('/') + 'admin/(?P<path>.*)$'
+admin_media_path = os.path.join(django.__path__[0], 'contrib', 'admin', 'static', 'admin')
+
 urlpatterns = patterns('',
+    (r'^admin/', include(admin.site.urls)),
+    (r'^' + admin_media_url , 'django.views.static.serve', {
+        'document_root': admin_media_path,
+        }),
+
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
     (r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page':'/'}),
     (r'^game/', include('mmqweb.game.urls')),
@@ -23,6 +32,4 @@ urlpatterns = patterns('',
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
-    # Uncomment the next line to enable the admin:
-    (r'^admin/', include(admin.site.urls)),
 )
