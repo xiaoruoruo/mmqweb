@@ -3,8 +3,8 @@ from itertools import groupby
 from django.db import transaction
 from django.db.models import Max
 
-from mmqweb.namebook.models import Entity
-from mmqweb.game.models import PersonalRating
+from namebook.models import Entity
+from game.models import PersonalRating
 
 class Ranker:
     def __init__(self, targets, matches):

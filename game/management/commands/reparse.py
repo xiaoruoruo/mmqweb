@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
-from mmqweb.game.models import *
-from mmqweb.game.parser import updateText
+from game.models import *
+from game.parser import updateText
 
 class Command(BaseCommand):
     def handle(self, *args, **options):

@@ -161,7 +161,7 @@ class PersonalRankingTest(TestCase):
         self.assertEquals(len(matches), self.tg.match_set.count())
 
     def testElo(self):
-        from mmqweb.game.ranker import EloPersonalRanker
+        from game.ranker import EloPersonalRanker
         ranker = EloPersonalRanker(self.r)
         ranker.rank()
         #for r in PersonalRating.objects.all():
@@ -179,7 +179,7 @@ class PersonalRankingTest(TestCase):
         self.assertTrue(rating_doubles_laoda > rating_doubles_zhutou)
 
     def testFish(self):
-        from mmqweb.game.ranker import FishPersonalRanker
+        from game.ranker import FishPersonalRanker
         ranker = FishPersonalRanker(self.r)
         ranker.rank()
         # for r in PersonalRating.objects.all():
