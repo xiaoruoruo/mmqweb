@@ -1,10 +1,10 @@
 from django.conf.urls.defaults import *
 
-urlpatterns = patterns('', 
-                       (r'^$',  'mmqweb.game.views.index'), 
-                       (r'^tournament/(?P<tid>\d+)/edit$',  'mmqweb.game.views.tournament_edit'), 
-                       (r'^tournament/(?P<tid>\d+)/text$',  'mmqweb.game.views.tournament_edit_text'), 
-                       (r'^tournament/(?P<tid>\d+)/addmatches$',  'mmqweb.game.views.tournament_add_matches'), 
-                       (r'^tournament/(?P<tid>\d+)/addp$',  'mmqweb.game.views.tournament_add_participation'), 
-                       (r'^mg/(?P<mgid>\d+)/matches$',  'mmqweb.game.views.matches'), 
+urlpatterns = patterns('',
+                       (r'^$',  'game.views.index'),
+                       (r'^tournament/(?P<tid>\d+)/edit$',  'game.views.tournament_edit'),
+                       (r'^tournament/(?P<tid>\d+)/text$',  'game.views.tournament_edit_text'),
+                       (r'^tournament/(?P<tid>\d+)/addmatches$',  'game.views.tournament_add_matches'),
+                       (r'^tournament/(?P<tid>\d+)/addp$',  'game.views.tournament_add_participation'),
+                       (r'^mg/(?P<mgid>\d+)/matches$',  'game.views.matches'),
                        )

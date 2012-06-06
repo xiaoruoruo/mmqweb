@@ -18,7 +18,7 @@
     </blockquote>
 </div>
 
-<form action="{% url 'mmqweb.game.views.tournament_add_participation' tid=tournament.id %}" method="POST">
+<form action="{% url 'game.views.tournament_add_participation' tid=tournament.id %}" method="POST">
     {{ form.as_p }}
     <input type="submit" value="增加" />
     {{ status }}
