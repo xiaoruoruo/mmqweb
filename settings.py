@@ -2,7 +2,7 @@
 
 import os
 
-DEBUG = True
+DEBUG = os.getenv('PRODUCTION', 'False') == 'False'
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -56,8 +56,12 @@ SECRET_KEY = '+6w5l6e8gvpzl=a$&e&_40n4+t%*)!#nm$4!hn)lbvn4mi9v0d'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.app_directories.Loader',
-)
+        'django.template.loaders.app_directories.Loader',
+    )
+if not TEMPLATE_DEBUG:
+    TEMPLATE_LOADERS = (
+        ('django.template.loaders.cached.Loader', TEMPLATE_LOADERS),
+    )
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
