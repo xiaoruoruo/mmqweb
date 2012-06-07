@@ -233,8 +233,11 @@ def ranking_person(request, ranking_id, name):
     "个人排名的积分变化过程显示，包括单双打"
     rs = get_list_or_404(PersonalRating, ranking__id=ranking_id, player__name=name)
     rs.reverse()
+    player = rs[0].player
+    for r in rs:
+        r.match.switchPlayer(player) # make the player always show on the left
     return render_to_response("ranking_person.html", {
-        'player': rs[0].player,
+        'player': player,
         'ranking': rs[0].ranking,
         'ratings': rs,
         }, RequestContext(request))

@@ -188,6 +188,8 @@ class Match(Model, Extension):
     text = TextField(blank=True)
     extra = TextField(default="{}") # json record
 
+    _i_player1 = 1    # used for switchPlayer
+
     def __lt__(self, other):
         time1 = self.xget(u'时间', None)
         time2 = other.xget(u'时间', None)
@@ -206,13 +208,13 @@ class Match(Model, Extension):
         return s
     def title(self):
         p1, p2 = self.player1_str(), self.player2_str()
-        if self.winner() == 1:
+        if self.winner() == self._i_player1:
             p= p1 + u" 胜 " + p2
-        elif self.winner() == 2:
+        elif self.winner() == 3 - self._i_player1:
             p= p1 + u" 负 " + p2
         else:
             p= p1 + u" 对 " + p2
-        scores = " ".join([unicode(game) for game in self.game_set.all()])
+        scores = " ".join([game.title(self._i_player1) for game in self.game_set.all()])
         return p+" " + scores
 
     def __unicode__(self):
@@ -220,6 +222,13 @@ class Match(Model, Extension):
 
     def asHtml(self):
         return self.title() + "\n" + self.textAsHtml()
+
+    def switchPlayer(self, player1):
+        "Make player1 on the left for display. Only applies to singles now."
+        if self.type == Match.Singles or self.type == Match.Team:
+            if player1 == self.player21:
+                self.player11, self.player21 = self.player21, self.player11
+                self._i_player1 = 3 - self._i_player1 # 1<->2
 
     def textAsHtml(self):
         return re_linkURL.sub(replURL, self.text)
@@ -287,7 +296,13 @@ class Game(Model, Extension):
     extra = TextField(default="{}") # json record
 
     def __unicode__(self):
-        return u"%d:%d" % (self.score1, self.score2)
+        return self.title(1)
+
+    def title(self, i_player1):
+        if i_player1 == 1:
+            return u"%d:%d" % (self.score1, self.score2)
+        elif i_player1 == 2:
+            return u"%d:%d" % (self.score2, self.score1)
 
     def winner(self):
         if self.score1 > self.score2:

@@ -31,3 +31,6 @@ pre, textarea {
     color: rgb(208, 0, 208);
 }
 
+.ranking_table h5 {
+    text-align: center;
+}

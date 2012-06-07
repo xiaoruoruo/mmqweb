@@ -48,11 +48,11 @@ class PersonalRanker(Ranker):
         s = u""
         s += Entity.ENTITY_TYPES_DICT[type] + u" "
         s += u"单打\n"
-        s += '\n'.join("%s %.2f" % (name, rating) for name, rating, c in self.result()[type_s+'S']) + '\n' + '\n'
+        s += '\n'.join("%s %.0f" % (name, rating) for name, rating, c in self.result()[type_s+'S']) + '\n' + '\n'
 
         s += Entity.ENTITY_TYPES_DICT[type] + u" "
         s += u"双打\n"
-        s += '\n'.join("%s %.2f" % (name, rating) for name, rating, c in self.result()[type_s+'D']) + '\n' + '\n'
+        s += '\n'.join("%s %.0f" % (name, rating) for name, rating, c in self.result()[type_s+'D']) + '\n' + '\n'
         return s
 
     def result(self):
