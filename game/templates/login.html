@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load url from future %}
+{% block title %}登录 - mmqweb{% endblock %}
+{% block content %}
+<div id="login_form">
+	{{ state }}
+	<form action="." method="post"> {% csrf_token %}
+		{% if next %}
+		<input type="hidden" name="next" value="{{ next }}" />
+		{% endif %}
+		Username:
+		<input type="text" name="username" value="{{ username }}" /><br />
+		Password:
+		<input type="password" name="password" value="" /><br />
+
+		<input type="submit" value="Log In" />
+	</form>
+</div>
+{% endblock %}

@@ -1,9 +1,10 @@
 # encoding:utf-8
 import re
 
-from django.shortcuts import get_list_or_404, get_object_or_404, render_to_response
-from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import get_list_or_404, get_object_or_404, render_to_response, redirect
+from django.http import HttpResponse
 from django import forms
+from django.contrib.auth import authenticate, login
 from django.db import transaction
 from django.contrib.auth.decorators import permission_required
 from django.template import RequestContext
@@ -40,6 +41,27 @@ def index(request):
                               }, RequestContext(request))
     else:
         return render_to_response("game_index.html", {}, RequestContext(request))
+
+def login_user(request):
+    state = ""
+    username = password = ''
+    if request.POST:
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                state = "You're successfully logged in!"
+                return redirect('game.views.index')
+            else:
+                state = "Your account is not active, please contact the site admin."
+        else:
+            state = "Your username and/or password were incorrect."
+
+    return render_to_response('login.html',{'state':state, 'username': username},
+            RequestContext(request))
 
 @permission_required('game.change_tournament')
 def tournament_edit(request, tid, text_status="", addmatch_status="", match_text=""):

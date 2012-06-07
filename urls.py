@@ -6,7 +6,6 @@ from django.contrib import admin
 admin.autodiscover()
 
 import os
-import sys
 PROJECT_ROOT = os.path.dirname(__file__)
 
 import django
@@ -19,8 +18,8 @@ urlpatterns = patterns('',
         'document_root': admin_media_path,
         }),
 
-    (r'^accounts/login/$', 'django.contrib.auth.views.login'),
-    (r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page':'/'}),
+    (r'^accounts/login/$', 'game.views.login_user'),
+    (r'^accounts/logout/$', 'django.contrib.auth.views.logout', {'next_page':'/game/'}),
     (r'^game/', include('game.urls')),
     (r'^', include('fight.urls')),
     #(r'^mmqweb/', include('namebook.urls')),

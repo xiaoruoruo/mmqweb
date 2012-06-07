@@ -14,9 +14,9 @@
             </div>
             <div id="account">
                 {% if user.is_authenticated %}
-                {{ user.username }} <a href="{% url 'django.contrib.auth.views.logout' %}">登出</a>
+                {{ user.username }} <a href="/accounts/logout/">登出</a>
                 {% else %}
-                <a href="{% url 'django.contrib.auth.views.login' %}">登录</a>
+                <a href="/accounts/login/">登录</a>
                 {% endif %}
             </div>
         </div>
