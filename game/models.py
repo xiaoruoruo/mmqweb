@@ -62,11 +62,7 @@ class Tournament(Model, Extension):
             return p[0]
         else:
             # default to create participant. Should the policy change, return None
-            ent = Entity.objects.filter(name__exact=name)
-            if not ent:
-                ent = Entity.objects.create(name=name)
-            else:
-                ent = ent[0]
+            ent = Entity.objects.create(name=name)
             p = self.add_participant(ent, None)
             return p
 

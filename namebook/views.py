@@ -51,7 +51,7 @@ def submit(request):
     r.save()
     return HttpResponse(status=200)
 
-@permission_required('namebook.change_entitiy')
+@permission_required('namebook.change_entity')
 def label_entity_types(request):
     if request.method != 'POST':
         return HttpResponseBadRequest("Bad Request")
