@@ -79,12 +79,14 @@ def tournament_edit(request, tid, text_status="", addmatch_status="", match_text
     form_text = TextForm(initial={'text':t.text})
     form_match = MatchTextForm(initial={'source':match_text})
     p_list = t.participants.all()
+    player_notypes = [p.player for p in t.participants.all() if not p.player.type]
     return render_to_response("tedit.html",
                               {'tournament':t,
                                'match_groups' : match_groups,
                               'form_text':form_text, 'text_status':text_status,
                               'form_match':form_match, 'addmatch_status':addmatch_status,
                               'participation_list': p_list,
+                              'player_notypes': player_notypes,
                               }, RequestContext(request))
 
 def matches(request, mgid):

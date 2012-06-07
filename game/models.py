@@ -63,6 +63,8 @@ class Tournament(Model, Extension):
             ent = Entity.objects.filter(name__exact=name)
             if not ent:
                 ent = Entity.objects.create(name=name)
+            else:
+                ent = ent[0]
             p = self.add_participant(ent, None)
             return p
 

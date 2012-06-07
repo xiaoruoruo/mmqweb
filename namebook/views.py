@@ -1,8 +1,8 @@
 # encoding: utf8
 from models import *
 
-from django.http import Http404
-from django.shortcuts import get_object_or_404, render_to_response
+from django.http import Http404, HttpResponseBadRequest
+from django.shortcuts import get_object_or_404, render_to_response, redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django import forms
 from django.db import transaction
@@ -51,3 +51,23 @@ def submit(request):
     r.save()
     return HttpResponse(status=200)
 
+@permission_required('namebook.change_entitiy')
+def label_entity_types(request):
+    if request.method != 'POST':
+        return HttpResponseBadRequest("Bad Request")
+    try:
+        for key, value in request.POST.iteritems():
+            if key.startswith('pt'):
+                eid = int(key[2:])
+                e = Entity.objects.get(id=eid)
+                if value[0] == 'M':
+                    e.type = Entity.Man
+                elif value[0] == 'F':
+                    e.type = Entity.Woman
+                else:
+                    raise
+                e.save()
+    except:
+        return HttpResponseBadRequest("Bad Request")
+
+    return redirect(request.POST['next'])

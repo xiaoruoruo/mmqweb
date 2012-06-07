@@ -29,10 +29,30 @@ function add_match() {
 
 <h4>参赛选手</h4>
 {% if participation_list %}
-{% for p in participation_list %}
-{{ p }}
-{% endfor %}
-<br/>
+    {% for p in participation_list %}
+    {% if p.player.type %}
+    <span class="player_type_{{p.player.type}}">{{ p }}</span>
+    {% endif %}
+    {% endfor %}
+    <br/>
+{% endif %}
+{% if player_notypes %}
+<div id="label_type">
+    <p>性别标注</p>
+    <form action="{% url 'namebook.views.label_entity_types' %}" method="POST"> {% csrf_token %}
+    <input type='hidden' name='next' value='{{ request.path }}' />
+    {% for p in player_notypes %}
+        <input type="radio" name="pt{{p.id}}" id="st{{p.id}}" value="M">
+        <label for="st{{p.id}}">男</label>
+        <input type="radio" name="pt{{p.id}}" id="sf{{p.id}}" value="F">
+        <label for="sf{{p.id}}">女</label>
+        {{ p }}
+        <br/>
+    {% endfor %}
+    <input type="submit" value="保存">
+    </form>
+    <br/>
+</div>
 {% endif %}
 <a href="{% url 'game.views.tournament_add_participation' tid=tournament.id %}">增加参赛选手</a>
 

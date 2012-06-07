@@ -23,3 +23,11 @@ pre, textarea {
     text-decoration:none;
 }
 
+.player_type_1 {
+    color: rgb(51, 160, 160);
+}
+
+.player_type_2 {
+    color: rgb(208, 0, 208);
+}
+
