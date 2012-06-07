@@ -21,24 +21,10 @@ class MatchTextForm(forms.Form):
 
 
 def index(request):
-    t = Tournament.objects.order_by('-id')
+    t = Tournament.objects.order_by('id')
     if t.count()>0:
         t = t[0]
-        groups = t.matchgroup_set.all()
-        group_views = []
-        for group in groups:
-            view = find_match_group_view(group.view_name)
-            try:
-                v = view(group)
-            except:
-                raise
-            # except e:
-            #     v = unicode(e)
-            group_views.append(v)
-        return render_to_response("game_index.html",
-                              {'tournament':t,
-                               'group_views':group_views
-                              }, RequestContext(request))
+        return tournament_index(request, t.id, t)
     else:
         return render_to_response("game_index.html", {}, RequestContext(request))
 
@@ -62,6 +48,26 @@ def login_user(request):
 
     return render_to_response('login.html',{'state':state, 'username': username},
             RequestContext(request))
+
+def tournament_index(request, tid, tournament=None):
+    t = tournament
+    if not t:
+        t = get_object_or_404(Tournament, id=tid)
+    groups = t.matchgroup_set.all()
+    group_views = []
+    for group in groups:
+        view = find_match_group_view(group.view_name)
+        try:
+            v = view(group)
+        except:
+            raise
+        # except e:
+        #     v = unicode(e)
+        group_views.append(v)
+    return render_to_response("game_index.html",
+                            {'tournament':t,
+                            'group_views':group_views
+                            }, RequestContext(request))
 
 @permission_required('game.change_tournament')
 def tournament_edit(request, tid, text_status="", addmatch_status="", match_text=""):
