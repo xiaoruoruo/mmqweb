@@ -6,9 +6,9 @@ from django.http import HttpResponse
 from django import forms
 from django.contrib.auth import authenticate, login
 from django.db import transaction
-from django.contrib.auth.decorators import permission_required
 from django.template import RequestContext
 from django.template.loader import render_to_string
+from django.core.exceptions import PermissionDenied
 
 import parser
 from game.models import Tournament, MatchGroup, Participation, Ranking, PersonalRating
@@ -49,8 +49,7 @@ def login_user(request):
     return render_to_response('login.html',{'state':state, 'username': username},
             RequestContext(request))
 
-def tournament_index(request, tid, tournament=None):
-    t = tournament
+def tournament_index(request, tid, t=None):
     if not t:
         t = get_object_or_404(Tournament, id=tid)
     groups = t.matchgroup_set.all()
@@ -66,12 +65,27 @@ def tournament_index(request, tid, tournament=None):
         group_views.append(v)
     return render_to_response("game_index.html",
                             {'tournament':t,
-                            'group_views':group_views
+                            'group_views':group_views,
+                            'is_admin': request.user.is_authenticated() and request.user in t.admins.all(),
                             }, RequestContext(request))
 
-@permission_required('game.change_tournament')
-def tournament_edit(request, tid, text_status="", addmatch_status="", match_text=""):
-    t = Tournament.objects.get(id=tid)
+def tournament_permitted(view_func):
+    "A decorator that checks if a user can admin a specific Tournament"
+    def newf(*args, **kwargs):
+        request = args[0]
+        if 'mgid' in kwargs:
+            mg = get_object_or_404(MatchGroup, id=kwargs['mgid'])
+            t = mg.tournament
+        else:
+            t = get_object_or_404(Tournament, id=kwargs['tid'])
+        if not request.user.is_authenticated() or request.user not in t.admins.all():
+            raise PermissionDenied
+        kwargs['t'] = t
+        return view_func(*args, **kwargs)
+    return newf
+
+@tournament_permitted
+def tournament_edit(request, tid, text_status="", addmatch_status="", match_text="", t=None):
     match_group_count = t.matchgroup_set.count()
     if match_group_count > 1:
         raise NotImplementedError("need template work")
@@ -94,9 +108,8 @@ def matches(request, mgid):
     matches = sorted(mg.match_set.all(), reverse=True)
     return render_to_response("matches.html", {'mg':mg,'matches':matches}, RequestContext(request))
 
-@permission_required('game.change_tournament')
-def tournament_edit_text(request, tid):
-    t = Tournament.objects.get(id=tid)
+@tournament_permitted
+def tournament_edit_text(request, tid, t=None):
     status=u""
     if request.method == 'POST':
         form = TextForm(request.POST)
@@ -108,9 +121,8 @@ def tournament_edit_text(request, tid):
             status=u"修改失败？？"
     return tournament_edit(request, tid, text_status=status)
 
-@permission_required('game.change_tournament')
-def tournament_add_matches(request, tid):
-    t = Tournament.objects.get(id=tid)
+@tournament_permitted
+def tournament_add_matches(request, tid, t=None):
     status = u""
     if request.method == 'POST':
         form = MatchTextForm(request.POST)
@@ -118,14 +130,14 @@ def tournament_add_matches(request, tid):
             try:
                 count = do_add_matches(t, form.cleaned_data['source'])
                 status=u"添加成功%d条比赛记录！" % count
-                return tournament_edit(request, tid, addmatch_status=status)
+                return tournament_edit(request, tid=tid, addmatch_status=status)
             except parser.ParseError as e:
                 status=u"错误：%s" % (unicode(e),  )
-                return tournament_edit(request, tid, addmatch_status=status, match_text=form.cleaned_data['source'])
+                return tournament_edit(request, tid=tid, addmatch_status=status, match_text=form.cleaned_data['source'])
 
 @transaction.commit_on_success
-def tournament_add_participation(request, tid=None):
-    t = Tournament.objects.get(id=tid)
+@tournament_permitted
+def tournament_add_participation(request, tid=None, t=None):
     status=u""
     if request.method == 'POST':
         form = TextForm(request.POST)
@@ -242,7 +254,7 @@ def ranking_person(request, ranking_id, name):
         'ratings': rs,
         }, RequestContext(request))
 
-@permission_required('game.change_tournament')
+@tournament_permitted
 def ranking_run(request, mgid):
     "重新计算一个MatchGroup的所有Ranking"
     mg = get_object_or_404(MatchGroup, id=mgid)

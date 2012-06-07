@@ -3,6 +3,7 @@ import json
 import re
 from django.db.models import *
 from namebook.models import Entity
+from django.contrib.auth.models import User
 
 class Extension:
     def xget(self, key, *default):
@@ -31,7 +32,8 @@ class Tournament(Model, Extension):
     name = CharField(max_length=50)
     text = TextField(blank=True)
     extra = TextField(default="{}") # json record
-    participants= ManyToManyField('Participation', related_name='tournaments', blank=True)
+    participants = ManyToManyField('Participation', related_name='tournaments', blank=True)
+    admins = ManyToManyField(User, blank=True) # 录入人员
 
     def __unicode__(self):
         return u"%s" %(self.name)
