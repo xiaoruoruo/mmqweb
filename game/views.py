@@ -236,3 +236,12 @@ def ranking_person(request, ranking_id, name):
         'ranking': rs[0].ranking,
         'ratings': rs,
         }, RequestContext(request))
+
+@permission_required('game.change_tournament')
+def ranking_run(request, mgid):
+    "重新计算一个MatchGroup的所有Ranking"
+    mg = get_object_or_404(MatchGroup, id=mgid)
+    for ranking in mg.ranking_set.all():
+        ranker = ranking.get_ranker()
+        ranker.rank()
+    return HttpResponse("OK. Please go back")

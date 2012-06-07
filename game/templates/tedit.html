@@ -56,4 +56,19 @@ function add_match() {
     {{ addmatch_status }}
 </form>
 </div>
+
+
+<h4>积分管理</h4>
+{% for mg in match_groups %}
+    {% for ranking in mg.ranking_set.all %}
+    {% if forloop.first %}
+    <span>该比赛纳入以下积分计算。</span>
+    <a href="{% url 'game.views.ranking_run' mgid=mg.id %}">重新计算积分</a>
+    {% endif %}
+    <ul>
+        <li><a href="{% url 'game.views.ranking_index' ranking_id=ranking.id %}">{{ ranking.name }}</a></li>
+    </ul>
+    {% endfor %}
+{% endfor %}
+
 {% endblock %}
