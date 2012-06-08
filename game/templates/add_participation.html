@@ -18,7 +18,7 @@
     </blockquote>
 </div>
 
-<form action="{% url 'game.views.tournament_add_participation' tname=tournament.name %}" method="POST">
+<form action="{% url 'game.views.tournament_add_participation' tname=tournament.name %}" method="POST"> {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="增加" />
     {{ status }}

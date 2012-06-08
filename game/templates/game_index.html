@@ -5,7 +5,7 @@
     <ul>
     {% for tournament in tournaments %}
     <li>
-        {{ tournament.name }}
+        <a href="{% url 'game.views.tournament_index' tname=tournament.name %}">{{ tournament.name }}</a>
         <a href="{% url 'game.views.tournament_edit' tname=tournament.name %}">编辑</a>
     </li>
     {% endfor %}
