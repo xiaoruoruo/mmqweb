@@ -26,7 +26,10 @@ def index(request):
             'tournaments': ts,
             }, RequestContext(request))
     else:
-        return render_to_response("game_index.html", {}, RequestContext(request))
+        # show Tournament 1 by default
+        return render_to_response("game_index.html", {
+            'tournaments': Tournament.objects.filter(id=1),
+            }, RequestContext(request))
 
 def login_user(request):
     state = ""
