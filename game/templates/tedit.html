@@ -19,7 +19,7 @@ function add_match() {
 <h4>简介文字：</h4>
 <a href="javascript:edit_text();">编辑</a> 
 <span id="text">{{ form_text.initial.text }}</span>
-<form id="form_text" action="{% url 'game.views.tournament_edit_text' tid=tournament.id %}" method="POST" style="display:none">
+<form id="form_text" action="{% url 'game.views.tournament_edit_text' tname=tournament.name %}" method="POST" style="display:none">
     {% csrf_token %}
     {{ form_text.as_p }}
     <input type="submit" value="修改" />
@@ -54,7 +54,7 @@ function add_match() {
     <br/>
 </div>
 {% endif %}
-<a href="{% url 'game.views.tournament_add_participation' tid=tournament.id %}">增加参赛选手</a>
+<a href="{% url 'game.views.tournament_add_participation' tname=tournament.name %}">增加参赛选手</a>
 
 <h4>比赛记录</h4>
 {% for mg in match_groups %}
@@ -69,7 +69,7 @@ function add_match() {
     上面一行格式固定，这一行可以写评论。需要的话用[裁判:fish],[时间:2012年06月05日],[耗时:10]等来统一表示比赛的属性。弃权，犯规等导致胜方需要特别说明的情况，在这里额外用[胜者:老大]表示。
     </blockquote>
 </div>
-<form action="{% url 'game.views.tournament_add_matches' tid=tournament.id %}" method="POST">
+<form action="{% url 'game.views.tournament_add_matches' tname=tournament.name %}" method="POST">
     {% csrf_token %}
     <span class="hl_message">{{ addmatch_status }}</span>
     {{ form_match.as_p }}

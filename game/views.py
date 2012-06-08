@@ -49,9 +49,9 @@ def login_user(request):
     return render_to_response('login.html',{'state':state, 'username': username},
             RequestContext(request))
 
-def tournament_index(request, tid, t=None):
+def tournament_index(request, tname, t=None):
     if not t:
-        t = get_object_or_404(Tournament, id=tid)
+        t = get_object_or_404(Tournament, name=tname)
     groups = t.matchgroup_set.all()
     group_views = []
     for group in groups:
@@ -77,7 +77,7 @@ def tournament_permitted(view_func):
             mg = get_object_or_404(MatchGroup, id=kwargs['mgid'])
             t = mg.tournament
         else:
-            t = get_object_or_404(Tournament, id=kwargs['tid'])
+            t = get_object_or_404(Tournament, name=kwargs['tname'])
         if not request.user.is_authenticated() or request.user not in t.admins.all():
             raise PermissionDenied
         kwargs['t'] = t
@@ -85,7 +85,7 @@ def tournament_permitted(view_func):
     return newf
 
 @tournament_permitted
-def tournament_edit(request, tid, text_status="", addmatch_status="", match_text="", t=None):
+def tournament_edit(request, tname, text_status="", addmatch_status="", match_text="", t=None):
     match_group_count = t.matchgroup_set.count()
     if match_group_count > 1:
         raise NotImplementedError("need template work")
@@ -109,7 +109,7 @@ def matches(request, mgid):
     return render_to_response("matches.html", {'mg':mg,'matches':matches}, RequestContext(request))
 
 @tournament_permitted
-def tournament_edit_text(request, tid, t=None):
+def tournament_edit_text(request, tname, t=None):
     status=u""
     if request.method == 'POST':
         form = TextForm(request.POST)
@@ -119,10 +119,10 @@ def tournament_edit_text(request, tid, t=None):
             status=u"修改成功！"
         else:
             status=u"修改失败？？"
-    return tournament_edit(request, tid, text_status=status)
+    return tournament_edit(request, tname, text_status=status)
 
 @tournament_permitted
-def tournament_add_matches(request, tid, t=None):
+def tournament_add_matches(request, tname, t=None):
     status = u""
     if request.method == 'POST':
         form = MatchTextForm(request.POST)
@@ -130,19 +130,19 @@ def tournament_add_matches(request, tid, t=None):
             try:
                 count = do_add_matches(t, form.cleaned_data['source'])
                 status=u"添加成功%d条比赛记录！" % count
-                return tournament_edit(request, tid=tid, addmatch_status=status)
+                return tournament_edit(request, tname=tname, addmatch_status=status)
             except:
                 # don't know why except ParseError no longer works
                 import sys
                 e = sys.exc_info()[1]
                 status=u"错误：%s" % (unicode(e),  )
-                return tournament_edit(request, tid=tid, addmatch_status=status, match_text=form.cleaned_data['source'])
+                return tournament_edit(request, tname=tname, addmatch_status=status, match_text=form.cleaned_data['source'])
     else:
-        return redirect('game.views.tournament_edit', tid=tid)
+        return redirect('game.views.tournament_edit', tname=tname)
 
 @transaction.commit_on_success
 @tournament_permitted
-def tournament_add_participation(request, tid=None, t=None):
+def tournament_add_participation(request, tname=None, t=None):
     status=u""
     if request.method == 'POST':
         form = TextForm(request.POST)
