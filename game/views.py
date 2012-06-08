@@ -10,7 +10,6 @@ from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.core.exceptions import PermissionDenied
 
-import parser
 from game.models import Tournament, MatchGroup, Participation, Ranking, PersonalRating
 from namebook.models import Entity
 
@@ -267,4 +266,4 @@ def ranking_run(request, mgid, **kwargs):
     for ranking in mg.ranking_set.all():
         ranker = ranking.get_ranker()
         ranker.rank()
-    return HttpResponse("OK. Please go back")
+    return redirect('game.views.tournament_index', tname=mg.tournament.name)
