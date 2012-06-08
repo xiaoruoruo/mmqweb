@@ -66,14 +66,14 @@ function add_match() {
     在下面的文本框中可以一次输入多条比赛记录，比赛之间用空行空开，每条记录至少一行，格式如下：<br/>
     <blockquote>
     老大:套长 21:19 12:21 21:12<br/>
-    上面一行格式固定，这一行可以写评论。需要的话用[耗时:10],[裁判:fish]来表示各种结构化的数据，这样方便统计耗时最长的比赛。弃权，犯规等导致胜方需要特别说明的情况，在这里用[胜者:老大]表示。
+    上面一行格式固定，这一行可以写评论。需要的话用[裁判:fish],[时间:2012年06月05日],[耗时:10]等来统一表示比赛的属性。弃权，犯规等导致胜方需要特别说明的情况，在这里额外用[胜者:老大]表示。
     </blockquote>
 </div>
 <form action="{% url 'game.views.tournament_add_matches' tid=tournament.id %}" method="POST">
     {% csrf_token %}
+    <span class="hl_message">{{ addmatch_status }}</span>
     {{ form_match.as_p }}
     <input type="submit" value="确定" />
-    {{ addmatch_status }}
 </form>
 </div>
 

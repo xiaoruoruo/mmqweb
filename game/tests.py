@@ -60,6 +60,9 @@ class SimpleTest(TestCase):
         ms.sort()
         self.assertEquals([m1, m2], ms)
 
+    def testParser(self):
+        from parser import ParseError
+        self.assertRaises(ParseError, self.g.addMatch, u'A:B 21:12 12:2121:12')
 
 
 class Tizong(TestCase):

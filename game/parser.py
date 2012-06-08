@@ -6,8 +6,10 @@ import models
 class ParseError(Exception):
     pass
 
-pattern = re.compile(ur"\s*(?P<p1a>\w+)([\s、，,/]+(?P<p1b>\w+))?\s*(:|vs|胜|负|对)\s*(?P<p2a>\w+)([\s、，,/]+(?P<p2b>\w+))?\s+(?P<games>.+)", re.UNICODE | re.IGNORECASE) # 第一行语法
-score_pattern = re.compile(r"(-?\d+):(-?\d+)") # 分数语法
+pattern = re.compile(ur"\s*(?P<p1a>\w+)([\s、，,/]+(?P<p1b>\w+))?\s*(:|vs|胜|负|对)\s*(?P<p2a>\w+)([\s、，,/]+(?P<p2b>\w+))?(?P<games>\s+.+)", re.UNICODE | re.IGNORECASE) # 第一行语法
+# 分数语法
+scores_pattern = re.compile(r"([\s,]+-?\d+:-?\d+)+$")
+score_pattern = re.compile(r"(-?\d+):(-?\d+)")
 sdata_pattern = re.compile(ur"\[(\w+):([^]]+)\]", re.UNICODE) # 标注数据
 
 def updateText(match, text):
@@ -52,13 +54,14 @@ source例子见tests.py
 
         # 识别局分
         games_str = m.group("games")
-        if games_str:
-            for gm in score_pattern.finditer(games_str):
-                score1, score2 = int(gm.group(1)), int(gm.group(2))
-                game = models.Game()
-                game.score1, game.score2 = score1, score2
-                game.match = match
-                game.save()
+        if not scores_pattern.match(games_str):
+            raise ParseError(u"分数部分格式错误:%s" % games_str)
+        for gm in score_pattern.finditer(games_str):
+            score1, score2 = int(gm.group(1)), int(gm.group(2))
+            game = models.Game()
+            game.score1, game.score2 = score1, score2
+            game.match = match
+            game.save()
     else:
         raise ParseError(u"格式错误:%s" % lines[0])
 

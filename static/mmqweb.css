@@ -34,3 +34,7 @@ pre, textarea {
 .ranking_table h5 {
     text-align: center;
 }
+
+.hl_message {
+    background-color:yellow;
+}

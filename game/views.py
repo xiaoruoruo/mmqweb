@@ -131,9 +131,14 @@ def tournament_add_matches(request, tid, t=None):
                 count = do_add_matches(t, form.cleaned_data['source'])
                 status=u"添加成功%d条比赛记录！" % count
                 return tournament_edit(request, tid=tid, addmatch_status=status)
-            except parser.ParseError as e:
+            except:
+                # don't know why except ParseError no longer works
+                import sys
+                e = sys.exc_info()[1]
                 status=u"错误：%s" % (unicode(e),  )
                 return tournament_edit(request, tid=tid, addmatch_status=status, match_text=form.cleaned_data['source'])
+    else:
+        return redirect('game.views.tournament_edit', tid=tid)
 
 @transaction.commit_on_success
 @tournament_permitted
@@ -255,7 +260,7 @@ def ranking_person(request, ranking_id, name):
         }, RequestContext(request))
 
 @tournament_permitted
-def ranking_run(request, mgid):
+def ranking_run(request, mgid, **kwargs):
     "重新计算一个MatchGroup的所有Ranking"
     mg = get_object_or_404(MatchGroup, id=mgid)
     for ranking in mg.ranking_set.all():
