@@ -30,7 +30,9 @@
 {% for match in matches %}
 <div class="match">
     <pre>{{ match.asHtml|safe }}</pre>
-    <a href="{% url 'game.views.del_match' match_id=match.id %}">删除</a>
+    {% if is_admin %}
+        <a href="{% url 'game.views.del_match' match_id=match.id %}">删除</a>
+    {% endif %}
 </div>
 {% endfor %}
 
