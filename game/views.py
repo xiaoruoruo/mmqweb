@@ -21,10 +21,11 @@ class MatchTextForm(forms.Form):
 
 
 def index(request):
-    t = Tournament.objects.order_by('id')
-    if t.count()>0:
-        t = t[0]
-        return tournament_index(request, t.id, t)
+    if request.user.is_authenticated():
+        ts = Tournament.objects.filter(admins=request.user)
+        return render_to_response("game_index.html", {
+            'tournaments': ts,
+            }, RequestContext(request))
     else:
         return render_to_response("game_index.html", {}, RequestContext(request))
 
@@ -63,7 +64,7 @@ def tournament_index(request, tname, t=None):
         # except e:
         #     v = unicode(e)
         group_views.append(v)
-    return render_to_response("game_index.html",
+    return render_to_response("tindex.html",
                             {'tournament':t,
                             'group_views':group_views,
                             'is_admin': request.user.is_authenticated() and request.user in t.admins.all(),
