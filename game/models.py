@@ -110,6 +110,8 @@ class Ranking(Model, Extension):
     name = CharField(max_length=50, blank=True)
     mg = ForeignKey('MatchGroup')
 
+    _ranker = None
+
     def __unicode__(self):
         return self.name
 
@@ -129,7 +131,9 @@ class Ranking(Model, Extension):
     """
 
     def ranking(self):
-        return self.get_ranker().result()
+        if self._ranker is None:
+            self._ranker = self.get_ranker()
+        return self._ranker.result()
 
     def get_ranker(self):
         import ranker

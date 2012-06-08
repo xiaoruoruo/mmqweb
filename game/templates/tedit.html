@@ -31,7 +31,7 @@ function add_match() {
 {% if participation_list %}
     {% for p in participation_list %}
     {% if p.player.type %}
-    <span class="player_type_{{p.player.type}}">{{ p }}</span>
+    <span class="player_type_{{p.player.type}}">{{ p }}</span>&nbsp;
     {% endif %}
     {% endfor %}
     <br/>
@@ -59,6 +59,7 @@ function add_match() {
 <h4>比赛记录</h4>
 {% for mg in match_groups %}
 <a href="{% url 'game.views.matches' mgid=mg.id %}">查看全部{{ mg.match_set.count }}场比赛</a>
+<br/>
 <a href="javascript:add_match();">增加比赛记录</a>
 {% endfor %}
 <div id="add_match" style="{% if addmatch_status %} display: block {% else %} display: none {% endif %}">
