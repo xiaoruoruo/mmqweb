@@ -1,10 +1,37 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% block title %}比赛列表 - mmqweb{% endblock %}
+
+{% block head %}
+<style>
+    .match pre {
+        display: inline;
+    }
+    .match {
+        padding-bottom:1em;
+    }
+</style>
+<script type="text/javascript">
+    $(function() {
+            $(".match>a").click(function(event) {
+                $.post(event.currentTarget.href, {'csrfmiddlewaretoken': '{{ csrf_token }}'}, function(res) {
+                    if (res == "ok") {
+                        $(event.currentTarget).parent().hide('fast');
+                    }
+                });
+                return false;
+            });
+        });
+</script>
+{% endblock %}
 
 {% block content %}
 <h2>{{ mg.name }} - 比赛列表</h2>
 {% for match in matches %}
-<div class="match"><pre>{{ match.asHtml|safe }}</pre></div>
+<div class="match">
+    <pre>{{ match.asHtml|safe }}</pre>
+    <a href="{% url 'game.views.del_match' match_id=match.id %}">删除</a>
+</div>
 {% endfor %}
 
 {% endblock %}

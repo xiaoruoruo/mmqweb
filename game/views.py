@@ -2,7 +2,7 @@
 import re
 
 from django.shortcuts import get_list_or_404, get_object_or_404, render_to_response, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
 from django import forms
 from django.contrib.auth import authenticate, login
 from django.db import transaction
@@ -10,7 +10,7 @@ from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.core.exceptions import PermissionDenied
 
-from game.models import Tournament, MatchGroup, Participation, Ranking, PersonalRating
+from game.models import Tournament, MatchGroup, Participation, Ranking, PersonalRating, Match
 from namebook.models import Entity
 
 class TextForm(forms.Form):
@@ -106,7 +106,10 @@ def tournament_edit(request, tname, text_status="", addmatch_status="", match_te
 def matches(request, mgid):
     mg = MatchGroup.objects.get(id=mgid)
     matches = sorted(mg.match_set.all(), reverse=True)
-    return render_to_response("matches.html", {'mg':mg,'matches':matches}, RequestContext(request))
+    return render_to_response("matches.html", {
+        'mg':mg,'matches':matches,
+        'is_admin': request.user.is_authenticated() and request.user in mg.tournament.admins.all(),
+        }, RequestContext(request))
 
 @tournament_permitted
 def tournament_edit_text(request, tname, t=None):
@@ -139,6 +142,18 @@ def tournament_add_matches(request, tname, t=None):
                 return tournament_edit(request, tname=tname, addmatch_status=status, match_text=form.cleaned_data['source'])
     else:
         return redirect('game.views.tournament_edit', tname=tname)
+
+def del_match(request, match_id):
+    if request.method != 'POST':
+        return HttpResponseBadRequest("Bad Request")
+    if not request.user.is_authenticated():
+        raise PermissionDenied
+    m = get_object_or_404(Match, id=match_id)
+    t = m.match_group.tournament
+    if request.user not in t.admins.all():
+        raise PermissionDenied
+    m.delete()
+    return HttpResponse('ok')
 
 @transaction.commit_on_success
 @tournament_permitted
