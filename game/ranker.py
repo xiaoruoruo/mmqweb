@@ -4,7 +4,7 @@ from django.db import transaction
 from django.db.models import Max
 
 from namebook.models import Entity
-from game.models import PersonalRating
+from game.models import PersonalRating, Match
 
 class Ranker:
     def __init__(self, targets, matches):
@@ -79,10 +79,13 @@ class FishPersonalRanker(PersonalRanker):
         w = m.winner()
         if not m.player12: # is singles
             self._update(m, m.player11, 3 if w == 1 else 1, 'singles')
-            self._update(m, m.player21, 3 if w == 2 else 1, 'singles')
         else:
             self._update(m, m.player11, 3 if w == 1 else 1, 'doubles')
             self._update(m, m.player12, 3 if w == 1 else 1, 'doubles')
+
+        if not m.player22: # is singles
+            self._update(m, m.player21, 3 if w == 2 else 1, 'singles')
+        else:
             self._update(m, m.player21, 3 if w == 2 else 1, 'doubles')
             self._update(m, m.player22, 3 if w == 2 else 1, 'doubles')
 
@@ -107,6 +110,8 @@ class FishPersonalRanker(PersonalRanker):
 class EloPersonalRanker(PersonalRanker):
     INIT_RATING = 1200
     def update(self, m):
+        if m.type == Match.OneVsTwo:
+            return
         w = m.winner()
         if not m.player12: # is singles
             self._update2(m, m.player11, m.player21) if w == 1 else self._update2(m, m.player21, m.player11)

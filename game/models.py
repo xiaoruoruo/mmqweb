@@ -174,11 +174,12 @@ class Match(Model, Extension):
 #    parent_match = ForeignKey('self', related_name="sub_matches", null=True, blank=True)
     result = IntegerField(null=True, blank=True) # 比赛结果，1,2代表赢家
 
-    Team, Singles, Doubles = 1,2,3
+    Team, Singles, Doubles, OneVsTwo = 1,2,3,4
     MATCH_TYPES= (
             (Team, "Team"),
             (Singles, "单打"),
             (Doubles, "双打"),
+            (OneVsTwo, "一打二"),
             )
     type = IntegerField(choices=MATCH_TYPES)
 
@@ -282,8 +283,10 @@ class Match(Model, Extension):
 
     def save(self, *args, **kwargs):
         if not self.type:
-            if self.player12 or self.player22:
+            if self.player12 and self.player22:
                 self.type = Match.Doubles
+            elif self.player12 or self.player22:
+                self.type = Match.OneVsTwo
             elif self.player11.type == Entity.Team or self.player21.type == Entity.Team:
                 self.type = Match.Team
             else:

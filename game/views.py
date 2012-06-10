@@ -12,6 +12,7 @@ from django.core.exceptions import PermissionDenied
 
 from game.models import Tournament, MatchGroup, Participation, Ranking, PersonalRating, Match
 from namebook.models import Entity
+from django.views.decorators.cache import cache_page
 
 class TextForm(forms.Form):
     text = forms.CharField(label="", widget=forms.Textarea(attrs={'rows':'10', 'cols':'80'}))

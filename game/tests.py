@@ -64,6 +64,12 @@ class SimpleTest(TestCase):
         from parser import ParseError
         self.assertRaises(ParseError, self.g.addMatch, u'A:B 21:12 12:2121:12')
 
+    def testOneVsTwo(self):
+        m = self.g.addMatch(u'''小小 龟龟：fish 13:20''')
+        self.assertEquals(2, m.winner())
+        self.assertEquals(Match.OneVsTwo, m.type)
+
+
 
 class Tizong(TestCase):
     teams = ["电子信息与电气工程学院","农业与生物学院","国际教育学院","理学院物理系","生命科学技术学院",
@@ -192,3 +198,36 @@ class PersonalRankingTest(TestCase):
             Entity.objects.get(name=u'老大')).rating_singles)
         self.assertEquals(3.0, ranker.rating(
             Entity.objects.get(name=u'fish')).rating_singles)
+
+class PersonalRankingOneVsTwoTest(TestCase):
+    def setUp(self):
+        self.t = t = Tournament.objects.create(name=u"Personal Tournament")
+        self.tg = tg = MatchGroup.objects.create(name=u"The Group", tournament = t, view_name = "roundrobin")
+        self.r = Ranking.objects.create(name = "Ranking", type = 4, mg = tg)
+
+        matches = [
+                u'''小小 龟龟：fish 13:20''',
+                ]
+        for m in matches:
+            self.tg.addMatch(m)
+
+    def tearDown(self):
+        self.ranker.rank()
+        ranker = self.ranker
+        # for r in PersonalRating.objects.all():
+        #     print r
+        self.assertEquals(None, ranker.rating(Entity.objects.get(name=u'fish')).rating_doubles)
+        self.assertEquals(None, ranker.rating(Entity.objects.get(name=u'小小')).rating_singles)
+        self.assertEquals(None, ranker.rating(Entity.objects.get(name=u'龟龟')).rating_singles)
+        self.assertTrue(ranker.rating(Entity.objects.get(name=u'fish')).rating_singles >
+                ranker.rating(Entity.objects.get(name=u'小小')).rating_doubles)
+        self.assertTrue(ranker.rating(Entity.objects.get(name=u'fish')).rating_singles >
+                ranker.rating(Entity.objects.get(name=u'龟龟')).rating_doubles)
+
+    def testFish(self):
+        from game.ranker import FishPersonalRanker
+        self.ranker = FishPersonalRanker(self.r)
+
+    def testElo(self):
+        from game.ranker import EloPersonalRanker
+        self.ranker = EloPersonalRanker(self.r)
