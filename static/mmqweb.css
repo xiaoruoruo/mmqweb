@@ -38,3 +38,8 @@ pre, textarea {
 .hl_message {
     background-color:yellow;
 }
+
+#id_same_comments {
+    width: 50em;
+    display: block;
+}

@@ -18,6 +18,7 @@ class TextForm(forms.Form):
     text = forms.CharField(label="", widget=forms.Textarea(attrs={'rows':'10', 'cols':'80'}))
 class MatchTextForm(forms.Form):
     source = forms.CharField(label="", widget=forms.Textarea(attrs={'rows':'15', 'cols':'80'}))
+    same_comments = forms.CharField(label="统一属性（所有比赛有相同的时间属性时不用输入多变了）")
 
 
 def index(request):
@@ -89,13 +90,13 @@ def tournament_permitted(view_func):
     return newf
 
 @tournament_permitted
-def tournament_edit(request, tname, text_status="", addmatch_status="", match_text="", t=None):
+def tournament_edit(request, tname, text_status="", addmatch_status="", match_text="", same_comments="", t=None):
     match_group_count = t.matchgroup_set.count()
     if match_group_count > 1:
         raise NotImplementedError("need template work")
     match_groups = t.matchgroup_set.all()
     form_text = TextForm(initial={'text':t.text})
-    form_match = MatchTextForm(initial={'source':match_text})
+    form_match = MatchTextForm(initial={'source':match_text, 'same_comments': same_comments})
     p_list = t.participants.all()
     player_notypes = [p.player for p in t.participants.all() if not p.player.type]
     return render_to_response("tedit.html",
@@ -135,7 +136,7 @@ def tournament_add_matches(request, tname, t=None):
         form = MatchTextForm(request.POST)
         if form.is_valid():
             try:
-                count = do_add_matches(t, form.cleaned_data['source'])
+                count = do_add_matches(t, form.cleaned_data['source'], form.cleaned_data['same_comments'])
                 status=u"添加成功%d条比赛记录！" % count
                 return tournament_edit(request, tname=tname, addmatch_status=status)
             except:
@@ -143,7 +144,8 @@ def tournament_add_matches(request, tname, t=None):
                 import sys
                 e = sys.exc_info()[1]
                 status=u"错误：%s" % (unicode(e),  )
-                return tournament_edit(request, tname=tname, addmatch_status=status, match_text=form.cleaned_data['source'])
+                return tournament_edit(request, tname=tname, addmatch_status=status,
+                        match_text=form.cleaned_data['source'], same_comments=form.cleaned_data['same_comments'])
     else:
         return redirect('game.views.tournament_edit', tname=tname)
 
@@ -196,30 +198,32 @@ def tournament_add_participation(request, tname=None, t=None):
     return render_to_response("add_participation.html", {'tournament':t, 'form': form, 'status': status})
 
 @transaction.commit_on_success
-def do_add_matches(tournament, source):
+def do_add_matches(tournament, source, same_comments):
     mgs = list(tournament.matchgroup_set.all())
     if len(mgs) != 1:
         raise NotImplementedError()
     mg = mgs[0]
     count = 0
-    for record in parse_blocks(source):
+    for record in parse_blocks(source, same_comments):
         mg.addMatch(record)
         count+=1
     return count
 
-def parse_blocks(source):
+def parse_blocks(source, same_comments):
+    if same_comments:
+        same_comments = '\n' + same_comments
     block = None
     for line in source.split('\n'):
         line=line.strip()
         if line=="":
-            if block: yield block
+            if block: yield block + same_comments
             block = None
         else:
             if block:
                 block += "\n" + line
             else:
                 block = line
-    if block: yield block
+    if block: yield block + same_comments
 
 # MatchGroup views
 def find_match_group_view(name):
