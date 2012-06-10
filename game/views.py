@@ -1,5 +1,6 @@
 # encoding:utf-8
 import re
+from datetime import datetime
 
 from django.shortcuts import get_list_or_404, get_object_or_404, render_to_response, redirect
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -90,7 +91,9 @@ def tournament_permitted(view_func):
     return newf
 
 @tournament_permitted
-def tournament_edit(request, tname, text_status="", addmatch_status="", match_text="", same_comments="", t=None):
+def tournament_edit(request, tname, text_status="", addmatch_status="", match_text="", same_comments=None, t=None):
+    if same_comments is None:
+        same_comments = u'[时间:%s]' % datetime.today().strftime(u"%Y年%m月%d日".encode('utf8')).decode('utf8')
     match_group_count = t.matchgroup_set.count()
     if match_group_count > 1:
         raise NotImplementedError("need template work")
