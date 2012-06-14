@@ -130,7 +130,7 @@ def tournament_edit_text(request, tname, t=None):
             status=u"修改成功！"
         else:
             status=u"修改失败？？"
-    return tournament_edit(request, tname, text_status=status)
+    return tournament_edit(request, tname=tname, text_status=status)
 
 @tournament_permitted
 def tournament_add_matches(request, tname, t=None):
