@@ -13,13 +13,12 @@ from django.core.exceptions import PermissionDenied
 
 from game.models import Tournament, MatchGroup, Participation, Ranking, PersonalRating, Match
 from namebook.models import Entity
-from django.views.decorators.cache import cache_page
 
 class TextForm(forms.Form):
-    text = forms.CharField(label="", widget=forms.Textarea(attrs={'rows':'10', 'cols':'80'}))
+    text = forms.CharField(label="", widget=forms.Textarea(attrs={'rows':'10', 'cols':'80'}), required=False)
 class MatchTextForm(forms.Form):
-    source = forms.CharField(label="", widget=forms.Textarea(attrs={'rows':'15', 'cols':'80'}))
-    same_comments = forms.CharField(label="统一属性（所有比赛有相同的时间属性时不用输入多变了）")
+    source = forms.CharField(label="", widget=forms.Textarea(attrs={'rows':'15', 'cols':'80'}), required=True)
+    same_comments = forms.CharField(label="统一属性（所有比赛有相同的时间属性时不用输入多变了）", required=False)
 
 
 def index(request):
