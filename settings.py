@@ -95,9 +95,11 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'south',
     'pipeline',
+    'tastypie',
     'mmqweb.namebook',
     'mmqweb.fight',
     'mmqweb.game',
+    'mmqweb.club',
 )
 
 LOGIN_REDIRECT_URL = '/mmqweb/'
