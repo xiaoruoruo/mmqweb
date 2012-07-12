@@ -1,0 +1,8 @@
+<button ng-click='save()'>保存签到表</button>
+<br/>
+首字母过滤：<input ng-model="query">
+<ul class="flat">
+    <li ng-repeat="member in members | filter:doFilter">
+        <a href='#/checkin/{{member.name}}' ng-class='{checkedin:isCheckin(member)}'>{{member.name}}</a>
+    </li>
+</ul>

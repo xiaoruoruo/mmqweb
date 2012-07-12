@@ -1,6 +1,10 @@
+import datetime
+
 from django.db import models
 from tastypie.resources import ModelResource
 from tastypie import fields
+from tastypie.authentication import BasicAuthentication
+from tastypie.authorization import DjangoAuthorization
 
 from xpinyin import Pinyin
 pinyin = Pinyin()
@@ -23,7 +27,10 @@ class Member(models.Model):
 class Activity(models.Model):
     member = models.ForeignKey(Member)
     weight = models.FloatField(default=1.0)
-    date   = models.DateField()
+    date   = models.DateField(default=datetime.date.today())
+
+    def __unicode__(self):
+        return u'%s * %.1f @ %s' % (self.member, self.weight, self.date)
 
 class MemberResource(ModelResource):
     class Meta:
@@ -31,5 +38,15 @@ class MemberResource(ModelResource):
         resource_name = 'member'
         fields = ['name', 'weight']
         limit = 0
+        include_resource_uri = False
     index = fields.CharField(attribute='index')
+
+class ActivityResource(ModelResource):
+    class Meta:
+        queryset = Activity.objects.all()
+        resource_name = 'activity'
+        list_allowed_methods = ['put']
+        detail_allowed_methods = []
+
+    authorization = DjangoAuthorization()
 

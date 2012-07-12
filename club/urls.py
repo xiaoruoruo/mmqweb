@@ -1,10 +1,16 @@
-from django.conf.urls.defaults import *
-from django.conf.urls.static import static
-from club.models import MemberResource
+import os
 
-member_resource = MemberResource()
+from django.conf.urls.defaults import patterns, include
+from django.conf.urls.static import static
+from tastypie.api import Api
+from club.models import MemberResource, ActivityResource
+
+v1_api = Api(api_name='')
+v1_api.register(MemberResource())
+v1_api.register(ActivityResource())
 
 urlpatterns = patterns('',
-                       (r'^api/', include(member_resource.urls)),
+                       (r'^api', include(v1_api.urls)),
+                       (r'^checkin$', 'club.views.checkin'),
                        ) + \
-                static('/', document_root='/Users/xrsun/Programs/mmqweb/club/templates')
+                static('/', document_root=os.path.join(os.path.dirname(__file__), 'templates'))

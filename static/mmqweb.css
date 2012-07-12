@@ -8,9 +8,7 @@ pre, textarea {
     line-height:150%;
 }
 
-.match {
-//    width: 250px;
-//    border-bottom:1px solid black;
+.match { //    width: 250px; //    border-bottom:1px solid black;
 }
 
 .ranking_table {
@@ -43,3 +41,19 @@ pre, textarea {
     width: 50em;
     display: block;
 }
+
+ul.flat > li {
+    float:left;
+    list-style-type: none;
+    padding-right: 1em;
+}
+
+ul.flat a {
+    text-decoration: none;
+    color: black;
+}
+
+ul.flat a.checkedin {
+    color: red;
+}
+
