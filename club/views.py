@@ -1,7 +1,6 @@
-from club.models import Member
-from django.http import HttpResponse
+from django.shortcuts import get_list_or_404, get_object_or_404, render_to_response, redirect
+from django.template import RequestContext
 
-def index(request):
-    members = Member.objects.order_by('-weight')
-    s = ''
-    return HttpResponse(s)
+def checkin(request):
+    return render_to_response("checkin.html", {
+        }, RequestContext(request))
