@@ -12,5 +12,6 @@ v1_api.register(ActivityResource())
 urlpatterns = patterns('',
                        (r'^api', include(v1_api.urls)),
                        (r'^checkin$', 'club.views.checkin'),
+                       (r'^new_member$', 'club.views.new_member'),
                        ) + \
                 static('/', document_root=os.path.join(os.path.dirname(__file__), 'templates'))

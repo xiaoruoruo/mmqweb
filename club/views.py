@@ -17,3 +17,12 @@ def checkin(request):
             a = Activity(member = member, weight = o['weight'])
             a.save()
     return HttpResponse("'ok'")
+
+@transaction.commit_on_success
+def new_member(request):
+    if request.method == 'POST':
+        l = json.loads( request.raw_post_data )
+        print l
+        member = Member(name = l['name'], male = l['male'])
+        member.save()
+    return HttpResponse("'ok'")

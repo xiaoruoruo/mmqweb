@@ -3,8 +3,6 @@ import datetime
 from django.db import models
 from tastypie.resources import ModelResource
 from tastypie import fields
-from tastypie.authentication import BasicAuthentication
-from tastypie.authorization import DjangoAuthorization
 
 from xpinyin import Pinyin
 pinyin = Pinyin()
@@ -14,7 +12,7 @@ class Member(models.Model):
     male  = models.BooleanField()
     phone = models.CharField(max_length=15, null=True)
     affiliation = models.CharField(max_length=20, null=True)
-    weight = models.FloatField()
+    weight = models.FloatField(default=0.0)
 
     def __unicode__(self):
         return self.name
@@ -36,9 +34,14 @@ class MemberResource(ModelResource):
     class Meta:
         queryset = Member.objects.order_by('-weight')
         resource_name = 'member'
-        fields = ['name', 'weight']
+        fields = ['name']
         limit = 0
         include_resource_uri = False
+
+        # change to SessionAuthentication and DjangoAuthorization once tastypie 0.9.12 is out
+        # authentication = Authentication()
+        # authorization = Authorization()
+
     index = fields.CharField(attribute='index')
 
 class ActivityResource(ModelResource):
@@ -47,6 +50,4 @@ class ActivityResource(ModelResource):
         resource_name = 'activity'
         list_allowed_methods = ['put']
         detail_allowed_methods = []
-
-    authorization = DjangoAuthorization()
 

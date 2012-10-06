@@ -1,3 +1,4 @@
+# run with: bin/gunicorn_django -c gunicorn_conf.py
 bind = '0.0.0.0:8557'
 workers = 4
 accesslog = 'access.log'
