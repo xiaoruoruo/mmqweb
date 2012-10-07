@@ -23,7 +23,16 @@ function OutCtrl($scope, $http) {
     }
 
     $scope.add_member = function(name, is_girl, cb) {
-        // TODO prevent adding an existing member (same name)
+        // prevent adding an existing member (same name)
+        for (var mi in $scope.members) {
+            var m = $scope.members[mi];
+            if (m['name'] == name) {
+                $scope.server_message = name + " 会员已在名单中，再找找";
+                return;
+            }
+            break;
+        }
+
         $http.post('new_member', JSON.stringify({'name': name, 'male': !is_girl}))
              .success(function() {
                  $scope.members.push({'name': name});
@@ -51,12 +60,13 @@ function ClubCtrl($scope, $http, $routeParams, $location) {
     }
 
     $scope.new_member = function(do_checkin) {
-        console.log(do_checkin);
         var name = $scope.name_new_member;
         var is_girl = $scope.girl_new_member;
         $scope.add_member(name, is_girl, function () {
             if (do_checkin) {
                 $location.path('/checkin/' + name);
+            } else {
+                $scope.server_message = "已添加会员 " + name;
             }
         });
     }
