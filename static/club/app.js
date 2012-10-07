@@ -36,7 +36,7 @@ function OutCtrl($scope, $http) {
             break;
         }
 
-        $http.post('new_member', JSON.stringify({'name': name, 'male': !is_girl}))
+        $http.post('new_member', {'name': name, 'male': !is_girl})
              .success(function() {
                  $scope.members.push({'name': name});
                  cb();
@@ -62,6 +62,7 @@ function ClubCtrl($scope, $http, $routeParams, $location) {
     }
 
     $scope.checkin_click = function(member) {
+        $scope.query = "";
         if ($scope.isCheckin(member)) {
             $location.path('/checkin/' + member.name);
         } else {
@@ -71,7 +72,6 @@ function ClubCtrl($scope, $http, $routeParams, $location) {
     }
 
     $scope.checkin_weight = function(name, weight) {
-        console.log(name);
         $scope.do_checkin(name, weight);
         $location.path('/');
     }
