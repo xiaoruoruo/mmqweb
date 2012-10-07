@@ -1,10 +1,10 @@
 <h3>
-    名单<span style="font-size:10pt">（单击姓名来点名，红色表示已签到）</span>
+    名单<span style="font-size:10pt">（单击姓名来点名，红色表示已签到，再单击红色算多次）</span>
 </h3>
 首字母过滤：<input ng-model="query">
 <ul class="flat">
     <li ng-repeat="member in members | filter:doFilter">
-        <a href='#/checkin/{{member.name}}' ng-class='{checkedin:isCheckin(member)}'>{{member.name}}</a>
+        <a ng-click='checkin_click(member)' ng-class='{checkedin:isCheckin(member)}'>{{member.name}}</a>
     </li>
 </ul>
 

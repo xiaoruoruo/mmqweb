@@ -44,9 +44,11 @@ function OutCtrl($scope, $http) {
     }
     
     $scope.do_checkin = function(name, weight) {
+        if (!$scope.checkins[name]) {
+            $scope.checkin_count ++;
+            $scope.server_message = "已经点了" + $scope.checkin_count + "位会员";
+        }
         $scope.checkins[name] = weight;
-        $scope.checkin_count ++;
-        console.log($scope.server_message);
     }
 }
 
@@ -59,8 +61,17 @@ function ClubCtrl($scope, $http, $routeParams, $location) {
         return angular.lowercase(elem.index).indexOf(angular.lowercase($scope.query)) == 0;
     }
 
-    // TODO 默认weight = 1，节省一次点击
-    $scope.checkin = function(name, weight) {
+    $scope.checkin_click = function(member) {
+        if ($scope.isCheckin(member)) {
+            $location.path('/checkin/' + member.name);
+        } else {
+            // 默认weight = 1，节省一次点击
+            $scope.do_checkin(member.name, 1.0);
+        }
+    }
+
+    $scope.checkin_weight = function(name, weight) {
+        console.log(name);
         $scope.do_checkin(name, weight);
         $location.path('/');
     }
