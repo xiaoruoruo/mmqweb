@@ -9,7 +9,7 @@
 </ul>
 
 <div style="clear:both">
-    新会员：<input ng-model="name_new_member"> 女生<input type="checkbox" ng-model="girl_new_member">
+    新会员：<input ng-model="name_new_member"> 女生<input type="checkbox" ng-model="girl_new_member" ng-true-value="1" ng-false-value="0">
     <button ng-click='new_member(false)'>添加</button> 
     <button ng-click='new_member(true)'>添加并签到</button>
 </div>

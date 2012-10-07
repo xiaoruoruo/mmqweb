@@ -11,13 +11,16 @@ function OutCtrl($scope, $http) {
         $scope.members = data.objects;
     });
     $scope.checkins = {};
+    $scope.checkin_count = 0;
     $scope.server_message = "";
+    console.log("OutCtrl");
     $scope.save = function() {
         list = [];
         for (var name in $scope.checkins)
             list.push({'name':name, 'weight':$scope.checkins[name]});
         $http.post('checkin', data=list).success(function() {
             $scope.checkins = {};
+            $scope.checkin_count = 0;
             $scope.server_message = "保存成功！"
         });
     }
@@ -39,19 +42,26 @@ function OutCtrl($scope, $http) {
                  cb();
               });
     }
+    
+    $scope.do_checkin = function(name, weight) {
+        $scope.checkins[name] = weight;
+        $scope.checkin_count ++;
+        console.log($scope.server_message);
+    }
 }
 
 function ClubCtrl($scope, $http, $routeParams, $location) {
     $scope.name = $routeParams.name;
-    $scope.girl_new_member = false;
+    console.log("ClubCtrl");
 
     $scope.doFilter = function(elem) {
         if (!$scope.query) return true;
         return angular.lowercase(elem.index).indexOf(angular.lowercase($scope.query)) == 0;
     }
 
+    // TODO 默认weight = 1，节省一次点击
     $scope.checkin = function(name, weight) {
-        $scope.checkins[name] = weight;
+        $scope.do_checkin(name, weight);
         $location.path('/');
     }
 
@@ -61,7 +71,7 @@ function ClubCtrl($scope, $http, $routeParams, $location) {
 
     $scope.new_member = function(do_checkin) {
         var name = $scope.name_new_member;
-        var is_girl = $scope.girl_new_member;
+        var is_girl = $scope.girl_new_member == "1";
         $scope.add_member(name, is_girl, function () {
             if (do_checkin) {
                 $location.path('/checkin/' + name);
