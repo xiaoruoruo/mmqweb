@@ -15,6 +15,11 @@ function OutCtrl($scope, $http) {
     $scope.server_message = "";
     console.log("OutCtrl");
     $scope.save = function() {
+        console.log($scope.info.date);
+        if ($scope.checkin_count == 0) {
+            $scope.server_message = "还没有点一个名不能保存";
+            return;
+        }
         list = [];
         for (var name in $scope.checkins)
             list.push({'name':name, 'weight':$scope.checkins[name]});
