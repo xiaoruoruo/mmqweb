@@ -12,10 +12,10 @@ function OutCtrl($scope, $http) {
     });
     $scope.checkins = {};
     $scope.checkin_count = 0;
+    $scope.info = {'date': function(d) { return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate(); } (new Date()) };
     $scope.server_message = "";
     console.log("OutCtrl");
     $scope.save = function() {
-        console.log($scope.info.date);
         if ($scope.checkin_count == 0) {
             $scope.server_message = "还没有点一个名不能保存";
             return;
@@ -23,7 +23,7 @@ function OutCtrl($scope, $http) {
         list = [];
         for (var name in $scope.checkins)
             list.push({'name':name, 'weight':$scope.checkins[name]});
-        $http.post('checkin', data=list).success(function() {
+        $http.post('checkin', data={'list': list, 'date': $scope.info.date}).success(function() {
             $scope.checkins = {};
             $scope.checkin_count = 0;
             $scope.server_message = "保存成功！"
