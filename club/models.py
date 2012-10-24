@@ -1,3 +1,4 @@
+# encoding: utf8
 import datetime
 
 from django.db import models
@@ -14,6 +15,8 @@ class Member(models.Model):
     affiliation = models.CharField(max_length=20, null=True)
     weight = models.FloatField(default=0.0)
 
+    balance = models.FloatField(default=0.0)
+
     def __unicode__(self):
         return self.name
 
@@ -24,11 +27,19 @@ class Member(models.Model):
 
 class Activity(models.Model):
     member = models.ForeignKey(Member)
+    # 算几次
     weight = models.FloatField(default=1.0)
     date   = models.DateField(default=datetime.date.today())
 
+    cost   = models.FloatField()
+    deposit= models.FloatField(null=True)
+
     def __unicode__(self):
-        return u'%s * %.1f @ %s' % (self.member, self.weight, self.date)
+        s = u'%s * %.1f @ %s' % (self.member, self.weight, self.date)
+        s += u' -￥%d' % self.cost
+        if self.deposit:
+            s += u' +￥%d' % self.deposit
+        return s
 
 class MemberResource(ModelResource):
     class Meta:

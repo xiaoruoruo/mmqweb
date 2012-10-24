@@ -1,5 +1,12 @@
 {{name}}：算几次？
 
 <ul class="flat">
-    <li ng-repeat="w in [0.5,1.0,1.5,2.0]"><button ng-click="checkin_weight(name,w)">{{w}}</button></li>
+    <li ng-repeat="w in [0, 0.5,1.0,1.5,2.0]"><button ng-click="checkin_weight(name,w)">{{w}}</button></li>
 </ul>
+
+<p style="clear:both">
+<br/>
+<b>缴费</b>
+<input ng-model="deposit">
+<button ng-click="checkin_deposit(name,deposit)">保存</button>
+</p>

@@ -21,10 +21,25 @@ def checkin(request):
         print l
         for o in l:
             print o
+            deposit = o['deposit']
             member = get_object_or_404(Member, name=o['name'])
-            a = Activity(member = member, weight = o['weight'], date = date)
+            cost = determine_cost(member, o['weight'])
+
+            a = Activity(
+                member = member,
+                weight = o['weight'],
+                date = date,
+                cost = cost,
+                deposit = deposit,
+            )
             a.save()
     return HttpResponse("'ok'")
+
+def determine_cost(member, weight):
+    if member.male:
+        return weight * 15.0
+    else:
+        return weight * 10.0
 
 re_date = re.compile(r'(\d\d\d\d)-(\d\d?)-(\d\d?)')
 def parse_date(date_string):

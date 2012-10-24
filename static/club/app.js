@@ -11,6 +11,7 @@ function OutCtrl($scope, $http) {
         $scope.members = data.objects;
     });
     $scope.checkins = {};
+    $scope.deposits = {};
     $scope.checkin_count = 0;
     $scope.info = {'date': function(d) { return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate(); } (new Date()) };
     $scope.server_message = "";
@@ -22,9 +23,14 @@ function OutCtrl($scope, $http) {
         }
         list = [];
         for (var name in $scope.checkins)
-            list.push({'name':name, 'weight':$scope.checkins[name]});
+            list.push({
+                'name':name,
+                'weight':$scope.checkins[name],
+                'deposit':$scope.deposits[name] || null,
+            });
         $http.post('checkin', data={'list': list, 'date': $scope.info.date}).success(function() {
             $scope.checkins = {};
+            $scope.deposits = {};
             $scope.checkin_count = 0;
             $scope.server_message = "保存成功！"
         });
@@ -55,10 +61,15 @@ function OutCtrl($scope, $http) {
         }
         $scope.checkins[name] = weight;
     }
+
+    $scope.do_deposit = function(name, deposit) {
+        $scope.deposits[name] = deposit;
+    }
 }
 
 function ClubCtrl($scope, $http, $routeParams, $location) {
     $scope.name = $routeParams.name;
+    $scope.deposit = $scope.deposits[$scope.name];
     console.log("ClubCtrl");
 
     $scope.doFilter = function(elem) {
@@ -78,6 +89,11 @@ function ClubCtrl($scope, $http, $routeParams, $location) {
 
     $scope.checkin_weight = function(name, weight) {
         $scope.do_checkin(name, weight);
+        $location.path('/');
+    }
+
+    $scope.checkin_deposit = function(name, deposit) {
+        $scope.do_deposit(name, deposit);
         $location.path('/');
     }
 

@@ -1,6 +1,6 @@
 日期：<input ng-model="info.date">
 <h3>
-    名单<span style="font-size:10pt">（单击姓名来点名，红色表示已签到，再单击红色算多次）</span>
+    名单<span style="font-size:10pt">（单击姓名来点名，红色表示已签到，再单击红色算多次、缴费）</span>
 </h3>
 首字母过滤：<input ng-model="query">
 <ul class="flat">
@@ -15,5 +15,13 @@
     <button ng-click='new_member(true)'>添加并签到</button>
 </div>
 
-<button ng-click='save()'>保存签到表</button>
+<button style="font-size:14pt" ng-click='save()'>保存签到表、缴费表</button>
 <span>{{server_message}}</span>
+
+
+<h3>本次缴费情况</h3>
+<ul>
+<li ng-repeat="(name,amount) in deposits">
+{{name}}: {{amount}}
+</li>
+</ul>
