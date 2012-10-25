@@ -93,6 +93,9 @@ function ClubCtrl($scope, $http, $routeParams, $location) {
     }
 
     $scope.checkin_deposit = function(deposit) {
+        deposit = Number(deposit);
+        if (isNaN(deposit)) return;
+        if (deposit < 0) return;
         $scope.do_deposit($scope.name, deposit);
         $location.path('/');
     }

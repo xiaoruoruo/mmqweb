@@ -18,7 +18,6 @@ def checkin(request):
         date = parse_date(data['date'])
 
         l = data['list']
-        print l
         for o in l:
             print o
             deposit = o['deposit']
@@ -33,6 +32,12 @@ def checkin(request):
                 deposit = deposit,
             )
             a.save()
+
+            member.balance -= cost
+            if deposit:
+                member.balance += deposit
+            member.save()
+
     return HttpResponse("'ok'")
 
 def determine_cost(member, weight):

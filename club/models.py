@@ -18,7 +18,7 @@ class Member(models.Model):
     balance = models.FloatField(default=0.0)
 
     def __unicode__(self):
-        return self.name
+        return u'%s (balance: %.2f)' % (self.name, self.balance)
 
     @property
     def index(self):
@@ -35,7 +35,7 @@ class Activity(models.Model):
     deposit= models.FloatField(null=True)
 
     def __unicode__(self):
-        s = u'%s * %.1f @ %s' % (self.member, self.weight, self.date)
+        s = u'%s * %.1f @ %s' % (self.member.name, self.weight, self.date)
         s += u' -￥%d' % self.cost
         if self.deposit:
             s += u' +￥%d' % self.deposit

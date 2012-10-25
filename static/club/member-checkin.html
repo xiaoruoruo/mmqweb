@@ -4,9 +4,11 @@
     <li ng-repeat="w in [0, 0.5,1.0,1.5,2.0]"><button ng-click="checkin_weight(name,w)" ng-class="weight_style(w)">{{w}}</button></li>
 </ul>
 
+<form name="depositForm">
 <p style="clear:both">
 <br/>
 <b>缴费</b>
-<input ng-model="deposit">
+<input type="number" name="money" min="0" ng-model="deposit">
 <button ng-click="checkin_deposit(deposit)">保存</button>
 </p>
+</form>
