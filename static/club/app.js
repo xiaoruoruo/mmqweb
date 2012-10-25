@@ -3,6 +3,8 @@ angular.module('club', []).
     $routeProvider.
         when('/', {templateUrl: '/static/club/member-list.html', controller: ClubCtrl}).
         when('/checkin/:name', {templateUrl: '/static/club/member-checkin.html', controller: ClubCtrl}).
+        when('/members', {templateUrl: '/static/club/members.html', controller: MemberCtrl}).
+        when('/member/:name', {templateUrl: '/static/club/member_detail.html', controller: MemberCtrl}).
         otherwise({redirectTo: '/'});
 }]);
 
@@ -125,3 +127,12 @@ function ClubCtrl($scope, $http, $routeParams, $location) {
     }
 }
 
+function MemberCtrl($scope, $http, $routeParams, $location) {
+    $scope.name = $routeParams.name;
+    $scope.member = get_member($scope.name); // filter from members where name matches
+    // call a http get for recent activities of this member.
+    
+    $scope.view_member = function(member) {
+        $location.path('/member/' + member.name);
+    }
+}
