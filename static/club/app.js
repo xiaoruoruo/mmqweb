@@ -92,8 +92,8 @@ function ClubCtrl($scope, $http, $routeParams, $location) {
         $location.path('/');
     }
 
-    $scope.checkin_deposit = function(name, deposit) {
-        $scope.do_deposit(name, deposit);
+    $scope.checkin_deposit = function(deposit) {
+        $scope.do_deposit($scope.name, deposit);
         $location.path('/');
     }
 
@@ -111,6 +111,14 @@ function ClubCtrl($scope, $http, $routeParams, $location) {
                 $scope.server_message = "已添加会员 " + name;
             }
         });
+    }
+
+    $scope.weight_style = function(w) {
+        if ($scope.checkins[$scope.name] == w) {
+            return 'weight_selected';
+        } else {
+            return '';
+        }
     }
 }
 

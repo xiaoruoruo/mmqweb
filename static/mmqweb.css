@@ -57,3 +57,6 @@ ul.flat a.checkedin {
     color: red;
 }
 
+.weight_selected {
+    background-color: yellow;
+}
