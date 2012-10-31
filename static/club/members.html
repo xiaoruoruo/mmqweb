@@ -1,0 +1,10 @@
+首字母过滤：<input ng-model="query">
+<table>
+    <tr><th>会员</th><th>余额</th><th>最近活动</th></tr>
+    <tr ng-repeat="member in members | filter:doFilter">
+        <td>{{member.name}}</td>
+        <td>{{member.balance}}</td>
+        <td><a ng-click='view_member(member)'>查看</a></td>
+    </tr>
+</table>
+

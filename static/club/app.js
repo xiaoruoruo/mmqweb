@@ -127,12 +127,15 @@ function ClubCtrl($scope, $http, $routeParams, $location) {
     }
 }
 
-function MemberCtrl($scope, $http, $routeParams, $location) {
+function MemberCtrl($scope, $http, $routeParams, $location, $filter) {
     $scope.name = $routeParams.name;
-    $scope.member = get_member($scope.name); // filter from members where name matches
-    // call a http get for recent activities of this member.
-    
+
     $scope.view_member = function(member) {
         $location.path('/member/' + member.name);
     }
+
+    $scope.member = $filter('filter')($scope.members, {'name': $scope.name})[0];
+    // call a http get for recent activities of this member.
+    
+
 }
