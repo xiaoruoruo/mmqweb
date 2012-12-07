@@ -1,0 +1,24 @@
+{% load url from future %}
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Balance</title>
+        <link rel="Stylesheet" type="text/css" href="/static/mmqweb.css" >
+    </head>
+    <body>
+        <table>
+            <thead>
+                <th>姓名</th>
+                <th>余额</th>
+            </thead>
+            {% for m in members %}
+            <tr>
+                <td><a href="{% url 'club.views.activity_sheet' name=m.name %}">{{m.name}}</a></td>
+                <td>{{m.balance}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>
+

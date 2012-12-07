@@ -13,5 +13,7 @@ urlpatterns = patterns('',
                        (r'^api', include(v1_api.urls)),
                        (r'^checkin$', 'club.views.checkin'),
                        (r'^new_member$', 'club.views.new_member'),
+                       (r'^balance_sheet$', 'club.views.balance_sheet'),
+                       (r'^activity/(?P<name>.+)$', 'club.views.activity_sheet'),
                        ) + \
                 static('/', document_root=os.path.join(os.path.dirname(__file__), 'templates'))

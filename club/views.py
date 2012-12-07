@@ -40,6 +40,22 @@ def checkin(request):
 
     return HttpResponse("'ok'")
 
+def balance_sheet(request):
+    members = Member.objects.all()
+    return render_to_response('balance_sheet.html',
+            {'members':members},
+            RequestContext(request))
+
+def activity_sheet(request, name):
+    member = Member.objects.get(name=name)
+    acts = Activity.objects.filter(member=member)
+    return render_to_response('activity_sheet.html',
+            {
+                'activities':acts,
+                'member': member,
+            },
+            RequestContext(request))
+
 def determine_cost(member, weight):
     if member.male:
         return weight * 15.0

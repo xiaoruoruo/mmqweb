@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Activity</title>
+        <link rel="Stylesheet" type="text/css" href="/static/mmqweb.css" >
+    </head>
+    <body>
+        <span>{{member.name}}</span>
+        当前余额:
+        <span>{{member.balance}}</span>
+
+        <table>
+            <thead>
+                <th>日期</th>
+                <th>消费</th>
+                <th>付款</th>
+            </thead>
+            {% for a in activities %}
+            <tr>
+                <td>{{a.date}}</td>
+                <td>{{a.cost}}</td>
+                <td>{{a.deposit}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>
+
+
