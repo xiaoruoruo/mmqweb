@@ -2,25 +2,32 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Activity</title>
+        <title>{{member.name}} - 活动记录</title>
         <link rel="Stylesheet" type="text/css" href="/static/mmqweb.css" >
     </head>
     <body>
+        会员：
         <span>{{member.name}}</span>
-        当前余额:
-        <span>{{member.balance}}</span>
+        <br/>
+        当前余额：
+        <span class="{{ member.is_low_balance|yesno:"low_balance," }}">{{member.balance}}</span>
 
-        <table>
+        <br/>
+        活动记录：
+
+        <table class="sheet">
             <thead>
                 <th>日期</th>
                 <th>消费</th>
-                <th>付款</th>
+                <th>充值</th>
+                <th>余额</th>
             </thead>
-            {% for a in activities %}
+            {% for a,running in activities %}
             <tr>
-                <td>{{a.date}}</td>
-                <td>{{a.cost}}</td>
-                <td>{{a.deposit}}</td>
+                <td>{{a.date|date:"Y-m-d"}}</td>
+                <td>{{a.cost|default:"-"}}</td>
+                <td>{{a.deposit|default:"-"}}</td>
+                <td>{{running}}</td>
             </tr>
             {% endfor %}
         </table>

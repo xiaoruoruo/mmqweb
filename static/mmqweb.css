@@ -48,7 +48,7 @@ ul.flat > li {
     padding-right: 1em;
 }
 
-ul.flat a {
+a {
     text-decoration: none;
     color: black;
 }
@@ -59,4 +59,21 @@ ul.flat a.checkedin {
 
 .weight_selected {
     background-color: yellow;
+}
+
+.low_balance {
+    color: red;
+}
+
+table.sheet {
+    border-collapse:collapse;
+    width: 300px;
+}
+table.sheet th, table.sheet td {
+    border: 1px solid black;
+}
+table.sheet td {
+    border: 1px solid black;
+    text-align: center;
+    padding: 3px;
 }

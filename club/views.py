@@ -1,3 +1,4 @@
+# encoding: utf8
 import json
 import re
 import datetime
@@ -41,17 +42,36 @@ def checkin(request):
     return HttpResponse("'ok'")
 
 def balance_sheet(request):
+    "按照拼音排序，所有人的余额"
     members = Member.objects.all()
+    members = list(members)
+    members.sort(key=lambda m: m.index)
     return render_to_response('balance_sheet.html',
             {'members':members},
             RequestContext(request))
 
 def activity_sheet(request, name):
+    "按照日期倒序，该会员的活动记录"
     member = Member.objects.get(name=name)
-    acts = Activity.objects.filter(member=member)
+    acts = Activity.objects.filter(member=member).order_by('-date')
+
+    # calculate running totals
+    acts = list(acts)
+    acts.reverse()
+    sum = 0.0
+    running = []
+    for a in acts:
+        if a.deposit:
+            sum += a.deposit
+        if a.cost:
+            sum -= a.cost
+        running.append(sum)
+    acts.reverse()
+    running.reverse()
+
     return render_to_response('activity_sheet.html',
             {
-                'activities':acts,
+                'activities':zip(acts, running),
                 'member': member,
             },
             RequestContext(request))

@@ -24,6 +24,9 @@ class Member(models.Model):
     def index(self):
         return ''.join(pinyin.get_initials(c) for c in self.name)
 
+    def is_low_balance(self):
+        return self.balance <= 0
+
 
 class Activity(models.Model):
     member = models.ForeignKey(Member)
