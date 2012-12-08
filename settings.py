@@ -75,7 +75,10 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.gzip.GZipMiddleware',
+    'htmlmin.middleware.HtmlMinifyMiddleware',
 )
+
+HTML_MINIFY = True
 
 ROOT_URLCONF = 'mmqweb.urls'
 
