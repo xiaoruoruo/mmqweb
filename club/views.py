@@ -39,7 +39,7 @@ def checkin(request):
                 member.balance += deposit
             member.save()
 
-    return HttpResponse("'ok'")
+    return HttpResponse("")
 
 def balance_sheet(request):
     "按照拼音排序，所有人的余额"
@@ -96,4 +96,4 @@ def new_member(request):
         print l
         member = Member(name = l['name'], male = l['male'])
         member.save()
-    return HttpResponse("'ok'")
+    return HttpResponse("")
