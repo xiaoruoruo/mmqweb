@@ -17,5 +17,5 @@ urlpatterns = patterns('',
                        (r'^balance_sheet$', 'club.views.balance_sheet'),
                        (r'^activity/(?P<name>.+)$', 'club.views.activity_sheet'),
                        ) + \
-                static('/', view='club.views.csrf_serve', document_root=os.path.join(os.path.dirname(__file__), 'templates'))
+                static('/', view='club.views.csrf_serve', document_root=os.path.join(os.path.dirname(__file__), 'static'))
 
