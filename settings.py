@@ -71,7 +71,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-#    'django.middleware.csrf.CsrfViewMiddleware',
+    'club.views.AngularJsCsrfMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.gzip.GZipMiddleware',
@@ -79,6 +80,8 @@ MIDDLEWARE_CLASSES = (
 )
 
 HTML_MINIFY = True
+EXCLUDE_FROM_MINIFYING = ('^static/',)
+CSRF_COOKIE_NAME = 'XSRF-TOKEN'
 
 ROOT_URLCONF = 'mmqweb.urls'
 

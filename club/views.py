@@ -6,9 +6,34 @@ from django.shortcuts import get_list_or_404, get_object_or_404, render_to_respo
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.db import transaction
+from django.views.decorators.csrf import csrf_protect
+from django.views.static import serve
 
 from club.models import Member, Activity
 
+
+@csrf_protect
+def csrf_serve(*args, **kwargs):
+    """
+    This is a hack: because django.middleware.csrf.process_response need this.
+    """
+    args[0].META['CSRF_COOKIE_USED'] = True
+    return serve(*args, **kwargs)
+
+class AngularJsCsrfMiddleware(object):
+    """
+    AngularJs's http service will set header X-XSRF-TOKEN.
+    However Django will look for X-CSRFToken header.
+    This middleware is used to replace the header to the desired name.
+    """
+
+    def process_request(self, request):
+        ANGULAR_HEADER = 'HTTP_X_XSRF_TOKEN'
+        DJANGO_HEADER = 'HTTP_X_CSRFTOKEN'
+        if ANGULAR_HEADER in request.META:
+            request.META[DJANGO_HEADER] = request.META[ANGULAR_HEADER]
+            del request.META[ANGULAR_HEADER]
+        return None
 
 @transaction.commit_on_success
 def checkin(request):
@@ -53,7 +78,7 @@ def balance_sheet(request):
 def activity_sheet(request, name):
     "按照日期倒序，该会员的活动记录"
     member = Member.objects.get(name=name)
-    acts = Activity.objects.filter(member=member).order_by('-date')
+    acts = Activity.objects.filter(member=member).order_by('-date', '-id')
 
     # calculate running totals
     acts = list(acts)

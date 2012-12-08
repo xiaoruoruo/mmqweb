@@ -18,6 +18,7 @@ function OutCtrl($scope, $http) {
     $scope.info = {'date': function(d) { return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate(); } (new Date()) };
     $scope.server_message = "";
     console.log("OutCtrl");
+
     $scope.save = function() {
         if ($scope.checkin_count == 0) {
             $scope.server_message = "还没有点一个名不能保存";
