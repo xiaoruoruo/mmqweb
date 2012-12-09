@@ -31,12 +31,24 @@ function OutCtrl($scope, $http) {
                 'weight':$scope.checkins[name],
                 'deposit':$scope.deposits[name] || null,
             });
-        $http.post('checkin', data={'list': list, 'date': $scope.info.date}).success(function() {
-            $scope.checkins = {};
-            $scope.deposits = {};
-            $scope.checkin_count = 0;
-            $scope.server_message = "保存成功！"
-        });
+        $http.post('checkin', data={'list': list, 'date': $scope.info.date}).
+            success(function(data) {
+                if (data != "ok") {
+                    $scope.server_message = "保存失败？？";
+                    return;
+                }
+                $scope.checkins = {};
+                $scope.deposits = {};
+                $scope.checkin_count = 0;
+                $scope.server_message = "保存成功！"
+            }).
+            error(function(data, status) {
+                if (status == 403) {
+                    $scope.server_message = "请先登录！";
+                } else {
+                    $scope.server_message = "保存失败，程序有bug，马上就会修复。。";
+                }
+            });
     }
 
     $scope.add_member = function(name, is_girl, cb) {
@@ -47,13 +59,24 @@ function OutCtrl($scope, $http) {
                 $scope.server_message = name + " 会员已在名单中，再找找";
                 return;
             }
-            break;
         }
 
-        $http.post('new_member', {'name': name, 'male': !is_girl})
-             .success(function() {
+        $http.post('new_member', {'name': name, 'male': !is_girl}).
+             success(function(data) {
+                 if (data != "ok") {
+                     $scope.server_message = "保存失败？？";
+                     return;
+                 }
+                 $scope.server_message = "已添加会员: " + name;
                  $scope.members.push({'name': name});
                  cb();
+              }).
+              error(function(data, status) {
+                  if (status == 403) {
+                      $scope.server_message = "请先登录！";
+                  } else {
+                      $scope.server_message = "保存失败，程序有bug，马上就会修复。。";
+                  }
               });
     }
     

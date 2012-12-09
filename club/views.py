@@ -8,6 +8,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.db import transaction
 from django.views.decorators.csrf import csrf_protect
 from django.views.static import serve
+from django.contrib.auth.decorators import permission_required
 
 from club.models import Member, Activity
 
@@ -35,6 +36,7 @@ class AngularJsCsrfMiddleware(object):
             del request.META[ANGULAR_HEADER]
         return None
 
+@permission_required('club.add_activity', raise_exception=True)
 @transaction.commit_on_success
 def checkin(request):
     if request.method == 'POST':
@@ -64,7 +66,17 @@ def checkin(request):
                 member.balance += deposit
             member.save()
 
-    return HttpResponse("")
+    return HttpResponse("ok", mimetype="application/json")
+
+@permission_required('club.add_member', raise_exception=True)
+@transaction.commit_on_success
+def new_member(request):
+    if request.method == 'POST':
+        l = json.loads( request.raw_post_data )
+        print l
+        member = Member(name = l['name'], male = l['male'])
+        member.save()
+    return HttpResponse("ok", mimetype="application/json")
 
 def balance_sheet(request):
     "按照拼音排序，所有人的余额"
@@ -77,7 +89,7 @@ def balance_sheet(request):
 
 def activity_sheet(request, name):
     "按照日期倒序，该会员的活动记录"
-    member = Member.objects.get(name=name)
+    member = get_object_or_404(Member, name=name)
     acts = Activity.objects.filter(member=member).order_by('-date', '-id')
 
     # calculate running totals
@@ -114,11 +126,3 @@ def parse_date(date_string):
         return HttpResponseBadRequest("'wrong date'")
     return datetime.date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
 
-@transaction.commit_on_success
-def new_member(request):
-    if request.method == 'POST':
-        l = json.loads( request.raw_post_data )
-        print l
-        member = Member(name = l['name'], male = l['male'])
-        member.save()
-    return HttpResponse("")
