@@ -44,6 +44,10 @@ def index(request):
 @permission_required('club.add_activity', raise_exception=True)
 @transaction.commit_on_success
 def checkin(request):
+    if request.method == 'GET':
+        return render_to_response('checkin.html',
+                {'checkin_active': True},
+                RequestContext(request))
     if request.method == 'POST':
         data = json.loads( request.raw_post_data )
         print data
