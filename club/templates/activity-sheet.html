@@ -1,0 +1,36 @@
+{% extends "bootstrap-base.html" %}
+{% load url from future %}
+{% block title %}
+{{member.name}} - 活动记录
+{% endblock %}
+{% block content %}
+<h1>
+  活动记录
+</h1>
+
+<p>
+  会员：
+  <span>{{member.name}}</span>
+</p>
+<p>
+  当前余额：
+  <span class="{{ member.is_low_balance|yesno:"low_balance," }}">{{member.balance}}</span>
+</p>
+
+<table class="sheet">
+  <thead>
+    <th>日期</th>
+    <th>消费</th>
+    <th>充值</th>
+    <th>余额</th>
+  </thead>
+  {% for a,running in activities %}
+  <tr>
+    <td>{{a.date|date:"Y-m-d"}}</td>
+    <td>{{a.cost|default:"-"}}</td>
+    <td>{{a.deposit|default:"-"}}</td>
+    <td>{{running}}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

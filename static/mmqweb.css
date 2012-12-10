@@ -1,5 +1,5 @@
 body {
-    font-size:medium;
+    padding-top: 40px;
 }
 
 pre, textarea {
@@ -46,11 +46,6 @@ ul.flat > li {
     float:left;
     list-style-type: none;
     padding-right: 1em;
-}
-
-a {
-    text-decoration: none;
-    color: black;
 }
 
 ul.flat a.checkedin {

@@ -10,6 +10,7 @@ v1_api.register(MemberResource())
 v1_api.register(ActivityResource())
 
 urlpatterns = patterns('',
+                       (r'^$', 'club.views.index'),
                        (r'^login$', 'django.contrib.auth.views.login'),
                        (r'^api', include(v1_api.urls)),
                        (r'^checkin$', 'club.views.checkin'),

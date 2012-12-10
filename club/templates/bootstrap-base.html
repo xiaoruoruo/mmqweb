@@ -1,0 +1,51 @@
+{% load url from future %}
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}三碗俱乐部{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="/static/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="/static/mmqweb.css" rel="stylesheet" media="screen">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="{% url 'club.views.index' %}">三碗俱乐部</a>
+          <ul class="nav">
+            <li class="{% if balance_sheet_active %}active{% endif %}"><a href="{% url 'club.views.balance_sheet' %}">会员会费</a></li>
+            <li class="{% if game_active %}active{% endif %}"><a href="/game/三碗积分赛/">积分赛</a></li>
+            {% block nav-login %}
+            {% endblock %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="container">
+
+      {% block content %}
+      {% endblock %}
+
+      <hr>
+
+      <footer>
+        <p>&copy; 交大三碗羽毛球俱乐部 2012</p>
+      </footer>
+
+    </div> <!-- /container -->
+
+    <script src="/static/js/bootstrap.min.js"></script>
+  </body>
+</html>
+

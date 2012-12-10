@@ -36,6 +36,11 @@ class AngularJsCsrfMiddleware(object):
             del request.META[ANGULAR_HEADER]
         return None
 
+def index(request):
+    return render_to_response('club-index.html',
+            {},
+            RequestContext(request))
+
 @permission_required('club.add_activity', raise_exception=True)
 @transaction.commit_on_success
 def checkin(request):
@@ -83,8 +88,11 @@ def balance_sheet(request):
     members = Member.objects.all()
     members = list(members)
     members.sort(key=lambda m: m.index)
-    return render_to_response('balance_sheet.html',
-            {'members':members},
+    return render_to_response('balance-sheet.html',
+            {
+                'members':members,
+                'balance_sheet_active': True,
+            },
             RequestContext(request))
 
 def activity_sheet(request, name):
@@ -106,8 +114,9 @@ def activity_sheet(request, name):
     acts.reverse()
     running.reverse()
 
-    return render_to_response('activity_sheet.html',
+    return render_to_response('activity-sheet.html',
             {
+                'activity-active': True,
                 'activities':zip(acts, running),
                 'member': member,
             },
