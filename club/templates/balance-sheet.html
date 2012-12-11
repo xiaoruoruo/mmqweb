@@ -5,16 +5,20 @@
 {% endblock %}
 {% block content %}
 <h1>会费情况表</h1>
-<table class="sheet">
-  <thead>
-    <th>姓名</th>
-    <th>余额</th>
-  </thead>
-  {% for m in members %}
-  <tr>
-    <td><a href="{% url 'club.views.activity_sheet' name=m.name %}">{{m.name}}</a></td>
-    <td><span class="{{ m.is_low_balance|yesno:"low_balance," }}">{{m.balance}}</span></td>
-  </tr>
-  {% endfor %}
-</table>
+<div class='row'>
+  <div class='span4'>
+    <table class="table">
+      <thead>
+        <th>姓名</th>
+        <th>余额</th>
+      </thead>
+      {% for m in members %}
+      <tr>
+        <td><a href="{% url 'club.views.activity_sheet' name=m.name %}">{{m.name}}</a></td>
+        <td><span class="{{ m.is_low_balance|yesno:"low_balance," }}">{{m.balance}}</span></td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
 {% endblock %}
