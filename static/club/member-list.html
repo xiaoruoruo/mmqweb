@@ -1,4 +1,7 @@
 日期：<input ng-model="info.date">
+
+<div class='row'>
+  <div class='span9'>
 <h3>
     名单<span style="font-size:10pt">（单击姓名来点名，红色表示已签到，再单击红色算多次、缴费）</span>
 </h3>
@@ -22,8 +25,8 @@
 
 <button style="font-size:14pt" ng-click='save()'>保存签到表、缴费表</button>
 <span>{{server_message}}</span>
+</div>
 
-<div class='row'>
   <div class='span3'>
     <h3>本次签到情况</h3>
     <table class='table'>
