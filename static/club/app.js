@@ -8,32 +8,41 @@ angular.module('club', []).
         otherwise({redirectTo: '/'});
 }]);
 
-function OutCtrl($scope, $http) {
+function OutCtrl($scope, $http, $window) {
     $http.get('api/member/?format=json').success(function(data) {
         $scope.members = data.objects;
     });
     $scope.checkins = {};
-    $scope.deposits = {};
-    $scope.checkin_count = 0;
     $scope.info = {
         'date': function(d) { return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate(); } (new Date()),
         'member_order': "-weight",
     };
     $scope.server_message = "";
+
+    $window.onbeforeunload = function() {
+        if ($scope.has_unsaved_data()) {
+            return "点名信息还未提交，真的要离开吗？";
+        }
+    }
+
     console.log("OutCtrl");
 
+    $scope.has_unsaved_data = function() {
+        return _.size($scope.checkins) > 0;
+    }
+
     $scope.save = function() {
-        if ($scope.checkin_count == 0) {
+        if (!$scope.has_unsaved_data()) {
             $scope.server_message = "还没有点一个名不能保存";
             return;
         }
-        list = [];
-        for (var name in $scope.checkins)
-            list.push({
-                'name':name,
-                'weight':$scope.checkins[name],
-                'deposit':$scope.deposits[name] || null,
+        list = _.map($scope.checkins, function(obj, name) {
+            return _.defaults(obj, {
+                'name': name,
+                'deposit': null,
+                'weight': null,
             });
+        });
         $http.post('checkin', data={'list': list, 'date': $scope.info.date}).
             success(function(data) {
                 if (data != "ok") {
@@ -41,8 +50,6 @@ function OutCtrl($scope, $http) {
                     return;
                 }
                 $scope.checkins = {};
-                $scope.deposits = {};
-                $scope.checkin_count = 0;
                 $scope.server_message = "保存成功！"
             }).
             error(function(data, status) {
@@ -71,7 +78,7 @@ function OutCtrl($scope, $http) {
                      return;
                  }
                  $scope.server_message = "已添加会员: " + name;
-                 $scope.members.push({'name': name});
+                 $scope.members.push({'name': name, 'weight': -1, 'index': '{'});
                  cb();
               }).
               error(function(data, status) {
@@ -84,21 +91,21 @@ function OutCtrl($scope, $http) {
     }
     
     $scope.do_checkin = function(name, weight) {
-        if (!$scope.checkins[name]) {
-            $scope.checkin_count ++;
-            $scope.server_message = "已经点了" + $scope.checkin_count + "位会员";
-        }
-        $scope.checkins[name] = weight;
+        if (!_.has($scope.checkins, name)) $scope.checkins[name] = {};
+        $scope.checkins[name]['weight'] = weight;
+        var sum = _.reduce(_.values($scope.checkins), function(sum, c) {return sum + c['weight'] || 0}, 0);
+        $scope.server_message = "已经点了" + sum + "位会员";
     }
 
     $scope.do_deposit = function(name, deposit) {
-        $scope.deposits[name] = deposit;
+        if (!_.has($scope.checkins, name)) $scope.checkins[name] = {};
+        $scope.checkins[name]['deposit'] = deposit;
     }
 }
 
 function ClubCtrl($scope, $http, $routeParams, $location) {
     $scope.name = $routeParams.name;
-    $scope.deposit = $scope.deposits[$scope.name];
+    $scope.deposit = ($scope.checkins[$scope.name] || {})['deposit'];
     console.log("ClubCtrl");
 
     $scope.doFilter = function(elem) {
@@ -130,7 +137,11 @@ function ClubCtrl($scope, $http, $routeParams, $location) {
     }
 
     $scope.isCheckin = function(member) {
-        return !! $scope.checkins[member.name];
+        if (! $scope.checkins[member.name]) {
+            return false;
+        }
+        var weight = $scope.checkins[member.name]['weight'];
+        return weight > 0;
     }
 
     $scope.new_member = function(do_checkin) {
@@ -146,7 +157,7 @@ function ClubCtrl($scope, $http, $routeParams, $location) {
     }
 
     $scope.weight_style = function(w) {
-        if ($scope.checkins[$scope.name] == w) {
+        if ($scope.checkins[$scope.name]['weight'] == w) {
             return 'weight_selected';
         } else {
             return '';

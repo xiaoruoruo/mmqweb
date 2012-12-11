@@ -10,5 +10,6 @@
 <b>缴费</b>
 <input type="number" name="money" min="0" ng-model="deposit">
 <button ng-click="checkin_deposit(deposit)">保存</button>
+<button ng-click="checkin_deposit(deposit);checkin_weight(name,0)">仅缴费，算0次</button>
 </p>
 </form>

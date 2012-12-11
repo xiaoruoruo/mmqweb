@@ -23,10 +23,22 @@
 <button style="font-size:14pt" ng-click='save()'>保存签到表、缴费表</button>
 <span>{{server_message}}</span>
 
-
-<h3>本次缴费情况</h3>
-<ul>
-<li ng-repeat="(name,amount) in deposits">
-{{name}}: {{amount}}
-</li>
-</ul>
+<div class='row'>
+  <div class='span3'>
+    <h3>本次签到情况</h3>
+    <table class='table'>
+      <thead>
+        <th>姓名</th>
+        <th>次数</th>
+        <th>缴费</th>
+      </thead>
+      <tbody>
+        <tr ng-repeat="(name,obj) in checkins">
+          <td>{{name}}</td>
+          <td>{{obj.weight}}</td>
+          <td>{{obj.deposit}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
