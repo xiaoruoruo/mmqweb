@@ -15,7 +15,10 @@ function OutCtrl($scope, $http) {
     $scope.checkins = {};
     $scope.deposits = {};
     $scope.checkin_count = 0;
-    $scope.info = {'date': function(d) { return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate(); } (new Date()) };
+    $scope.info = {
+        'date': function(d) { return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate(); } (new Date()),
+        'member_order': "-weight",
+    };
     $scope.server_message = "";
     console.log("OutCtrl");
 

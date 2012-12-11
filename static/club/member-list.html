@@ -2,9 +2,14 @@
 <h3>
     名单<span style="font-size:10pt">（单击姓名来点名，红色表示已签到，再单击红色算多次、缴费）</span>
 </h3>
+<p>
+排序方式: 
+<input type="radio" ng-model="info.member_order" value="index">拼音首字母序
+<input type="radio" ng-model="info.member_order" value="-weight">活动频繁程度
+</p>
 首字母过滤：<input ng-model="query">
 <ul class="flat">
-    <li ng-repeat="member in members | filter:doFilter">
+    <li ng-repeat="member in members | filter:doFilter | orderBy:info.member_order">
         <a ng-click='checkin_click(member)' ng-class='{checkedin:isCheckin(member)}'>{{member.name}}</a>
     </li>
 </ul>
