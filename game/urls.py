@@ -2,6 +2,7 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns('',
                        (r'^$',  'game.views.index'),
+                       (r'^login$', 'game.views.login_user'),
                        (r'^del_match/(?P<match_id>\d+)/$', 'game.views.del_match'),
                        (r'^(?P<tname>\w+)/$',  'game.views.tournament_index'),
                        (r'^(?P<tname>\w+)/edit$',  'game.views.tournament_edit'),

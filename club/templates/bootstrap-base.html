@@ -41,7 +41,7 @@
               {% if user.is_authenticated %}
               <a href="/accounts/logout/?next=/club/">登出</a>
               {% else %}
-              <a href="/accounts/login/">登录</a>
+              <a href="/accounts/login/?next={{request.path}}">登录</a>
               {% endif %}
             </li>
           </ul>
@@ -58,7 +58,7 @@
       <hr>
 
       <footer>
-        <p>&copy; 交大三碗羽毛球俱乐部 2012</p>
+      <p>&copy; 交大三碗羽毛球俱乐部 2012</p>
       </footer>
 
     </div> <!-- /container -->
