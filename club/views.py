@@ -41,39 +41,46 @@ def index(request):
             {},
             RequestContext(request))
 
-@permission_required('club.add_activity', raise_exception=True)
-@transaction.commit_on_success
 def checkin(request):
     if request.method == 'GET':
-        return render_to_response('checkin.html',
-                {'checkin_active': True},
-                RequestContext(request))
-    if request.method == 'POST':
-        data = json.loads( request.raw_post_data )
-        print data
+        return checkin_GET(request)
+    elif request.method == 'POST':
+        return checkin_POST(request)
 
-        date = parse_date(data['date'])
+@permission_required('club.add_activity')
+def checkin_GET(request):
+    return render_to_response('checkin.html',
+            {'checkin_active': True},
+            RequestContext(request))
 
-        l = data['list']
-        for o in l:
-            print o
-            deposit = o['deposit']
-            member = get_object_or_404(Member, name=o['name'])
-            cost = determine_cost(member, o['weight'])
+@permission_required('club.add_activity', raise_exception=True)
+@transaction.commit_on_success
+def checkin_POST(request):
+    data = json.loads( request.raw_post_data )
+    print data
 
-            a = Activity(
-                member = member,
-                weight = o['weight'],
-                date = date,
-                cost = cost,
-                deposit = deposit,
-            )
-            a.save()
+    date = parse_date(data['date'])
 
-            member.balance -= cost
-            if deposit:
-                member.balance += deposit
-            member.save()
+    l = data['list']
+    for o in l:
+        print o
+        deposit = o['deposit']
+        member = get_object_or_404(Member, name=o['name'])
+        cost = determine_cost(member, o['weight'])
+
+        a = Activity(
+            member = member,
+            weight = o['weight'],
+            date = date,
+            cost = cost,
+            deposit = deposit,
+        )
+        a.save()
+
+        member.balance -= cost
+        if deposit:
+            member.balance += deposit
+        member.save()
 
     return HttpResponse("ok", mimetype="application/json")
 
