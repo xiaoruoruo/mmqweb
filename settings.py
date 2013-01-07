@@ -6,8 +6,15 @@ DEBUG = os.getenv('PRODUCTION', 'False') == 'False'
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    ('TomatoSmith', 'TomatoSmith@YSSY'),
+    ('Xinruo Sun', 'xiaoruoruo@gmail.com'),
 )
+
+# email settings
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    from local_setting import EMAIL_HOST, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD, SERVER_EMAIL
 
 MANAGERS = ADMINS
 
