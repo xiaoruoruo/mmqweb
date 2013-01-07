@@ -13,8 +13,8 @@ pinyin = Pinyin()
 class Member(models.Model):
     name  = models.CharField(max_length=50)
     male  = models.BooleanField()
-    phone = models.CharField(max_length=15, null=True)
-    affiliation = models.CharField(max_length=20, null=True)
+    phone = models.CharField(max_length=15, null=True, blank=True)
+    affiliation = models.CharField(max_length=20, null=True, blank=True)
     weight = models.FloatField(default=0.0)
 
     balance = models.FloatField(default=0.0)

@@ -67,6 +67,7 @@ function OutCtrl($scope, $http, $window) {
                     return;
                 }
                 $scope.checkins = {};
+                $scope.checkin_names_list = [];
                 $scope.server_message = "保存成功！"
             }).
             error(function(data, status) {
