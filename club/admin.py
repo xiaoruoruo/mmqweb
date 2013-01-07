@@ -1,5 +1,12 @@
-from club.models import *
+from club.models import Member, Activity
 from django.contrib import admin
+import reversion
 
-admin.site.register(Member)
-admin.site.register(Activity)
+class MemberModelAdmin(reversion.VersionAdmin):
+    pass
+
+class ActivityModelAdmin(reversion.VersionAdmin):
+    pass
+
+admin.site.register(Member, MemberModelAdmin)
+admin.site.register(Activity, ActivityModelAdmin)

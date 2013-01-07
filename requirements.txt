@@ -1,4 +1,4 @@
-Django==1.4.2
+Django==1.4.3
 South==0.7.6
 django-debug-toolbar==0.9.4
 django-tastypie==0.9.11
@@ -10,3 +10,4 @@ xpinyin==0.4.5
 BeautifulSoup==3.2.1
 argparse==1.2.1
 django-htmlmin==0.5.2
+django-reversion==1.6.5
