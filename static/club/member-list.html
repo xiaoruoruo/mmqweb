@@ -36,10 +36,10 @@
         <th>缴费</th>
       </thead>
       <tbody>
-        <tr ng-repeat="(name,obj) in checkins">
+        <tr ng-repeat="name in checkin_names_list">
           <td>{{name}}</td>
-          <td>{{obj.weight}}</td>
-          <td>{{obj.deposit}}</td>
+          <td>{{checkins[name].weight}}</td>
+          <td>{{checkins[name].deposit}}</td>
         </tr>
       </tbody>
     </table>

@@ -12,11 +12,20 @@ function OutCtrl($scope, $http, $window) {
     $http.get('api/member/?format=json').success(function(data) {
         $scope.members = data.objects;
     });
+
+    /* hash: name -> {weight, deposit} */
     $scope.checkins = {};
+
+    /* list: names */
+    $scope.checkin_names_list = [];
+
+    /* a local scope to make angularjs happy */
     $scope.info = {
         'date': function(d) { return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate(); } (new Date()),
         'member_order': "-weight",
     };
+
+    /* shows hint messages or message from server */
     $scope.server_message = "";
 
     $window.onbeforeunload = function() {
@@ -91,7 +100,10 @@ function OutCtrl($scope, $http, $window) {
     }
     
     $scope.do_checkin = function(name, weight) {
-        if (!_.has($scope.checkins, name)) $scope.checkins[name] = {};
+        if (!_.has($scope.checkins, name)) {
+            $scope.checkins[name] = {};
+            $scope.checkin_names_list.unshift(name);
+        }
         $scope.checkins[name]['weight'] = weight;
         var sum = _.reduce(_.values($scope.checkins), function(sum, c) {return sum + c['weight'] || 0}, 0);
         $scope.server_message = "已经点了" + sum + "位会员";
