@@ -133,13 +133,13 @@ function ClubCtrl($scope, $http, $routeParams, $location) {
         return angular.lowercase(elem.index).indexOf(angular.lowercase($scope.query)) == 0;
     }
 
-    $scope.checkin_click = function(member) {
+    $scope.checkin_click = function(name) {
         $scope.query = "";
-        if ($scope.isCheckin(member)) {
-            $location.path('/checkin/' + member.name);
+        if ($scope.isCheckin(name)) {
+            $location.path('/checkin/' + name);
         } else {
             // 默认weight = 1，节省一次点击
-            $scope.do_checkin(member.name, 1.0);
+            $scope.do_checkin(name, 1.0);
         }
     }
 
@@ -156,11 +156,11 @@ function ClubCtrl($scope, $http, $routeParams, $location) {
         $location.path('/');
     }
 
-    $scope.isCheckin = function(member) {
-        if (! $scope.checkins[member.name]) {
+    $scope.isCheckin = function(name) {
+        if (! $scope.checkins[name]) {
             return false;
         }
-        var weight = $scope.checkins[member.name]['weight'];
+        var weight = $scope.checkins[name]['weight'];
         return weight > 0;
     }
 
