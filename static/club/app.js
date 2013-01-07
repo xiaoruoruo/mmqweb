@@ -28,6 +28,14 @@ function OutCtrl($scope, $http, $window) {
     /* shows hint messages or message from server */
     $scope.server_message = "";
 
+    /* the style of names, just font-size now */
+    $scope.member_style = {'font-size': '14px'};
+
+    $scope.member_font_adjust = function(delta) {
+        var new_size = parseInt($scope.member_style['font-size']) + delta;
+        $scope.member_style['font-size'] = new_size + 'px';
+    }
+
     $window.onbeforeunload = function() {
         if ($scope.has_unsaved_data()) {
             return "点名信息还未提交，真的要离开吗？";
