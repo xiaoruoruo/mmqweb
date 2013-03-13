@@ -1,4 +1,4 @@
-angular.module('club', []).
+angular.module('club', ['ui']).
     config(['$routeProvider', function($routeProvider) {
     $routeProvider.
         when('/', {templateUrl: '/static/club/member-list.html', controller: ClubCtrl}).
@@ -124,7 +124,7 @@ function OutCtrl($scope, $http, $window) {
     }
 }
 
-function ClubCtrl($scope, $http, $routeParams, $location) {
+function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
     $scope.name = $routeParams.name;
     $scope.deposit = ($scope.checkins[$scope.name] || {})['deposit'];
     console.log("ClubCtrl");
@@ -132,6 +132,14 @@ function ClubCtrl($scope, $http, $routeParams, $location) {
     $scope.doFilter = function(elem) {
         if (!$scope.query) return true;
         return angular.lowercase(elem.index).indexOf(angular.lowercase($scope.query)) == 0;
+    }
+
+    /* checkin using enter if only one is left */
+    $scope.queryOnEnter = function(query) {
+        var filtered = $filter('filter')($scope.members, query);
+        if (filtered.length == 1) {
+            $scope.checkin_click(filtered[0].name);
+        }
     }
 
     $scope.checkin_click = function(name) {
