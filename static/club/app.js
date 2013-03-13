@@ -175,6 +175,10 @@ function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
 
     $scope.new_member = function(do_checkin) {
         var name = $scope.name_new_member;
+        if (!name) {
+            // invalid name
+            return;
+        }
         var is_girl = $scope.girl_new_member == "1";
         $scope.add_member(name, is_girl, function () {
             if (do_checkin) {
