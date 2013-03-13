@@ -1,0 +1,30 @@
+{% extends "bootstrap-base.html" %}
+{% load url from future %}
+{% block title %}
+活动记录总表
+{% endblock %}
+{% block content %}
+<h1>
+  活动记录总表
+</h1>
+
+{% for dates in overall %}
+<div class='row'>
+  <div class='span6'>
+    <h2>{{dates.date}} ({{dates.acts|length}}人)</h2>
+    <ul>
+      {% for acts in dates.acts %}
+      <li>
+        <a href="{% url 'club.views.activity_sheet' name=acts.member.name %}">{{acts.member.name}}</a> ( {{acts.cost}}
+        {% if acts.deposit %}
+        / {{acts.deposit}}
+        {% endif %}
+        )
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}

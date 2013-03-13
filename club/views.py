@@ -133,6 +133,34 @@ def activity_sheet(request, name):
             },
             RequestContext(request))
 
+@permission_required('club.add_activity', raise_exception=True)
+def activity_overall(request):
+    overall = []
+    current_date = None
+
+    all_acts = Activity.objects.order_by('-date')
+    for a in all_acts:
+        date_s = u"%s" % a.date
+        if current_date is None:
+            current_date = date_s
+            current_activities = []
+        if current_date != date_s:
+            overall.append({'date': current_date, 'acts': current_activities})
+            current_date = date_s
+            current_activities = []
+        current_activities.append({'member': a.member, 'cost': a.cost, 'deposit': a.deposit})
+
+    overall.append({'date': current_date, 'acts': current_activities})
+
+    return render_to_response('activity-overall.html',
+            {
+                'overall': overall
+            },
+            RequestContext(request))
+
+
+
+
 def determine_cost(member, weight):
     if member.male:
         return weight * 15.0

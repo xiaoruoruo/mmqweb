@@ -29,6 +29,7 @@
 
             {% if perms.club.add_activity %}
             <li class="{% if checkin_active %}active{% endif %}"><a href="{% url 'club.views.checkin' %}">点名</a></li>
+            <li class="{% if checkin_active %}active{% endif %}"><a href="{% url 'club.views.activity_overall' %}">活动总表</a></li>
             {% endif %}
           </ul>
           <ul class="nav pull-right">
