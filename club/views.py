@@ -152,6 +152,7 @@ def activity_overall(request):
 
     return render_to_response('activity-overall.html',
             {
+                'activity_overall_active': True,
                 'overall': overall
             },
             RequestContext(request))
