@@ -36,8 +36,8 @@ class Activity(models.Model):
     weight = models.FloatField(default=1.0)
     date   = models.DateField(default=datetime.date.today())
 
-    cost   = models.FloatField()
-    deposit= models.FloatField(null=True)
+    cost   = models.FloatField(blank=True)
+    deposit= models.FloatField(null=True, blank=True)
 
     def __unicode__(self):
         s = u'%s * %.1f @ %s' % (self.member.name, self.weight, self.date)
