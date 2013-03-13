@@ -46,6 +46,7 @@ ul.flat > li {
     float:left;
     list-style-type: none;
     padding-right: 1em;
+    line-height: normal;
 }
 
 ul.flat a.checkedin {

@@ -17,7 +17,6 @@ import random
 class YssyRegistrationForm(forms.Form):
     yssyid = forms.CharField(label="水源ID", max_length=12)
 
-@transaction.commit_on_success
 def register_yssy(request):
     text = u''
     if request.method == 'POST':

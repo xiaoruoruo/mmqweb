@@ -6,8 +6,15 @@ DEBUG = os.getenv('PRODUCTION', 'False') == 'False'
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    ('TomatoSmith', 'TomatoSmith@YSSY'),
+    ('Xinruo Sun', 'xiaoruoruo@gmail.com'),
 )
+
+# email settings
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    from local_setting import EMAIL_HOST, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD, SERVER_EMAIL
 
 MANAGERS = ADMINS
 
@@ -74,6 +81,8 @@ MIDDLEWARE_CLASSES = (
     'club.views.AngularJsCsrfMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.middleware.transaction.TransactionMiddleware',
+    'reversion.middleware.RevisionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'htmlmin.middleware.HtmlMinifyMiddleware',
@@ -100,6 +109,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'south',
     'tastypie',
+    'reversion',
     'mmqweb.namebook',
     'mmqweb.fight',
     'mmqweb.game',

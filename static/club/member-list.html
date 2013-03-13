@@ -11,9 +11,10 @@
 <input type="radio" ng-model="info.member_order" value="-weight">活动频繁程度
 </p>
 首字母过滤：<input ng-model="query">
+名字大小：<input type="button" value="+" ng-click="member_font_adjust(5)"> <input type="button" value="-" ng-click="member_font_adjust(-5)">
 <ul class="flat">
     <li ng-repeat="member in members | filter:doFilter | orderBy:info.member_order">
-        <a ng-click='checkin_click(member)' ng-class='{checkedin:isCheckin(member)}'>{{member.name}}</a>
+        <a ng-style='member_style' ng-click='checkin_click(member.name)' ng-class='{checkedin:isCheckin(member.name)}'>{{member.name}}</a>
     </li>
 </ul>
 
@@ -36,10 +37,10 @@
         <th>缴费</th>
       </thead>
       <tbody>
-        <tr ng-repeat="(name,obj) in checkins">
-          <td>{{name}}</td>
-          <td>{{obj.weight}}</td>
-          <td>{{obj.deposit}}</td>
+        <tr ng-repeat="name in checkin_names_list">
+          <td><a ng-click='checkin_click(name)'>{{name}}</a></td>
+          <td>{{checkins[name].weight}}</td>
+          <td>{{checkins[name].deposit}}</td>
         </tr>
       </tbody>
     </table>

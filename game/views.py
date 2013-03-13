@@ -163,7 +163,6 @@ def del_match(request, match_id):
     m.delete()
     return HttpResponse('ok')
 
-@transaction.commit_on_success
 @tournament_permitted
 def tournament_add_participation(request, tname=None, t=None):
     status=u""
@@ -199,7 +198,6 @@ def tournament_add_participation(request, tname=None, t=None):
         form = TextForm()
     return render_to_response("add_participation.html", {'tournament':t, 'form': form, 'status': status})
 
-@transaction.commit_on_success
 def do_add_matches(tournament, source, same_comments):
     mgs = list(tournament.matchgroup_set.all())
     if len(mgs) != 1:

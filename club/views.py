@@ -54,7 +54,6 @@ def checkin_GET(request):
             RequestContext(request))
 
 @permission_required('club.add_activity', raise_exception=True)
-@transaction.commit_on_success
 def checkin_POST(request):
     data = json.loads( request.raw_post_data )
     print data
@@ -85,7 +84,6 @@ def checkin_POST(request):
     return HttpResponse("ok", mimetype="application/json")
 
 @permission_required('club.add_member', raise_exception=True)
-@transaction.commit_on_success
 def new_member(request):
     if request.method == 'POST':
         l = json.loads( request.raw_post_data )

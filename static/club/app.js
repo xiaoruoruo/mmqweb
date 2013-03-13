@@ -12,12 +12,29 @@ function OutCtrl($scope, $http, $window) {
     $http.get('api/member/?format=json').success(function(data) {
         $scope.members = data.objects;
     });
+
+    /* hash: name -> {weight, deposit} */
     $scope.checkins = {};
+
+    /* list: names */
+    $scope.checkin_names_list = [];
+
+    /* a local scope to make angularjs happy */
     $scope.info = {
         'date': function(d) { return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate(); } (new Date()),
         'member_order': "-weight",
     };
+
+    /* shows hint messages or message from server */
     $scope.server_message = "";
+
+    /* the style of names, just font-size now */
+    $scope.member_style = {'font-size': '14px'};
+
+    $scope.member_font_adjust = function(delta) {
+        var new_size = parseInt($scope.member_style['font-size']) + delta;
+        $scope.member_style['font-size'] = new_size + 'px';
+    }
 
     $window.onbeforeunload = function() {
         if ($scope.has_unsaved_data()) {
@@ -50,6 +67,7 @@ function OutCtrl($scope, $http, $window) {
                     return;
                 }
                 $scope.checkins = {};
+                $scope.checkin_names_list = [];
                 $scope.server_message = "保存成功！"
             }).
             error(function(data, status) {
@@ -91,7 +109,10 @@ function OutCtrl($scope, $http, $window) {
     }
     
     $scope.do_checkin = function(name, weight) {
-        if (!_.has($scope.checkins, name)) $scope.checkins[name] = {};
+        if (!_.has($scope.checkins, name)) {
+            $scope.checkins[name] = {};
+            $scope.checkin_names_list.unshift(name);
+        }
         $scope.checkins[name]['weight'] = weight;
         var sum = _.reduce(_.values($scope.checkins), function(sum, c) {return sum + c['weight'] || 0}, 0);
         $scope.server_message = "已经点了" + sum + "位会员";
@@ -113,13 +134,13 @@ function ClubCtrl($scope, $http, $routeParams, $location) {
         return angular.lowercase(elem.index).indexOf(angular.lowercase($scope.query)) == 0;
     }
 
-    $scope.checkin_click = function(member) {
+    $scope.checkin_click = function(name) {
         $scope.query = "";
-        if ($scope.isCheckin(member)) {
-            $location.path('/checkin/' + member.name);
+        if ($scope.isCheckin(name)) {
+            $location.path('/checkin/' + name);
         } else {
             // 默认weight = 1，节省一次点击
-            $scope.do_checkin(member.name, 1.0);
+            $scope.do_checkin(name, 1.0);
         }
     }
 
@@ -136,11 +157,11 @@ function ClubCtrl($scope, $http, $routeParams, $location) {
         $location.path('/');
     }
 
-    $scope.isCheckin = function(member) {
-        if (! $scope.checkins[member.name]) {
+    $scope.isCheckin = function(name) {
+        if (! $scope.checkins[name]) {
             return false;
         }
-        var weight = $scope.checkins[member.name]['weight'];
+        var weight = $scope.checkins[name]['weight'];
         return weight > 0;
     }
 

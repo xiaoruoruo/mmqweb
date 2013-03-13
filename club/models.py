@@ -8,11 +8,13 @@ from tastypie import fields
 from xpinyin import Pinyin
 pinyin = Pinyin()
 
+# Changing the models here will impact the revisions
+
 class Member(models.Model):
     name  = models.CharField(max_length=50)
     male  = models.BooleanField()
-    phone = models.CharField(max_length=15, null=True)
-    affiliation = models.CharField(max_length=20, null=True)
+    phone = models.CharField(max_length=15, null=True, blank=True)
+    affiliation = models.CharField(max_length=20, null=True, blank=True)
     weight = models.FloatField(default=0.0)
 
     balance = models.FloatField(default=0.0)
