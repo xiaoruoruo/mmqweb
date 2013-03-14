@@ -138,7 +138,7 @@ def activity_overall(request):
     overall = []
     current_date = None
 
-    all_acts = Activity.objects.order_by('-date')
+    all_acts = Activity.objects.order_by('-date').select_related('member')
     for a in all_acts:
         date_s = u"%s" % a.date
         if current_date is None:
