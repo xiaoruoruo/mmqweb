@@ -142,6 +142,10 @@ function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
         }
     }
 
+    $scope.queryOnEsc = function() {
+        $scope.query = "";
+    }
+
     $scope.checkin_click = function(name) {
         $scope.query = "";
         if ($scope.isCheckin(name)) {
