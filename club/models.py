@@ -26,6 +26,10 @@ class Member(models.Model):
     def index(self):
         return ''.join(pinyin.get_initials(c) for c in self.name)
 
+    @property
+    def sex(self):
+        return self.male and u'男' or u'女'
+
     def is_low_balance(self):
         return self.balance <= 0
 

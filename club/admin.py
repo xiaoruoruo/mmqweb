@@ -3,7 +3,8 @@ from django.contrib import admin
 import reversion
 
 class MemberModelAdmin(reversion.VersionAdmin):
-    pass
+    list_display = ('name', 'sex', 'balance', 'weight')
+    ordering = ('-weight', )
 
 class ActivityModelAdmin(reversion.VersionAdmin):
     pass
