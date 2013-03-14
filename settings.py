@@ -4,6 +4,7 @@ import os
 
 DEBUG = os.getenv('PRODUCTION', 'False') == 'False'
 TEMPLATE_DEBUG = DEBUG
+print 'running with DEBUG=', DEBUG
 
 ADMINS = (
     ('Xinruo Sun', 'xiaoruoruo@gmail.com'),
@@ -85,12 +86,14 @@ MIDDLEWARE_CLASSES = (
     'reversion.middleware.RevisionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.gzip.GZipMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'htmlmin.middleware.HtmlMinifyMiddleware',
 )
 
 HTML_MINIFY = True
 EXCLUDE_FROM_MINIFYING = ('^static/',)
 CSRF_COOKIE_NAME = 'XSRF-TOKEN'
+INTERNAL_IPS = ('127.0.0.1',)
 
 ROOT_URLCONF = 'mmqweb.urls'
 
@@ -110,6 +113,7 @@ INSTALLED_APPS = (
     'south',
     'tastypie',
     'reversion',
+    'debug_toolbar',
     'mmqweb.namebook',
     'mmqweb.fight',
     'mmqweb.game',
