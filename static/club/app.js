@@ -91,12 +91,13 @@ function OutCtrl($scope, $http, $window) {
 
         $http.post('new_member', {'name': name, 'male': !is_girl}).
              success(function(data) {
-                 if (data != "ok") {
+                 if (!_.has(data, "ok")) {
                      $scope.server_message = "保存失败？？";
                      return;
                  }
-                 $scope.server_message = "已添加会员: " + name;
-                 $scope.members.push({'name': name, 'weight': -1, 'index': '{'});
+                 member = data.ok
+                 $scope.server_message = "已添加会员: " + member.name;
+                 $scope.members.push(member);
                  cb();
               }).
               error(function(data, status) {

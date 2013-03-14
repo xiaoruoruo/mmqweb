@@ -91,7 +91,8 @@ def new_member(request):
         print l
         member = Member(name = l['name'], male = l['male'])
         member.save()
-    return HttpResponse("ok", mimetype="application/json")
+        res = {'ok': {'name': member.name, 'index': member.index, 'weight': -1}}
+    return HttpResponse(json.dumps(res), mimetype="application/json")
 
 def balance_sheet(request):
     "按照拼音排序，所有人的余额"
