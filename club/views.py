@@ -9,6 +9,7 @@ from django.db import transaction
 from django.views.decorators.csrf import csrf_protect
 from django.views.static import serve
 from django.contrib.auth.decorators import permission_required
+from django.conf import settings
 
 from club.models import Member, Activity
 
@@ -158,7 +159,10 @@ def activity_overall(request):
             RequestContext(request))
 
 
-
+@permission_required('admin', raise_exception=True)
+def dump_db(request):
+    "Dump the db file for backup"
+    return serve(request, 'mmqweb.db', settings.SITE_ROOT)
 
 def determine_cost(member, weight):
     if member.male:
