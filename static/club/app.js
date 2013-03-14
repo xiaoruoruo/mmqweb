@@ -135,8 +135,8 @@ function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
     }
 
     /* checkin using enter if only one is left */
-    $scope.queryOnEnter = function(query) {
-        var filtered = $filter('filter')($scope.members, query);
+    $scope.queryOnEnter = function() {
+        var filtered = $filter('filter')($scope.members, $scope.doFilter);
         if (filtered.length == 1) {
             $scope.checkin_click(filtered[0].name);
         }
