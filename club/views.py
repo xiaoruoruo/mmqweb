@@ -87,7 +87,7 @@ def checkin_POST(request):
 @permission_required('club.add_member', raise_exception=True)
 def new_member(request):
     if request.method == 'POST':
-        l = json.loads( request.raw_post_data )
+        l = json.loads( request.body )
         print l
         member = Member(name = l['name'], male = l['male'])
         member.save()

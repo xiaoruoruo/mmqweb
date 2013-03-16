@@ -1,6 +1,6 @@
 import os
 
-from django.conf.urls.defaults import patterns, include
+from django.conf.urls import patterns, include
 from django.conf.urls.static import static
 from tastypie.api import Api
 from club.models import MemberResource, ActivityResource
