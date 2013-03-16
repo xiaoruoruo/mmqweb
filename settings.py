@@ -95,7 +95,7 @@ EXCLUDE_FROM_MINIFYING = ('^static/',)
 CSRF_COOKIE_NAME = 'XSRF-TOKEN'
 INTERNAL_IPS = ('127.0.0.1',)
 
-ALLOWED_HOSTS = ['mmqweb.apexlab.org']
+ALLOWED_HOSTS = ['*']
 
 ROOT_URLCONF = 'mmqweb.urls'
 
