@@ -1,16 +1,17 @@
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#/">三碗点名</a></li>
+  <li><a href="#/members">会员管理</a></li>
+</ul>
 日期（如2013-3-13）：<input ng-model="info.date">
 
 <div class='row'>
   <div class='span9'>
-<h3>
-    名单<span style="font-size:10pt">（单击姓名来点名，红色表示已签到，再单击红色算多次、缴费）</span>
-</h3>
 <p>
 排序方式: 
 <input type="radio" ng-model="info.member_order" value="index">拼音首字母序
 <input type="radio" ng-model="info.member_order" value="-weight">活动频繁程度
 </p>
-首字母过滤：<input ng-model="query" ui-keyup="{'enter':'queryOnEnter()', 'esc': 'queryOnEsc()'}">
+首字母过滤：<input ng-model="info.query" ui-keyup="{'enter':'queryOnEnter()', 'esc': 'queryOnEsc()'}">
 名字大小：<input type="button" value="+" ng-click="member_font_adjust(5)"> <input type="button" value="-" ng-click="member_font_adjust(-5)">
 <ul class="flat">
     <li ng-repeat="member in members | filter:doFilter | orderBy:info.member_order">
@@ -26,6 +27,11 @@
 
 <button style="font-size:14pt" ng-click='save()'>保存签到表、缴费表</button>
 <span>{{server_message}}</span>
+<p>
+  使用说明：
+  <ul><li>单击姓名来点名，红色表示已签到，再单击红色算多次、缴费</li></ul>
+</p>
+
 </div>
 
   <div class='span3'>

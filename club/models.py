@@ -56,7 +56,7 @@ class MemberResource(ModelResource):
     class Meta:
         queryset = Member.objects.order_by('-weight')
         resource_name = 'member'
-        fields = ['name', 'balance', 'weight']
+        fields = ['name', 'male', 'balance', 'weight']
         limit = 0
         include_resource_uri = False
 

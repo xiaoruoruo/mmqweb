@@ -1,7 +1,7 @@
 angular.module('club', ['ui']).
     config(['$routeProvider', function($routeProvider) {
     $routeProvider.
-        when('/', {templateUrl: '/static/club/member-list.html', controller: ClubCtrl}).
+        when('/', {templateUrl: '/static/club/checkin.html', controller: ClubCtrl}).
         when('/checkin/:name', {templateUrl: '/static/club/member-checkin.html', controller: ClubCtrl}).
         when('/members', {templateUrl: '/static/club/members.html', controller: MemberCtrl}).
         when('/member/:name', {templateUrl: '/static/club/member_detail.html', controller: MemberCtrl}).
@@ -21,6 +21,7 @@ function OutCtrl($scope, $http, $window) {
 
     /* a local scope to make angularjs happy */
     $scope.info = {
+        'query': '',
         'date': function(d) { return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate(); } (new Date()),
         'member_order': "-weight",
     };
@@ -123,17 +124,17 @@ function OutCtrl($scope, $http, $window) {
         if (!_.has($scope.checkins, name)) $scope.checkins[name] = {};
         $scope.checkins[name]['deposit'] = deposit;
     }
+
+    $scope.doFilter = function(elem) {
+        if (!$scope.info.query) return true;
+        return angular.lowercase(elem.index).indexOf(angular.lowercase($scope.info.query)) == 0;
+    }
 }
 
 function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
     $scope.name = $routeParams.name;
     $scope.deposit = ($scope.checkins[$scope.name] || {})['deposit'];
     console.log("ClubCtrl");
-
-    $scope.doFilter = function(elem) {
-        if (!$scope.query) return true;
-        return angular.lowercase(elem.index).indexOf(angular.lowercase($scope.query)) == 0;
-    }
 
     /* checkin using enter if only one is left */
     $scope.queryOnEnter = function() {
@@ -144,11 +145,11 @@ function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
     }
 
     $scope.queryOnEsc = function() {
-        $scope.query = "";
+        $scope.info.query = "";
     }
 
     $scope.checkin_click = function(name) {
-        $scope.query = "";
+        $scope.info.query = "";
         if ($scope.isCheckin(name)) {
             $location.path('/checkin/' + name);
         } else {
@@ -210,7 +211,7 @@ function MemberCtrl($scope, $http, $routeParams, $location, $filter) {
         $location.path('/member/' + member.name);
     }
 
-    $scope.member = $filter('filter')($scope.members, {'name': $scope.name})[0];
+    // $scope.member = $filter('filter')($scope.members, {'name': $scope.name})[0];
     // call a http get for recent activities of this member.
     
 

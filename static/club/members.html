@@ -1,10 +1,21 @@
-首字母过滤：<input ng-model="query">
-<table>
-    <tr><th>会员</th><th>余额</th><th>最近活动</th></tr>
-    <tr ng-repeat="member in members | filter:doFilter">
+<ul class="nav nav-tabs">
+  <li><a href="#/">三碗点名</a></li>
+  <li class="active"><a href="#/members">会员管理</a></li>
+</ul>
+<div class="row">
+  <div class="span4">
+    <p>
+    首字母过滤：<input ng-model="info.query">
+    </p>
+    <table class="table">
+      <tr><th>会员</th><th>性别</th><th>余额</th><th>最近活动</th></tr>
+      <tr ng-repeat="member in members | orderBy:'index' | filter:doFilter">
         <td>{{member.name}}</td>
+        <td ng-show="member.male">男</td>
+        <td ng-show="!member.male">女</td>
         <td>{{member.balance}}</td>
         <td><a ng-click='view_member(member)'>查看</a></td>
-    </tr>
-</table>
-
+      </tr>
+    </table>
+  </div>
+</div>
