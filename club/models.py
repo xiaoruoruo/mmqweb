@@ -4,6 +4,8 @@ import datetime
 from django.db import models
 from tastypie.resources import ModelResource
 from tastypie import fields
+from tastypie.authentication import SessionAuthentication
+from tastypie.authorization import DjangoAuthorization
 
 from xpinyin import Pinyin
 pinyin = Pinyin()
@@ -58,16 +60,8 @@ class MemberResource(ModelResource):
         limit = 0
         include_resource_uri = False
 
-        # change to SessionAuthentication and DjangoAuthorization once tastypie 0.9.12 is out
-        # authentication = Authentication()
-        # authorization = Authorization()
+        authentication = SessionAuthentication()
+        authorization = DjangoAuthorization()
 
     index = fields.CharField(attribute='index')
-
-class ActivityResource(ModelResource):
-    class Meta:
-        queryset = Activity.objects.all()
-        resource_name = 'activity'
-        list_allowed_methods = ['put']
-        detail_allowed_methods = []
 
