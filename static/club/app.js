@@ -211,6 +211,18 @@ function MemberCtrl($scope, $http, $routeParams, $location, $filter) {
         $location.path('/member/' + member.name);
     }
 
+    $scope.delete_member = function(member) {
+        var r = confirm("确定要删除会员“" + member.name + "”吗？");
+        if (r == true) {
+            $http({
+                method: 'PATCH', 
+                url: member.resource_uri, 
+                data: {'hidden': true},
+                headers: {'Content-Type': 'application/json'},
+            });
+        }
+    }
+
     // $scope.member = $filter('filter')($scope.members, {'name': $scope.name})[0];
     // call a http get for recent activities of this member.
     

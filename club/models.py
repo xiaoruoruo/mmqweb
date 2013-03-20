@@ -18,8 +18,8 @@ class Member(models.Model):
     phone = models.CharField(max_length=15, null=True, blank=True)
     affiliation = models.CharField(max_length=20, null=True, blank=True)
     weight = models.FloatField(default=0.0)
-
     balance = models.FloatField(default=0.0)
+    hidden = models.BooleanField(default=False)
 
     def __unicode__(self):
         return u'%s (balance: %.2f)' % (self.name, self.balance)
@@ -54,14 +54,14 @@ class Activity(models.Model):
 
 class MemberResource(ModelResource):
     class Meta:
-        queryset = Member.objects.order_by('-weight')
+        queryset = Member.objects.filter(hidden=False).order_by('-weight')
         resource_name = 'member'
-        fields = ['name', 'male', 'balance', 'weight']
+        fields = ['name', 'male', 'balance', 'weight', 'hidden']
         limit = 0
-        include_resource_uri = False
+        include_resource_uri = True
 
         authentication = SessionAuthentication()
         authorization = DjangoAuthorization()
 
-    index = fields.CharField(attribute='index')
+    index = fields.CharField(attribute='index', readonly=True)
 

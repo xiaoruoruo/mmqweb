@@ -65,7 +65,7 @@ def checkin_POST(request):
     for o in l:
         print o
         deposit = o['deposit']
-        member = get_object_or_404(Member, name=o['name'])
+        member = get_object_or_404(Member, name=o['name'], hidden=False)
         cost = determine_cost(member, o['weight'])
 
         a = Activity(
@@ -108,7 +108,7 @@ def balance_sheet(request):
 
 def activity_sheet(request, name):
     "按照日期倒序，该会员的活动记录"
-    member = get_object_or_404(Member, name=name)
+    member = get_object_or_404(Member, name=name, hidden=False)
     acts = Activity.objects.filter(member=member).order_by('-date', '-id')
 
     # calculate running totals

@@ -73,3 +73,7 @@ table.sheet td {
     text-align: center;
     padding: 3px;
 }
+
+td.right {
+    text-align: right;
+}
