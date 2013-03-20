@@ -8,10 +8,6 @@ angular.module('club', ['ui']).
 }]);
 
 function OutCtrl($scope, $http, $window) {
-    $http.get('api/member/?format=json').success(function(data) {
-        $scope.members = data.objects;
-    });
-
     /* hash: name -> {weight, deposit} */
     $scope.checkins = {};
 
@@ -42,6 +38,13 @@ function OutCtrl($scope, $http, $window) {
         }
     }
 
+    $scope.get_members = function() {
+        $http.get('api/member/?format=json').success(function(data) {
+            $scope.members = data.objects;
+        });
+    }
+
+    $scope.get_members();
     console.log("OutCtrl");
 
     $scope.has_unsaved_data = function() {
@@ -69,6 +72,7 @@ function OutCtrl($scope, $http, $window) {
                 $scope.checkins = {};
                 $scope.checkin_names_list = [];
                 $scope.server_message = "保存成功！"
+                $scope.get_members();
             }).
             error(function(data, status) {
                 if (status == 403) {
@@ -212,7 +216,6 @@ function MemberCtrl($scope, $http, $routeParams, $location, $filter) {
     }
 
     $scope.edit_member_save = function() {
-        console.log($scope.memberEdit);
         $http.put($scope.memberEdit.resource_uri, $scope.memberEdit)
             .success(function () {
                 $('#editModal').modal('hide');

@@ -56,7 +56,7 @@ class MemberResource(ModelResource):
     class Meta:
         queryset = Member.objects.filter(hidden=False).order_by('-weight')
         resource_name = 'member'
-        fields = ['name', 'male', 'balance', 'weight', 'hidden']
+        fields = ['name', 'male', 'hidden']
         limit = 0
         include_resource_uri = True
 
@@ -64,4 +64,6 @@ class MemberResource(ModelResource):
         authorization = DjangoAuthorization()
 
     index = fields.CharField(attribute='index', readonly=True)
+    balance = fields.CharField(attribute='balance', readonly=True)
+    weight = fields.CharField(attribute='weight', readonly=True)
 
