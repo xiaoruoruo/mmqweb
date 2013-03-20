@@ -96,7 +96,7 @@ def new_member(request):
 
 def balance_sheet(request):
     "按照拼音排序，所有人的余额"
-    members = Member.objects.all()
+    members = Member.objects.filter(hidden=False)
     members = list(members)
     members.sort(key=lambda m: m.index)
     return render_to_response('balance-sheet.html',
@@ -135,6 +135,7 @@ def activity_sheet(request, name):
 
 @permission_required('club.add_activity', raise_exception=True)
 def activity_overall(request):
+    "活动总表"
     overall = []
     current_date = None
 
