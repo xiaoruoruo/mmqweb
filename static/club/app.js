@@ -4,7 +4,6 @@ angular.module('club', ['ui']).
         when('/', {templateUrl: '/static/club/checkin.html', controller: ClubCtrl}).
         when('/checkin/:name', {templateUrl: '/static/club/member-checkin.html', controller: ClubCtrl}).
         when('/members', {templateUrl: '/static/club/members.html', controller: MemberCtrl}).
-        when('/member/:name', {templateUrl: '/static/club/member_detail.html', controller: MemberCtrl}).
         otherwise({redirectTo: '/'});
 }]);
 
@@ -207,8 +206,20 @@ function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
 function MemberCtrl($scope, $http, $routeParams, $location, $filter) {
     $scope.name = $routeParams.name;
 
-    $scope.view_member = function(member) {
-        $location.path('/member/' + member.name);
+    $scope.edit_member = function(member) {
+        $scope.memberEdit = member;
+        $('#editModal').modal();
+    }
+
+    $scope.edit_member_save = function() {
+        console.log($scope.memberEdit);
+        $http.put($scope.memberEdit.resource_uri, $scope.memberEdit)
+            .success(function () {
+                $('#editModal').modal('hide');
+            })
+            .error(function () {
+                alert("出错了，请稍后再试");
+            }) ;
     }
 
     $scope.delete_member = function(member) {
@@ -222,9 +233,4 @@ function MemberCtrl($scope, $http, $routeParams, $location, $filter) {
             });
         }
     }
-
-    // $scope.member = $filter('filter')($scope.members, {'name': $scope.name})[0];
-    // call a http get for recent activities of this member.
-    
-
 }

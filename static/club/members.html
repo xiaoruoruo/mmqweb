@@ -3,20 +3,44 @@
   <li class="active"><a href="#/members">会员管理</a></li>
 </ul>
 <div class="row">
-  <div class="span4">
+  <div class="span6">
     <p>
     首字母过滤：<input ng-model="info.query">
     </p>
     <table class="table">
-      <tr><th>会员</th><th>性别</th><th>余额</th><th>最近活动</th><th>删除</th></tr>
+      <tr><th>会员</th><th>性别</th><th>余额</th><th>最近活动</th><th>修改</th><th>删除</th></tr>
       <tr ng-repeat="member in members | orderBy:'index' | filter:doFilter">
         <td>{{member.name}}</td>
         <td ng-show="member.male">男</td>
         <td ng-show="!member.male">女</td>
         <td class="right">{{member.balance}}</td>
         <td class="right"><a href="/club/activity/{{member.name}}" target="blank">查看</a></td>
+        <td class="right"><a ng-click="edit_member(member)">修改</a></td>
         <td class="right"><a ng-click="delete_member(member)">删除</a></td>
       </tr>
     </table>
   </div>
 </div>
+
+<div id="editModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="editModalLabel">修改会员</h3>
+  </div>
+  <div class="modal-body">
+    <form>
+      <fieldset>
+        <label>姓名</label>
+        <input type="text" ng-model="memberEdit.name">
+        <label>性别</label>
+        <input type="radio" id="maleRadio" ng-value="true" ng-model="memberEdit.male"> 男
+        <input type="radio" id="femaleRadio" ng-value="false" ng-model="memberEdit.male"> 女
+      </fieldset>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">取消</button>
+    <button class="btn btn-primary" ng-click="edit_member_save()">保存修改</button>
+  </div>
+</div>
+
