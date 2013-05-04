@@ -64,6 +64,6 @@ class MemberResource(ModelResource):
         authorization = DjangoAuthorization()
 
     index = fields.CharField(attribute='index', readonly=True)
-    balance = fields.CharField(attribute='balance', readonly=True)
-    weight = fields.CharField(attribute='weight', readonly=True)
+    balance = fields.FloatField(attribute='balance', readonly=True)
+    weight = fields.FloatField(attribute='weight', readonly=True)
 

@@ -8,13 +8,14 @@
     首字母过滤：<input ng-model="info.query">
     </p>
     <table class="table">
-      <tr><th>会员</th><th>性别</th><th>余额</th><th>最近活动</th><th>修改</th><th>删除</th></tr>
+      <tr><th>会员</th><th>性别</th><th>余额</th><th>最近活动</th><th>缴费</th><th>修改</th><th>删除</th></tr>
       <tr ng-repeat="member in members | orderBy:'index' | filter:doFilter">
         <td>{{member.name}}</td>
         <td ng-show="member.male">男</td>
         <td ng-show="!member.male">女</td>
-        <td class="right">{{member.balance}}</td>
+        <td class="right" ng-style="member.balanceStyle">{{member.balance}}</td>
         <td class="right"><a href="/club/activity/{{member.name}}" target="blank">查看</a></td>
+        <td class="right"><a ng-click="deposit(member)">缴费</a></td>
         <td class="right"><a ng-click="edit_member(member)">修改</a></td>
         <td class="right"><a ng-click="delete_member(member)">删除</a></td>
       </tr>
@@ -41,6 +42,29 @@
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">取消</button>
     <button class="btn btn-primary" ng-click="edit_member_save()">保存修改</button>
+  </div>
+</div>
+
+<div id="depositModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="depositModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="editModalLabel">会员缴费</h3>
+  </div>
+  <div class="modal-body">
+    <form>
+      <fieldset>
+        <label>姓名</label>
+        <input type="text" ng-model="depositEdit.name">
+        <label>缴费日期</label>
+        <input type="date" ng-model="depositEdit.date">
+        <label>金额</label>
+        <input type="number" ng-model="depositEdit.amount">
+      </fieldset>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">取消</button>
+    <button class="btn btn-primary" ng-click="deposit_save()">保存修改</button>
   </div>
 </div>
 

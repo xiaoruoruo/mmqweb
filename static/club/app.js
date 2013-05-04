@@ -7,6 +7,14 @@ angular.module('club', ['ui']).
         otherwise({redirectTo: '/'});
 }]);
 
+function api_error_func(data, status) {
+    if (status == 403) {
+        $scope.server_message = "请先登录！";
+    } else {
+        $scope.server_message = "保存失败，程序有bug，马上就会修复。。";
+    }
+}
+
 function OutCtrl($scope, $http, $window) {
     /* hash: name -> {weight, deposit} */
     $scope.checkins = {};
@@ -74,13 +82,7 @@ function OutCtrl($scope, $http, $window) {
                 $scope.server_message = "保存成功！"
                 $scope.get_members();
             }).
-            error(function(data, status) {
-                if (status == 403) {
-                    $scope.server_message = "请先登录！";
-                } else {
-                    $scope.server_message = "保存失败，程序有bug，马上就会修复。。";
-                }
-            });
+            error(api_error_func);
     }
 
     $scope.add_member = function(name, is_girl, cb) {
@@ -104,13 +106,7 @@ function OutCtrl($scope, $http, $window) {
                  $scope.members.push(member);
                  cb();
               }).
-              error(function(data, status) {
-                  if (status == 403) {
-                      $scope.server_message = "请先登录！";
-                  } else {
-                      $scope.server_message = "保存失败，程序有bug，马上就会修复。。";
-                  }
-              });
+              error(api_error_func);
     }
     
     $scope.do_checkin = function(name, weight) {
@@ -207,7 +203,7 @@ function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
     }
 }
 
-function MemberCtrl($scope, $http, $routeParams, $location, $filter) {
+function MemberCtrl($scope, $http, $routeParams, $location, $filter, $timeout) {
     $scope.name = $routeParams.name;
 
     $scope.edit_member = function(member) {
@@ -235,5 +231,43 @@ function MemberCtrl($scope, $http, $routeParams, $location, $filter) {
                 headers: {'Content-Type': 'application/json'},
             });
         }
+    }
+
+    $scope.deposit = function(member) {
+        $scope.depositEdit = $scope.depositEdit || {};
+        $scope.depositEdit["name"] = member.name;
+        if (!$scope.depositEdit["date"]) {
+            // reuse previous entered date or use default
+            $scope.depositEdit["date"] = $scope.info.date;
+        }
+        $('#depositModal').modal();
+    }
+
+    $scope.deposit_save = function() {
+        var depositEdit = _.clone($scope.depositEdit);
+        var payload = {
+            "date": depositEdit["date"],
+            "list": [{
+                "name": depositEdit["name"],
+                "deposit": depositEdit["amount"],
+                "weight": 0,
+            }]
+        }
+        $http.post("checkin", payload)
+            .success(function(data) {
+                if (data != "ok") {
+                    alert("保存失败？？");
+                    return;
+                }
+                $('#depositModal').modal('hide');
+                // update the member balance in model
+                var member = _.findWhere($scope.members, {"name": depositEdit.name});
+                member.balance += depositEdit.amount;
+                member.balanceStyle = {"background-color": "yellow"};
+                $timeout(function() {
+                    member.balanceStyle = {};
+                }, 1000);
+            })
+            .error(api_error_func);
     }
 }
