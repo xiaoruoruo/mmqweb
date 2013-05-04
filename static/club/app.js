@@ -229,6 +229,8 @@ function MemberCtrl($scope, $http, $routeParams, $location, $filter, $timeout) {
                 url: member.resource_uri, 
                 data: {'hidden': true},
                 headers: {'Content-Type': 'application/json'},
+            }).success(function() {
+                $scope.members = _.reject($scope.members, function(m) {return m.name == member.name});
             });
         }
     }
