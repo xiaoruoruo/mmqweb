@@ -95,13 +95,45 @@ def new_member(request):
     return HttpResponse(json.dumps(res), mimetype="application/json")
 
 def balance_sheet(request):
-    "按照拼音排序，所有人的余额"
-    members = Member.objects.filter(hidden=False)
-    members = list(members)
+    "Balance sheet during select date range, of all visible members, sorted by name index."
+    filter_start = request.GET.get('start', None)
+    filter_end = request.GET.get('end', None)
+
+    members_dict = {}
+
+    activity_start = datetime.date.today()
+    activity_end = datetime.date(2000,1,1)
+
+    activities = Activity.objects
+    # string date filtering
+    if filter_start:
+        activities = activities.filter(date__gte=filter_start)
+    if filter_end:
+        activities = activities.filter(date__lte=filter_end)
+
+    for a in activities.select_related('member'):
+        if a.member.hidden:
+            continue
+        m = members_dict.get(a.member.id, None)
+        if not m:
+            m = a.member
+            m.balance = 0
+            members_dict[m.id] = m
+        m.balance -= a.cost
+        if a.deposit:
+            m.balance += a.deposit
+
+        if a.date < activity_start:
+            activity_start = a.date
+        if a.date > activity_end:
+            activity_end = a.date
+
+    members = members_dict.values()
     members.sort(key=lambda m: m.index)
     return render_to_response('balance-sheet.html',
             {
                 'members':members,
+                'range': {'start': str(activity_start), 'end': str(activity_end)},
                 'balance_sheet_active': True,
             },
             RequestContext(request))

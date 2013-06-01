@@ -3,8 +3,24 @@
 {% block title %}
 会费情况表
 {% endblock %}
+{% block head %}
+<style type="text/css">
+  #range-filter > form > * {
+    margin-right: 5px;
+  }
+</style>
+{% endblock %}
 {% block content %}
 <h1>会费情况表</h1>
+<div id="range-filter">
+  <span>统计范围：</span>
+  <form action='' class='form-inline' method='get'>
+    <input type='date' class='input-small' name='start' value='{{range.start}}' placeholder='起始日期' />
+    <span>-</span>
+    <input type='date' class='input-small' name='end' value='{{range.end}}' placeholder='终止日期' />
+    <button type='submit' class='btn'>刷新</button>
+  </form>
+</div>
 <div class='row'>
   <div class='span4'>
     <table class="table">

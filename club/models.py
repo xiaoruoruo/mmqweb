@@ -49,7 +49,7 @@ class Activity(models.Model):
         s = u'%s * %.1f @ %s' % (self.member.name, self.weight, self.date)
         s += u' -￥%d' % self.cost
         if self.deposit:
-            s += u' +￥%d' % self.deposit
+            s += u' +￥%.2f' % self.deposit
         return s
 
 class MemberResource(ModelResource):
