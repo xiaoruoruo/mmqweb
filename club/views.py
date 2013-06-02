@@ -143,9 +143,11 @@ def activity_sheet(request, name):
     member = get_object_or_404(Member, name=name, hidden=False)
     acts = Activity.objects.filter(member=member).order_by('-date', '-id')
 
-    # calculate running totals
-    acts = list(acts)
+    # filter out zero activity
+    acts = list(filter(lambda a: a.deposit or a.cost, acts))
     acts.reverse()
+
+    # calculate running totals
     sum = 0.0
     running = []
     for a in acts:
