@@ -141,21 +141,8 @@ def balance_sheet(request):
 def activity_sheet(request, name):
     "按照日期倒序，该会员的活动记录"
     member = get_object_or_404(Member, name=name, hidden=False)
-    acts = Activity.objects.filter(member=member).order_by('-date', '-id')
 
-    # filter out zero activity
-    acts = list(filter(lambda a: a.deposit or a.cost, acts))
-    acts.reverse()
-
-    # calculate running totals
-    sum = 0.0
-    running = []
-    for a in acts:
-        if a.deposit:
-            sum += a.deposit
-        if a.cost:
-            sum -= a.cost
-        running.append(sum)
+    acts, running, sum = member.running_total()
     acts.reverse()
     running.reverse()
 
