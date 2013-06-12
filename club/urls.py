@@ -3,7 +3,7 @@ import os
 from django.conf.urls import patterns, include
 from django.conf.urls.static import static
 from tastypie.api import Api
-from club.models import MemberResource
+from club.resources import MemberResource
 
 v1_api = Api(api_name='')
 v1_api.register(MemberResource())

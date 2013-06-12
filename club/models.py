@@ -2,10 +2,6 @@
 import datetime
 
 from django.db import models
-from tastypie.resources import ModelResource
-from tastypie import fields
-from tastypie.authentication import SessionAuthentication
-from tastypie.authorization import DjangoAuthorization
 
 from xpinyin import Pinyin
 pinyin = Pinyin()
@@ -51,19 +47,4 @@ class Activity(models.Model):
         if self.deposit:
             s += u' +￥%.2f' % self.deposit
         return s
-
-class MemberResource(ModelResource):
-    class Meta:
-        queryset = Member.objects.filter(hidden=False).order_by('-weight')
-        resource_name = 'member'
-        fields = ['name', 'male', 'hidden']
-        limit = 0
-        include_resource_uri = True
-
-        authentication = SessionAuthentication()
-        authorization = DjangoAuthorization()
-
-    index = fields.CharField(attribute='index', readonly=True)
-    balance = fields.FloatField(attribute='balance', readonly=True)
-    weight = fields.FloatField(attribute='weight', readonly=True)
 
