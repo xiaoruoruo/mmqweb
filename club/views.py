@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.static import serve
 from django.contrib.auth.decorators import permission_required
 from django.conf import settings
+import reversion
 
 from club.models import Member, Activity
 
@@ -62,25 +63,29 @@ def checkin_POST(request):
     date = parse_date(data['date'])
 
     l = data['list']
-    for o in l:
-        print o
-        deposit = o['deposit']
-        member = get_object_or_404(Member, name=o['name'], hidden=False)
-        cost = determine_cost(member, o['weight'])
 
-        a = Activity(
-            member = member,
-            weight = o['weight'],
-            date = date,
-            cost = cost,
-            deposit = deposit,
-        )
-        a.save()
+    with reversion.create_revision():
+        for o in l:
+            print o
+            deposit = o['deposit']
+            member = get_object_or_404(Member, name=o['name'], hidden=False)
+            cost = determine_cost(member, o['weight'])
 
-        member.balance -= cost
-        if deposit:
-            member.balance += deposit
-        member.save()
+            a = Activity(
+                member = member,
+                weight = o['weight'],
+                date = date,
+                cost = cost,
+                deposit = deposit,
+            )
+            a.save()
+
+            member.balance -= cost
+            if deposit:
+                member.balance += deposit
+            member.save()
+        reversion.set_user(request.user)
+        reversion.set_comment('Checkin %d members' % len(l))
 
     return HttpResponse("ok", mimetype="application/json")
 
