@@ -17,11 +17,15 @@ class Activity(models.Model):
     cost   = models.FloatField(blank=True)
     deposit= models.FloatField(null=True, blank=True)
 
+    comment= models.CharField(max_length=100, blank=True, null=True)
+
     def __unicode__(self):
         s = u'%s * %.1f @ %s' % (self.member.name, self.weight, self.date)
         s += u' -￥%d' % self.cost
         if self.deposit:
             s += u' +￥%.2f' % self.deposit
+        if self.comment:
+            s += u' (%s)' % self.comment
         return s
 
 class Member(models.Model):
