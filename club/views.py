@@ -2,6 +2,7 @@
 import json
 import re
 import datetime
+import itertools
 from django.shortcuts import get_list_or_404, get_object_or_404, render_to_response, redirect
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -163,21 +164,14 @@ def activity_sheet(request, name):
 def activity_overall(request):
     "活动总表"
     overall = []
-    current_date = None
 
     all_acts = Activity.objects.order_by('-date').select_related('member')
-    for a in all_acts:
-        date_s = u"%s" % a.date
-        if current_date is None:
-            current_date = date_s
-            current_activities = []
-        if current_date != date_s:
-            overall.append({'date': current_date, 'acts': current_activities})
-            current_date = date_s
-            current_activities = []
-        current_activities.append({'member': a.member, 'cost': a.cost, 'deposit': a.deposit})
-
-    overall.append({'date': current_date, 'acts': current_activities})
+    for date, acts in itertools.groupby(all_acts, lambda a: a.date):
+        current_date = u"%s" % date
+        current_activities = []
+        for a in acts:
+            current_activities.append({'member': a.member, 'cost': a.cost, 'deposit': a.deposit})
+        overall.append({'date': current_date, 'acts': current_activities})
 
     return render_to_response('activity-overall.html',
             {
