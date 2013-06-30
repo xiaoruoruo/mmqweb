@@ -1,4 +1,4 @@
-angular.module('club', ['ui']).
+var app = angular.module('club', ['ui']).
     config(['$routeProvider', function($routeProvider) {
     $routeProvider.
         when('/', {templateUrl: '/static/club/checkin.html', controller: ClubCtrl}).
@@ -7,12 +7,29 @@ angular.module('club', ['ui']).
         otherwise({redirectTo: '/'});
 }]);
 
+app.directive('disabler', function($compile) {
+    return {
+        link: function(scope, elm, attrs) {
+            scope.$watch(attrs.ngModel, function(value) {
+                if (value) {
+                    setTimeout(function(){
+                        elm.attr('disabled',true);
+                    }, 0);
+                } else {
+                    elm.attr('disabled',false);
+                }
+            });
+        }
+    }
+})
+
 function api_error_func(data, status) {
     if (status == 403) {
-        $scope.server_message = "请先登录！";
+        this.server_message = "请先登录！";
     } else {
-        $scope.server_message = "保存失败，程序有bug，马上就会修复。。";
+        this.server_message = "保存失败，程序有bug，马上就会修复。。";
     }
+    this.info.loading = false;
 }
 
 function OutCtrl($scope, $http, $window) {
@@ -27,6 +44,7 @@ function OutCtrl($scope, $http, $window) {
         'query': '',
         'date': function(d) { return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate(); } (new Date()),
         'member_order': "-weight",
+        'loading': false,
     };
 
     /* shows hint messages or message from server */
@@ -64,6 +82,8 @@ function OutCtrl($scope, $http, $window) {
             $scope.server_message = "还没有点一个名不能保存";
             return;
         }
+        $scope.info.loading = true;
+        $scope.server_message = "请稍后。。。";
         list = _.map($scope.checkins, function(obj, name) {
             return _.defaults(obj, {
                 'name': name,
@@ -81,8 +101,9 @@ function OutCtrl($scope, $http, $window) {
                 $scope.checkin_names_list = [];
                 $scope.server_message = "保存成功！"
                 $scope.get_members();
+                $scope.info.loading = false;
             }).
-            error(api_error_func);
+            error(function() {api_error_func.apply($scope, arguments)});
     }
 
     $scope.add_member = function(name, is_girl, cb) {
@@ -95,6 +116,9 @@ function OutCtrl($scope, $http, $window) {
             }
         }
 
+        $scope.info.loading = true;
+        $scope.server_message = "请稍后。。。";
+
         $http.post('new_member', {'name': name, 'male': !is_girl}).
              success(function(data) {
                  if (!_.has(data, "ok")) {
@@ -103,10 +127,11 @@ function OutCtrl($scope, $http, $window) {
                  }
                  member = data.ok
                  $scope.server_message = "已添加会员: " + member.name;
+                 $scope.info.loading = false;
                  $scope.members.push(member);
                  cb();
               }).
-              error(api_error_func);
+            error(function() {api_error_func.apply($scope, arguments)});
     }
     
     $scope.do_checkin = function(name, weight) {
@@ -246,6 +271,7 @@ function MemberCtrl($scope, $http, $routeParams, $location, $filter, $timeout) {
     }
 
     $scope.deposit_save = function() {
+        $scope.info.loading = true;
         var depositEdit = _.clone($scope.depositEdit);
         var payload = {
             "date": depositEdit["date"],
@@ -269,7 +295,7 @@ function MemberCtrl($scope, $http, $routeParams, $location, $filter, $timeout) {
                 $timeout(function() {
                     member.balanceStyle = {};
                 }, 1000);
-            })
-            .error(api_error_func);
+                $scope.info.loading = false;
+            });
     }
 }
