@@ -5,7 +5,7 @@ import datetime
 import itertools
 from django.shortcuts import get_list_or_404, get_object_or_404, render_to_response, redirect
 from django.template import RequestContext
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.db import transaction
 from django.views.decorators.csrf import csrf_protect
 from django.views.static import serve
@@ -49,6 +49,8 @@ def checkin(request):
         return checkin_GET(request)
     elif request.method == 'POST':
         return checkin_POST(request)
+    else:
+        raise HttpResponseNotAllowed(['GET', 'POST'])
 
 @permission_required('club.add_activity')
 def checkin_GET(request):
