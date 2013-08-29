@@ -123,3 +123,5 @@ INSTALLED_APPS = (
 )
 
 LOGIN_REDIRECT_URL = '/mmqweb/'
+
+OTP_SECRET = 'base32secret3232'
