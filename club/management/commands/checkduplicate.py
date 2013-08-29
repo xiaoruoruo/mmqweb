@@ -11,11 +11,12 @@ class Command(BaseCommand):
     @transaction.commit_on_success
     def handle(self, *args, **options):
         with reversion.create_revision():
-            self.check_duplicate()
+            assert self.check_duplicate()
             reversion.set_comment("Check duplicate")
         print "Run checkbalance afterwards."
 
     def check_duplicate(self):
+        success = True
         all_acts = Activity.objects.order_by('date').select_related('member')
         for date, acts in itertools.groupby(all_acts, lambda a: a.date):
             today = {}
@@ -23,13 +24,20 @@ class Command(BaseCommand):
                 if a.member in today:
                     if today[a.member] == (a.cost, a.deposit):
                         # remove duplicate
-                        print "Duplicate checkin for %s on %s" % (a.member.name, date)
+                        print u"Duplicate checkin for {0} on {1}".format(a.member.name, date)
                         a.delete()
+                    elif self.compatible(today[a.member], (a.cost, a.deposit)):
+                        pass
                     else:
                         # not really duplicate
-                        print "Multiple checkins for %s on %s: (%.2f %.2f) (%.2f %.2f)" \
-                            % (a.member.name, date, a.cost, a.deposit, a.cost, a.deposit)
-                        assert False
+                        print u"Multiple checkins for {0} on {1}: ({2} {3}) ({4} {5})".format(
+                            a.member.name, date, today[a.member][0], today[a.member][1], a.cost, a.deposit)
+                        success = False
                 else:
                     today[a.member] = (a.cost, a.deposit)
+        return success
+
+    def compatible(self, ta, tb):
+        t = lambda x: x is None or x == 0.0
+        return (t(ta[0]) and t(tb[1])) or (t(ta[1]) and t(tb[0]))
 
