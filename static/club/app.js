@@ -271,8 +271,14 @@ function MemberCtrl($scope, $http, $routeParams, $location, $filter, $timeout) {
     }
 
     $scope.deposit_save = function() {
-        $scope.info.loading = true;
         var depositEdit = _.clone($scope.depositEdit);
+        deposit = Number(depositEdit["amount"]);
+        if (isNaN(deposit) || deposit < 0) {
+            alert("输入有误");
+            return;
+        }
+
+        $scope.info.loading = true;
         var payload = {
             "date": depositEdit["date"],
             "list": [{
