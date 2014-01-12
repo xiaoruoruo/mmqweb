@@ -117,10 +117,11 @@ INSTALLED_APPS = (
     'tastypie',
     'reversion',
     'debug_toolbar',
-    'mmqweb.namebook',
-    'mmqweb.fight',
-    'mmqweb.game',
-    'mmqweb.club',
+# mmqweb's apps
+    'namebook',
+    'fight',
+    'game',
+    'club',
 )
 
 LOGIN_REDIRECT_URL = '/mmqweb/'
