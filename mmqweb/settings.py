@@ -20,7 +20,7 @@ else:
 
 MANAGERS = ADMINS
 
-SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
+SITE_ROOT = os.path.dirname(os.path.dirname(__file__))
 
 DATABASES = {
     'default': {
@@ -60,6 +60,10 @@ MEDIA_URL = ''
 # Examples: "http://foo.com/media/", "/media/".
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = (
+    os.path.join(SITE_ROOT, 'static'),
+)
+
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '+6w5l6e8gvpzl=a$&e&_40n4+t%*)!#nm$4!hn)lbvn4mi9v0d'
 
@@ -83,13 +87,14 @@ MIDDLEWARE_CLASSES = (
     'club.views.AngularJsCsrfMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.middleware.transaction.TransactionMiddleware',
     'reversion.middleware.RevisionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.gzip.GZipMiddleware',
 #    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'htmlmin.middleware.HtmlMinifyMiddleware',
 )
+
+ATOMIC_REQUESTS = True
 
 HTML_MINIFY = True
 EXCLUDE_FROM_MINIFYING = ('^static/',)
@@ -113,6 +118,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'django.contrib.staticfiles',
     'south',
     'tastypie',
     'reversion',

@@ -6,7 +6,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 import os
-PROJECT_ROOT = os.path.dirname(__file__)
+PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
 
 import django
 admin_media_url = settings.STATIC_URL.lstrip('/') + 'admin/(?P<path>.*)$'
