@@ -36,6 +36,7 @@ class Member(models.Model):
     weight = models.FloatField(default=0.0)
     balance = models.FloatField(default=0.0)
     hidden = models.BooleanField(default=False)
+    hidden_date = models.DateField(null=True)
 
     def __unicode__(self):
         return u'%s (balance: %.2f)' % (self.name, self.balance)
