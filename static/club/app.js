@@ -32,6 +32,11 @@ function api_error_func(data, status) {
     this.info.loading = false;
 }
 
+function today() {
+    var d = new Date();
+    return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
+};
+
 function OutCtrl($scope, $http, $window) {
     /* hash: name -> {weight, deposit} */
     $scope.checkins = {};
@@ -42,7 +47,7 @@ function OutCtrl($scope, $http, $window) {
     /* a local scope to make angularjs happy */
     $scope.info = {
         'query': '',
-        'date': function(d) { return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate(); } (new Date()),
+        'date': today(),
         'member_order': "-weight",
         'loading': false,
     };
@@ -66,7 +71,15 @@ function OutCtrl($scope, $http, $window) {
 
     $scope.get_members = function() {
         $http.get('api/member/?format=json').success(function(data) {
-            $scope.members = data.objects;
+            $scope.members = [];
+            $scope.hidden_members = [];
+            _.each(data.objects, function(member) {
+                if (!member.hidden) {
+                    $scope.members.push(member);
+                } else {
+                    $scope.hidden_members.push(member);
+                }
+            });
         });
     }
 
@@ -252,7 +265,7 @@ function MemberCtrl($scope, $http, $routeParams, $location, $filter, $timeout) {
             $http({
                 method: 'PATCH', 
                 url: member.resource_uri, 
-                data: {'hidden': true},
+                data: {'hidden': true, 'hidden_date': today()},
                 headers: {'Content-Type': 'application/json'},
             }).success(function() {
                 $scope.members = _.reject($scope.members, function(m) {return m.name == member.name});

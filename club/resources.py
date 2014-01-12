@@ -7,9 +7,9 @@ from club.models import Member
 
 class MemberResource(ModelResource):
     class Meta:
-        queryset = Member.objects.filter(hidden=False).order_by('-weight')
+        queryset = Member.objects.order_by('-weight')
         resource_name = 'member'
-        fields = ['name', 'male', 'hidden']
+        fields = ['name', 'male', 'hidden', 'hidden_date']
         limit = 0
         include_resource_uri = True
 
