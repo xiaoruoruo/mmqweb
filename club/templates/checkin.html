@@ -28,12 +28,19 @@
         <label>性别</label>
         <input type="radio" id="maleRadio" ng-value="true" ng-model="memberEdit.male"> 男
         <input type="radio" id="femaleRadio" ng-value="false" ng-model="memberEdit.male"> 女
+        <p><span>联系信息</span></p>
+        <p ng-repeat="o in extra">
+          <select ng-options="o for o in extraOptions" ng-model="o.key"/>
+          <input type="text" ng-model="o.value">
+          <button type="button" class="close" ng-click="del_extra($index)">×</button>
+        </p>
+        <br/><button class="btn" ng-click="add_extra()">添加</button>
       </fieldset>
     </form>
   </div>
   <div class="modal-footer">
     <button class="btn" ng-click="cancel()">取消</button>
-    <button class="btn btn-primary" ng-click="edit_member_save(memberEdit)">保存修改</button>
+    <button class="btn btn-primary" ng-click="edit_member_save()">保存修改</button>
   </div>
   </script>
 

@@ -259,14 +259,16 @@ function MemberCtrl($scope, $http, $routeParams, $location, $filter, $timeout, $
 
     $scope.delete_member = function(member) {
         var r = confirm("确定要删除会员“" + member.name + "”吗？");
+        var change = {'hidden': true, 'hidden_date': today()};
         if (r == true) {
             $http({
                 method: 'PATCH', 
                 url: member.resource_uri, 
-                data: {'hidden': true, 'hidden_date': today()},
+                data: change,
                 headers: {'Content-Type': 'application/json'},
             }).success(function() {
                 $scope.members = _.reject($scope.members, function(m) {return m.name == member.name});
+                $scope.hidden_members.push(_.extend(member, change));
             });
         }
     }
@@ -320,12 +322,46 @@ function MemberCtrl($scope, $http, $routeParams, $location, $filter, $timeout, $
 var EditModalCtrl = function ($scope, $modalInstance, $http, memberEdit) {
 
   $scope.memberEdit = memberEdit;
+  
+  // Convert dict to an array format
+  var extra = JSON.parse(memberEdit.extra);
+  $scope.extra = [];
+  for (var key in extra) {
+    $scope.extra.push({'key': key, 'value': extra[key]});
+  }
+  $scope.extraOptions = ['手机', 'QQ', '微信', 'Email', '其他'];
+
+  $scope.add_extra = function() {
+    $scope.extra.push({'key':'','value':''});
+  }
+
+  $scope.del_extra = function(i) {
+    $scope.extra.splice(i, 1);
+  }
 
   $scope.cancel = function () {
     $modalInstance.dismiss('cancel');
   };
 
-  $scope.edit_member_save = function(memberEdit) {
+  $scope.edit_member_save = function() {
+    var memberEdit = $scope.memberEdit;
+
+    // Convert array format back to dict
+    var extra = {};
+    for (var i in $scope.extra) {
+      var o = $scope.extra[i];
+      if (o.key === '') {
+        alert('请选择联系方式');
+        return;
+      }
+      if (o.key in extra) {
+        alert('请不要选择重复联系方式');
+        return;
+      }
+      extra[o.key] = o.value;
+    }
+    memberEdit.extra = JSON.stringify(extra);
+
     $http.put(memberEdit.resource_uri, memberEdit)
         .success(function () {
             $modalInstance.close(memberEdit);
