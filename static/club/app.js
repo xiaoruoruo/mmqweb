@@ -362,12 +362,15 @@ var EditModalCtrl = function ($scope, $modalInstance, $http, memberEdit) {
     }
     memberEdit.extra = JSON.stringify(extra);
 
-    $http.put(memberEdit.resource_uri, memberEdit)
-        .success(function () {
-            $modalInstance.close(memberEdit);
-        })
-        .error(function () {
-            alert("出错了，请稍后再试");
-        }) ;
+    $http({
+        method: 'PATCH', 
+        url: memberEdit.resource_uri, 
+        data: memberEdit,
+        headers: {'Content-Type': 'application/json'}
+    }).success(function () {
+        $modalInstance.close(memberEdit);
+    }).error(function () {
+        alert("出错了，请稍后再试");
+    }) ;
   }
 };
