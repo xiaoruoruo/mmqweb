@@ -9,7 +9,7 @@ class MemberResource(ModelResource):
     class Meta:
         queryset = Member.objects.order_by('-weight')
         resource_name = 'member'
-        fields = ['name', 'male', 'hidden', 'hidden_date']
+        fields = ['name', 'male', 'hidden', 'hidden_date', 'extra']
         limit = 0
         include_resource_uri = True
 

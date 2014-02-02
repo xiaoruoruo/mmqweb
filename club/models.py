@@ -28,15 +28,16 @@ class Activity(models.Model):
             s += u' (%s)' % self.comment
         return s
 
+
 class Member(models.Model):
-    name  = models.CharField(max_length=50)
-    male  = models.BooleanField()
-    phone = models.CharField(max_length=15, null=True, blank=True)
+    name = models.CharField(max_length=50)
+    male = models.BooleanField()
     affiliation = models.CharField(max_length=20, null=True, blank=True)
     weight = models.FloatField(default=0.0)
     balance = models.FloatField(default=0.0)
     hidden = models.BooleanField(default=False)
     hidden_date = models.DateField(null=True)
+    extra = models.TextField(default='{}')
 
     def __unicode__(self):
         return u'%s (balance: %.2f)' % (self.name, self.balance)
