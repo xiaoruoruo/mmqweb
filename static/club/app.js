@@ -1,9 +1,10 @@
-var app = angular.module('club', ['ui']).
+var app = angular.module('club', ['ui', 'ui.bootstrap']).
     config(['$routeProvider', function($routeProvider) {
     $routeProvider.
         when('/', {templateUrl: '/static/club/checkin.html', controller: ClubCtrl}).
         when('/checkin/:name', {templateUrl: '/static/club/member-checkin.html', controller: ClubCtrl}).
         when('/members', {templateUrl: '/static/club/members.html', controller: MemberCtrl}).
+        when('/hidden', {templateUrl: '/static/club/members-hidden.html', controller: MemberCtrl}).
         otherwise({redirectTo: '/'});
 }]);
 
@@ -241,22 +242,19 @@ function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
     }
 }
 
-function MemberCtrl($scope, $http, $routeParams, $location, $filter, $timeout) {
+function MemberCtrl($scope, $http, $routeParams, $location, $filter, $timeout, $modal) {
     $scope.name = $routeParams.name;
 
     $scope.edit_member = function(member) {
-        $scope.memberEdit = member;
-        $('#editModal').modal();
-    }
-
-    $scope.edit_member_save = function() {
-        $http.put($scope.memberEdit.resource_uri, $scope.memberEdit)
-            .success(function () {
-                $('#editModal').modal('hide');
-            })
-            .error(function () {
-                alert("出错了，请稍后再试");
-            }) ;
+        var modalInstance = $modal.open({
+            templateUrl: 'editModal.html',
+            controller: EditModalCtrl,
+            resolve: {
+                memberEdit: function () {
+                    return member;
+                }
+            }
+        });
     }
 
     $scope.delete_member = function(member) {
@@ -318,3 +316,22 @@ function MemberCtrl($scope, $http, $routeParams, $location, $filter, $timeout) {
             });
     }
 }
+
+var EditModalCtrl = function ($scope, $modalInstance, $http, memberEdit) {
+
+  $scope.memberEdit = memberEdit;
+
+  $scope.cancel = function () {
+    $modalInstance.dismiss('cancel');
+  };
+
+  $scope.edit_member_save = function(memberEdit) {
+    $http.put(memberEdit.resource_uri, memberEdit)
+        .success(function () {
+            $modalInstance.close(memberEdit);
+        })
+        .error(function () {
+            alert("出错了，请稍后再试");
+        }) ;
+  }
+};

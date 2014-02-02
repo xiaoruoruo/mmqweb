@@ -1,6 +1,7 @@
 <ul class="nav nav-tabs">
   <li><a href="#/">三碗点名</a></li>
   <li class="active"><a href="#/members">会员管理</a></li>
+  <li><a href="#/hidden">老会员</a></li>
 </ul>
 <div class="row">
   <div class="span6">
@@ -20,28 +21,6 @@
         <td class="right"><a ng-click="delete_member(member)">删除</a></td>
       </tr>
     </table>
-  </div>
-</div>
-
-<div id="editModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="editModalLabel">修改会员</h3>
-  </div>
-  <div class="modal-body">
-    <form>
-      <fieldset>
-        <label>姓名</label>
-        <input type="text" ng-model="memberEdit.name">
-        <label>性别</label>
-        <input type="radio" id="maleRadio" ng-value="true" ng-model="memberEdit.male"> 男
-        <input type="radio" id="femaleRadio" ng-value="false" ng-model="memberEdit.male"> 女
-      </fieldset>
-    </form>
-  </div>
-  <div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true">取消</button>
-    <button class="btn btn-primary" ng-click="edit_member_save()">保存修改</button>
   </div>
 </div>
 
@@ -67,4 +46,3 @@
     <button class="btn btn-primary" ng-model="info.loading" disabler ng-click="deposit_save()">保存修改</button>
   </div>
 </div>
-

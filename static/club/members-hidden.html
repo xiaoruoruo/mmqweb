@@ -1,0 +1,23 @@
+<ul class="nav nav-tabs">
+  <li><a href="#/">三碗点名</a></li>
+  <li><a href="#/members">会员管理</a></li>
+  <li class="active"><a href="#/hidden">老会员</a></li>
+</ul>
+<div class="row">
+  <div class="span6">
+    <p>
+    首字母过滤：<input ng-model="info.query">
+    </p>
+    <table class="table">
+      <tr><th>会员</th><th>性别</th><th>进入老会员日期</th><th>以往活动</th><th>修改信息</th></tr>
+      <tr ng-repeat="member in hidden_members | orderBy:'-hidden_date' | filter:doFilter">
+        <td>{{member.name}}</td>
+        <td ng-show="member.male">男</td>
+        <td ng-show="!member.male">女</td>
+        <td class="right">{{member.hidden_date}}</td>
+        <td class="right"><a href="/club/activity/{{member.name}}" target="blank">查看</a></td>
+        <td class="right"><a ng-click="edit_member(member)">修改信息</a></td>
+      </tr>
+    </table>
+  </div>
+</div>
