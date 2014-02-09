@@ -62,7 +62,7 @@ def checkin_GET(request):
 
 @permission_required('club.add_activity', raise_exception=True)
 def checkin_POST(request):
-    data = json.loads( request.raw_post_data )
+    data = json.loads( request.body )
     print data
 
     date = parse_date(data['date'])
