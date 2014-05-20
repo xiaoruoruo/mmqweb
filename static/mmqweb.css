@@ -53,6 +53,10 @@ ul.flat a.checkedin {
     color: red;
 }
 
+.girl {
+    color: #d000d0;
+}
+
 .weight_selected {
     background-color: yellow;
 }

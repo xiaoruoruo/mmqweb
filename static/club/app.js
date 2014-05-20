@@ -209,6 +209,14 @@ function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
         $location.path('/');
     }
 
+    $scope.isGirl = function(member) {
+        if (_.has(member, 'male')) {
+            return !member.male;
+        }
+        var member = _.findWhere($scope.members, {"name": member});
+        return !member.male;
+    }
+
     $scope.isCheckin = function(name) {
         if (! $scope.checkins[name]) {
             return false;

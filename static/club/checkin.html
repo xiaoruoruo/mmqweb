@@ -16,7 +16,7 @@
 名字大小：<input type="button" value="+" ng-click="member_font_adjust(5)"> <input type="button" value="-" ng-click="member_font_adjust(-5)">
 <ul class="flat">
     <li ng-repeat="member in members | filter:doFilter | orderBy:info.member_order">
-        <a ng-style='member_style' ng-click='checkin_click(member.name)' ng-class='{checkedin:isCheckin(member.name)}'>{{member.name}}</a>
+        <a ng-style='member_style' ng-click='checkin_click(member.name)' ng-class='{checkedin:isCheckin(member.name), girl:isGirl(member)}'>{{member.name}}</a>
     </li>
 </ul>
 
@@ -45,7 +45,7 @@
       </thead>
       <tbody>
         <tr ng-repeat="name in checkin_names_list">
-          <td><a ng-click='checkin_click(name)'>{{name}}</a></td>
+          <td><a ng-click='checkin_click(name)' ng-class='{girl:isGirl(name)}'>{{name}}</a></td>
           <td>{{checkins[name].weight}}</td>
           <td>{{checkins[name].deposit}}</td>
         </tr>
