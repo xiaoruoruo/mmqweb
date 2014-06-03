@@ -194,10 +194,7 @@ def dump_db(request):
         raise PermissionDenied()
 
 def determine_cost(member, weight):
-    if member.male:
-        return weight * 15.0
-    else:
-        return weight * 10.0
+    return weight * member.cost
 
 re_date = re.compile(r'(\d\d\d\d)-(\d\d?)-(\d\d?)')
 def parse_date(date_string):

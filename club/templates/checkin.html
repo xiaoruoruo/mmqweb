@@ -28,6 +28,8 @@
         <label>性别</label>
         <input type="radio" id="maleRadio" ng-value="true" ng-model="memberEdit.male"> 男
         <input type="radio" id="femaleRadio" ng-value="false" ng-model="memberEdit.male"> 女
+        <label>每次费用</label>
+        <input type="text" ng-model="memberEdit.cost">
         <p><span>联系信息</span></p>
         <p ng-repeat="o in extra">
           <select ng-options="o for o in extraOptions" ng-model="o.key"/>

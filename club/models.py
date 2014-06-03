@@ -33,10 +33,14 @@ class Member(models.Model):
     name = models.CharField(max_length=50)
     male = models.BooleanField()
     affiliation = models.CharField(max_length=20, null=True, blank=True)
+
+    # Karma: the larger, the more possible this member will come next time
     weight = models.FloatField(default=0.0)
+
     balance = models.FloatField(default=0.0)
     hidden = models.BooleanField(default=False)
     hidden_date = models.DateField(null=True)
+    cost_override = models.FloatField(null=True, blank=True)
     extra = models.TextField(default='{}')
 
     def __unicode__(self):
@@ -49,6 +53,18 @@ class Member(models.Model):
     @property
     def sex(self):
         return self.male and u'男' or u'女'
+
+    @property
+    def cost(self):
+        if self.cost_override:
+            return self.cost_override
+        else:
+            # When changing the default costs, consider also how to change the
+            # existing overrides.
+            if self.male:
+                return 15.0
+            else:
+                return 10.0
 
     def is_low_balance(self):
         return self.balance <= 0
