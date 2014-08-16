@@ -45,6 +45,9 @@ function OutCtrl($scope, $http, $window) {
     /* list: names */
     $scope.checkin_names_list = [];
 
+    /* sum of weight */
+    $scope.checkin_weight_sum = 0;
+
     /* a local scope to make angularjs happy */
     $scope.info = {
         'query': '',
@@ -156,6 +159,7 @@ function OutCtrl($scope, $http, $window) {
         $scope.checkins[name]['weight'] = weight;
         var sum = _.reduce(_.values($scope.checkins), function(sum, c) {return sum + c['weight'] || 0}, 0);
         $scope.server_message = "已经点了" + sum + "位会员";
+        $scope.checkin_weight_sum = sum;
     }
 
     $scope.do_deposit = function(name, deposit) {
