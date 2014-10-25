@@ -92,6 +92,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.gzip.GZipMiddleware',
 #    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'htmlmin.middleware.HtmlMinifyMiddleware',
+    'htmlmin.middleware.MarkRequestMiddleware',
 )
 
 ATOMIC_REQUESTS = True

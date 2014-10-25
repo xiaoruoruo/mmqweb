@@ -14,9 +14,9 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 import reversion
 import pyotp
+from htmlmin.decorators import not_minified_response
 
 from club.models import Member, Activity
-
 
 @csrf_protect
 def csrf_serve(*args, **kwargs):
@@ -165,6 +165,7 @@ def activity_sheet(request, name):
             RequestContext(request))
 
 @permission_required('club.add_activity', raise_exception=True)
+@not_minified_response
 def activity_overall(request):
     "活动总表"
     overall = []
@@ -183,7 +184,6 @@ def activity_overall(request):
                 'overall': overall
             },
             RequestContext(request))
-
 
 def dump_db(request):
     "Dump the db file for backup"
