@@ -157,13 +157,17 @@ function OutCtrl($scope, $http, $window) {
             $scope.checkin_names_list.unshift(name);
         }
         $scope.checkins[name]['weight'] = weight;
-        var sum = _.reduce(_.values($scope.checkins), function(sum, c) {return sum + c['weight'] || 0}, 0);
+        var sum = _.reduce(_.values($scope.checkins), function(sum, c) {return sum + (c['weight'] > 0 ? 1 : 0)}, 0);
         $scope.server_message = "已经点了" + sum + "位会员";
         $scope.checkin_weight_sum = sum;
     }
 
     $scope.do_deposit = function(name, deposit) {
-        if (!_.has($scope.checkins, name)) $scope.checkins[name] = {};
+        if (!_.has($scope.checkins, name)) {
+            $scope.checkins[name] = {};
+            $scope.checkins[name]['weight'] = 0;
+            $scope.checkin_names_list.unshift(name);
+        }
         $scope.checkins[name]['deposit'] = deposit;
     }
 
@@ -192,12 +196,7 @@ function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
 
     $scope.checkin_click = function(name) {
         $scope.info.query = "";
-        if ($scope.isCheckin(name)) {
-            $location.path('/checkin/' + name);
-        } else {
-            // 默认weight = 1，节省一次点击
-            $scope.do_checkin(name, 1.0);
-        }
+        $location.path('/checkin/' + name);
     }
 
     $scope.checkin_weight = function(name, weight) {

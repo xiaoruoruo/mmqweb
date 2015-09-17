@@ -194,7 +194,9 @@ def dump_db(request):
         raise PermissionDenied()
 
 def determine_cost(member, weight):
-    return weight * member.cost
+    # Always set member cost to 1.
+    # TODO: there used to have a member-based weight. Clean up code related to that.
+    return weight * 1
 
 re_date = re.compile(r'(\d\d\d\d)-(\d\d?)-(\d\d?)')
 def parse_date(date_string):

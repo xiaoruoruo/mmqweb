@@ -2,10 +2,10 @@
   <li class="active"><a href="#/">三碗点名</a></li>
   <li><a href="#/members">会员管理</a></li>
 </ul>
-{{name}}：算几次？
+{{name}}：记帐多少元？
 
 <ul class="flat">
-    <li ng-repeat="w in [0, 0.5,1.0,1.5,2.0,2.5,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10.0]"><button ng-click="checkin_weight(name,w)" ng-class="weight_style(w)">{{w}}</button></li>
+    <li ng-repeat="w in [0, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]"><button ng-click="checkin_deposit(deposit);checkin_weight(name,w)" ng-class="weight_style(w)">{{w}}</button></li>
 </ul>
 
 <form name="depositForm">
