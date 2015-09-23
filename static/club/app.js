@@ -108,7 +108,7 @@ function OutCtrl($scope, $http, $window) {
                 'weight': null,
             });
         });
-        $http.post('checkin', data={'list': list, 'date': $scope.info.date}).
+        $http.post('checkin', data={'list': list, 'date': $scope.info.date, 'ver': '2'}).
             success(function(data) {
                 if (data != "ok") {
                     $scope.server_message = "保存失败？？";

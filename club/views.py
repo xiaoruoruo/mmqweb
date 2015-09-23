@@ -68,13 +68,14 @@ def checkin_POST(request):
     date = parse_date(data['date'])
 
     l = data['list']
+    ver = data.get('ver', '1')
 
     with reversion.create_revision():
         for o in l:
             print o
             deposit = o['deposit']
             member = get_object_or_404(Member, name=o['name'], hidden=False)
-            cost = determine_cost(member, o['weight'])
+            cost = determine_cost(member, o['weight'], ver)
 
             a = Activity(
                 member = member,
@@ -193,10 +194,15 @@ def dump_db(request):
     else:
         raise PermissionDenied()
 
-def determine_cost(member, weight):
-    # Always set member cost to 1.
-    # TODO: there used to have a member-based weight. Clean up code related to that.
-    return weight * 1
+def determine_cost(member, weight, ver):
+    if ver == '1':
+        return weight * member.cost
+    elif ver == '2':
+        # Always set member cost to 1.
+        # TODO: there used to have a member-based weight. Clean up code related to that.
+        return weight * 1
+    else:
+        raise Exception("Unknown ver: " + ver)
 
 re_date = re.compile(r'(\d\d\d\d)-(\d\d?)-(\d\d?)')
 def parse_date(date_string):
