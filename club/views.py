@@ -11,9 +11,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.static import serve
 from django.contrib.auth.decorators import permission_required
 from django.conf import settings
-from django.core.exceptions import PermissionDenied
 import reversion
-import pyotp
 from htmlmin.decorators import not_minified_response
 
 from club.models import Member, Activity
@@ -185,14 +183,6 @@ def activity_overall(request):
                 'overall': overall
             },
             RequestContext(request))
-
-def dump_db(request):
-    "Dump the db file for backup"
-    totp = pyotp.TOTP(settings.OTP_SECRET)
-    if request.GET.get('otp', None) == str(totp.now()):
-        return serve(request, 'mmqweb.db', settings.SITE_ROOT)
-    else:
-        raise PermissionDenied()
 
 def determine_cost(member, weight, ver):
     if ver == '1':
