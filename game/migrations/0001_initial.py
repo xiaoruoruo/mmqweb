@@ -14,61 +14,56 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='ExtensionModel',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-            ],
-            options={
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
             name='Game',
             fields=[
-                ('extensionmodel_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='game.ExtensionModel')),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('score1', models.IntegerField()),
                 ('score2', models.IntegerField()),
                 ('extra', models.TextField(default=b'{}')),
             ],
             options={
+                'abstract': False,
             },
-            bases=('game.extensionmodel',),
+            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Match',
             fields=[
-                ('extensionmodel_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='game.ExtensionModel')),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('result', models.IntegerField(null=True, blank=True)),
                 ('type', models.IntegerField(choices=[(1, b'Team'), (2, b'\xe5\x8d\x95\xe6\x89\x93'), (3, b'\xe5\x8f\x8c\xe6\x89\x93'), (4, b'\xe4\xb8\x80\xe6\x89\x93\xe4\xba\x8c')])),
                 ('text', models.TextField(blank=True)),
                 ('extra', models.TextField(default=b'{}')),
             ],
             options={
+                'abstract': False,
             },
-            bases=('game.extensionmodel',),
+            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='MatchGroup',
             fields=[
-                ('extensionmodel_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='game.ExtensionModel')),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=50)),
                 ('view_name', models.CharField(max_length=50, blank=True)),
             ],
             options={
+                'abstract': False,
             },
-            bases=('game.extensionmodel',),
+            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Participation',
             fields=[
-                ('extensionmodel_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='game.ExtensionModel')),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('displayname', models.CharField(max_length=50, blank=True)),
                 ('player', models.ForeignKey(related_name='player', to='namebook.Entity')),
                 ('represent', models.ForeignKey(related_name='represent', blank=True, to='namebook.Entity', null=True)),
             ],
             options={
+                'abstract': False,
             },
-            bases=('game.extensionmodel',),
+            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='PersonalRating',
@@ -86,19 +81,20 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Ranking',
             fields=[
-                ('extensionmodel_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='game.ExtensionModel')),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('type', models.IntegerField(choices=[(1, b'\xe5\x8d\x95\xe6\xb7\x98\xe6\xb1\xb0'), (2, b'\xe5\x8d\x95\xe5\xbe\xaa\xe7\x8e\xaf'), (3, b'2n-1\xe5\xb1\x80n\xe8\x83\x9c'), (4, b'\xe4\xb8\xaa\xe4\xba\xba\xe6\x8e\x92\xe5\x90\x8d(fish)'), (5, b'\xe4\xb8\xaa\xe4\xba\xba\xe6\x8e\x92\xe5\x90\x8d(elo)')])),
                 ('name', models.CharField(max_length=50, blank=True)),
                 ('mg', models.ForeignKey(to='game.MatchGroup')),
             ],
             options={
+                'abstract': False,
             },
-            bases=('game.extensionmodel',),
+            bases=(models.Model,),
         ),
         migrations.CreateModel(
             name='Tournament',
             fields=[
-                ('extensionmodel_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='game.ExtensionModel')),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=50)),
                 ('text', models.TextField(blank=True)),
                 ('extra', models.TextField(default=b'{}')),
@@ -106,8 +102,9 @@ class Migration(migrations.Migration):
                 ('participants', models.ManyToManyField(related_name='tournaments', to='game.Participation', blank=True)),
             ],
             options={
+                'abstract': False,
             },
-            bases=('game.extensionmodel',),
+            bases=(models.Model,),
         ),
         migrations.AddField(
             model_name='personalrating',

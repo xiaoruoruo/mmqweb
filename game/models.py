@@ -14,6 +14,10 @@ class ExtensionModel(Model):
         r[key] = val
         self.extra = json.dumps(r)
 
+    class Meta:
+        abstract = True
+
+
 re_linkURL=re.compile(r'https?://([-\w\.]+)+(:\d+)?(/[-\w/_\.]*)?(\?\S+)?')
 def replURL(m):
     # Replace picture URLs with img tag, replace bbs links with href tag
