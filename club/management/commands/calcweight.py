@@ -7,7 +7,7 @@ import club.admin  # for registration of reversion
 DROP_PER_MONTH = 0.5
 
 class Command(BaseCommand):
-    @transaction.commit_on_success
+    @transaction.atomic
     def handle(self, *args, **options):
         with reversion.create_revision():
             self.update_weight_for_all()

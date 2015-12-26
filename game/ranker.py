@@ -23,7 +23,7 @@ class PersonalRanker(Ranker):
         self.matches = sorted(self.mg.match_set.all())
         self._result_cache = None
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def rank(self):
         """
         删除所有rating，重新排

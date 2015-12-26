@@ -11,7 +11,7 @@ class Command(BaseCommand):
     help = 'Revert new activities created in selected revisions, and revert the balances.'
 
     activity_type = ContentType.objects.get(app_label="club", model="activity")
-    @transaction.commit_on_success
+    @transaction.atomic
     def handle(self, *args, **options):
         with reversion.create_revision():
             for revision_id in args:

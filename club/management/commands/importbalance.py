@@ -1,14 +1,14 @@
 import io
 from django.core.management.base import BaseCommand, CommandError
 from club.models import Member, Activity
-from django.db.transaction import commit_on_success
+from django.db.transaction import atomic
 import reversion
 import club.admin  # for registration of reversion
 from datetime import datetime
 import pdb
 
 class Command(BaseCommand):
-    @commit_on_success
+    @atomic
     def handle(self, *args, **options):
         f = io.open(args[0], 'r', encoding='utf8')
         date = datetime.strptime(args[1], "%Y-%m-%d")

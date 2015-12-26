@@ -8,7 +8,7 @@ import club.admin  # for registration of reversion
 class Command(BaseCommand):
     help = 'Check duplicate checkins for each day.'
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def handle(self, *args, **options):
         with reversion.create_revision():
             assert self.check_duplicate()

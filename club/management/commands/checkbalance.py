@@ -7,7 +7,7 @@ import club.admin  # for registration of reversion
 class Command(BaseCommand):
     help = 'Check the balance for each member and reset the balance if wrong.'
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def handle(self, *args, **options):
         with reversion.create_revision():
             self.check_balance()
