@@ -119,7 +119,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.staticfiles',
-    'tastypie',
+#    'tastypie',
     'reversion',
     'debug_toolbar',
 # mmqweb's apps
