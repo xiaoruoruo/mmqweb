@@ -245,7 +245,7 @@ function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
     }
 
     $scope.weight_style = function(w) {
-        if ($scope.checkins[$scope.name]['weight'] == w) {
+        if ($scope.checkins[$scope.name] && $scope.checkins[$scope.name]['weight'] == w) {
             return 'weight_selected';
         } else {
             return '';

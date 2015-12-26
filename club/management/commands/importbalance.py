@@ -2,7 +2,7 @@ import io
 from django.core.management.base import BaseCommand, CommandError
 from club.models import Member, Activity
 from django.db.transaction import atomic
-import reversion
+from reversion import revisions as reversion
 import club.admin  # for registration of reversion
 from datetime import datetime
 import pdb

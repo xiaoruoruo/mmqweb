@@ -2,7 +2,7 @@ import itertools
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from club.models import Member, Activity
-import reversion
+from reversion import revisions as reversion
 import club.admin  # for registration of reversion
 
 class Command(BaseCommand):

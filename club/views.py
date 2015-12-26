@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.static import serve
 from django.contrib.auth.decorators import permission_required
 from django.conf import settings
-import reversion
+from reversion import revisions as reversion
 from htmlmin.decorators import not_minified_response
 
 from club.models import Member, Activity
@@ -91,7 +91,7 @@ def checkin_POST(request):
         reversion.set_user(request.user)
         reversion.set_comment('Checkin %d members' % len(l))
 
-    return HttpResponse("ok", mimetype="application/json")
+    return HttpResponse("ok", content_type="application/json")
 
 @permission_required('club.add_member', raise_exception=True)
 def new_member(request):
@@ -101,7 +101,7 @@ def new_member(request):
         member = Member(name = l['name'], male = l['male'])
         member.save()
         res = {'ok': {'name': member.name, 'index': member.index, 'weight': -1}}
-    return HttpResponse(json.dumps(res), mimetype="application/json")
+    return HttpResponse(json.dumps(res), content_type="application/json")
 
 def balance_sheet(request):
     "Balance sheet during select date range, of all visible members, sorted by name index."

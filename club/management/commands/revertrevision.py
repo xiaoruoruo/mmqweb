@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.contrib.contenttypes.models import ContentType
 from club.models import Member, Activity
-import reversion
+from reversion import revisions as reversion
 from reversion.models import Revision
 import club.admin  # for registration of reversion
 
