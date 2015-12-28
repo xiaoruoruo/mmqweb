@@ -100,7 +100,12 @@ def new_member(request):
         print l
         member = Member(name = l['name'], male = l['male'])
         member.save()
-        res = {'ok': {'name': member.name, 'index': member.index, 'weight': -1}}
+        res = {'ok': {
+            'name': member.name,
+            'male': member.male,
+            'index': member.index,
+            'weight': -1
+            }}
     return HttpResponse(json.dumps(res), content_type="application/json")
 
 def balance_sheet(request):
