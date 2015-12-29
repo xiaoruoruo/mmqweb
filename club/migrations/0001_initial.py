@@ -1,59 +1,52 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.db import models, migrations
 import datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'Member'
-        db.create_table('club_member', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('male', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('phone', self.gf('django.db.models.fields.CharField')(max_length=15, null=True)),
-            ('affiliation', self.gf('django.db.models.fields.CharField')(max_length=20, null=True)),
-            ('weight', self.gf('django.db.models.fields.FloatField')()),
-        ))
-        db.send_create_signal('club', ['Member'])
+    dependencies = [
+    ]
 
-        # Adding model 'Activity'
-        db.create_table('club_activity', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('member', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['club.Member'])),
-            ('weight', self.gf('django.db.models.fields.FloatField')(default=1.0)),
-            ('date', self.gf('django.db.models.fields.DateField')()),
-        ))
-        db.send_create_signal('club', ['Activity'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'Member'
-        db.delete_table('club_member')
-
-        # Deleting model 'Activity'
-        db.delete_table('club_activity')
-
-
-    models = {
-        'club.activity': {
-            'Meta': {'object_name': 'Activity'},
-            'date': ('django.db.models.fields.DateField', [], {}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'member': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['club.Member']"}),
-            'weight': ('django.db.models.fields.FloatField', [], {'default': '1.0'})
-        },
-        'club.member': {
-            'Meta': {'object_name': 'Member'},
-            'affiliation': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'male': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'phone': ('django.db.models.fields.CharField', [], {'max_length': '15', 'null': 'True'}),
-            'weight': ('django.db.models.fields.FloatField', [], {})
-        }
-    }
-
-    complete_apps = ['club']
+    operations = [
+        migrations.CreateModel(
+            name='Activity',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('weight', models.FloatField(default=1.0)),
+                ('date', models.DateField(default=datetime.date(2015, 12, 26))),
+                ('cost', models.FloatField(blank=True)),
+                ('deposit', models.FloatField(null=True, blank=True)),
+                ('comment', models.CharField(max_length=100, null=True, blank=True)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Member',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=50)),
+                ('male', models.BooleanField()),
+                ('affiliation', models.CharField(max_length=20, null=True, blank=True)),
+                ('weight', models.FloatField(default=0.0)),
+                ('balance', models.FloatField(default=0.0)),
+                ('hidden', models.BooleanField(default=False)),
+                ('hidden_date', models.DateField(null=True)),
+                ('cost_override', models.FloatField(null=True, blank=True)),
+                ('extra', models.TextField(default=b'{}')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.AddField(
+            model_name='activity',
+            name='member',
+            field=models.ForeignKey(to='club.Member'),
+            preserve_default=True,
+        ),
+    ]

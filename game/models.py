@@ -5,7 +5,7 @@ from django.db.models import *
 from namebook.models import Entity
 from django.contrib.auth.models import User
 
-class Extension:
+class ExtensionModel(Model):
     def xget(self, key, *default):
         return json.loads(self.extra).get(key, *default)
 
@@ -13,6 +13,10 @@ class Extension:
         r = json.loads(self.extra)
         r[key] = val
         self.extra = json.dumps(r)
+
+    class Meta:
+        abstract = True
+
 
 re_linkURL=re.compile(r'https?://([-\w\.]+)+(:\d+)?(/[-\w/_\.]*)?(\?\S+)?')
 def replURL(m):
@@ -26,7 +30,7 @@ def replURL(m):
     else:
         return url
 
-class Tournament(Model, Extension):
+class Tournament(ExtensionModel):
     "一次正规赛事，包括参赛人员"
 
     name = CharField(max_length=50)
@@ -66,7 +70,7 @@ class Tournament(Model, Extension):
             p = self.add_participant(ent, None)
             return p
 
-class Participation(Model, Extension):
+class Participation(ExtensionModel):
     displayname = CharField(max_length=50, blank=True)
     player = ForeignKey(Entity, related_name='player')
     represent = ForeignKey(Entity, related_name='represent', null=True, blank=True)
@@ -95,7 +99,7 @@ class PersonalRating(Model):
         return u'%s在比赛%d后的积分：%.2f/%.2f' % (self.player, self.match.pk,
                 self.rating_singles or NaN, self.rating_doubles or NaN)
 
-class Ranking(Model, Extension):
+class Ranking(ExtensionModel):
     """
     排名表，对于一个MatchGroup，以一种排名系统，增量计算每个实体的排名。
     """
@@ -151,7 +155,7 @@ class Ranking(Model, Extension):
             raise NotImplementedError
 
 
-class MatchGroup(Model, Extension):
+class MatchGroup(ExtensionModel):
     """一些比赛Match的集合，以一种形式展现在网页上。
     """
     name = CharField(max_length=50)
@@ -165,7 +169,7 @@ class MatchGroup(Model, Extension):
     def __unicode__(self):
         return self.name
 
-class Match(Model, Extension):
+class Match(ExtensionModel):
     """一场比赛，通常为三局两胜制。
     也可能是，两个团体之间的一次比赛，通常五个项目五局三胜，每一局是一个Match
     """
@@ -293,7 +297,7 @@ class Match(Model, Extension):
                 self.type = Match.Singles
         super(Match, self).save(*args, **kwargs)
 
-class Game(Model, Extension):
+class Game(ExtensionModel):
     "一局比赛，通常为21分制"
     match = ForeignKey(Match)
     score1 = IntegerField()

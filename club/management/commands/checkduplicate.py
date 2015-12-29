@@ -2,13 +2,13 @@ import itertools
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from club.models import Member, Activity
-import reversion
+from reversion import revisions as reversion
 import club.admin  # for registration of reversion
 
 class Command(BaseCommand):
     help = 'Check duplicate checkins for each day.'
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def handle(self, *args, **options):
         with reversion.create_revision():
             assert self.check_duplicate()

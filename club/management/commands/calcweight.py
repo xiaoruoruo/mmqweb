@@ -1,13 +1,13 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from club.models import Member, Activity
-import reversion
+from reversion import revisions as reversion
 import club.admin  # for registration of reversion
 
 DROP_PER_MONTH = 0.5
 
 class Command(BaseCommand):
-    @transaction.commit_on_success
+    @transaction.atomic
     def handle(self, *args, **options):
         with reversion.create_revision():
             self.update_weight_for_all()

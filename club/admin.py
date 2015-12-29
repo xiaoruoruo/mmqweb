@@ -1,12 +1,12 @@
 from club.models import Member, Activity
 from django.contrib import admin
-import reversion
+from reversion.admin import VersionAdmin
 
-class MemberModelAdmin(reversion.VersionAdmin):
+class MemberModelAdmin(VersionAdmin):
     list_display = ('name', 'sex', 'balance', 'weight')
     ordering = ('-weight', )
 
-class ActivityModelAdmin(reversion.VersionAdmin):
+class ActivityModelAdmin(VersionAdmin):
     pass
 
 admin.site.register(Member, MemberModelAdmin)

@@ -1,50 +1,39 @@
 # -*- coding: utf-8 -*-
-import datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'Entity'
-        db.create_table('namebook_entity', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('type', self.gf('django.db.models.fields.IntegerField')(null=True)),
-            ('text', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('redirect', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['namebook.Entity'], null=True, blank=True)),
-        ))
-        db.send_create_signal('namebook', ['Entity'])
+    dependencies = [
+    ]
 
-        # Adding M2M table for field categories on 'Entity'
-        db.create_table('namebook_entity_categories', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('from_entity', models.ForeignKey(orm['namebook.entity'], null=False)),
-            ('to_entity', models.ForeignKey(orm['namebook.entity'], null=False))
-        ))
-        db.create_unique('namebook_entity_categories', ['from_entity_id', 'to_entity_id'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'Entity'
-        db.delete_table('namebook_entity')
-
-        # Removing M2M table for field categories on 'Entity'
-        db.delete_table('namebook_entity_categories')
-
-
-    models = {
-        'namebook.entity': {
-            'Meta': {'object_name': 'Entity'},
-            'categories': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'categories_rel_+'", 'blank': 'True', 'to': "orm['namebook.Entity']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'redirect': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['namebook.Entity']", 'null': 'True', 'blank': 'True'}),
-            'text': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'type': ('django.db.models.fields.IntegerField', [], {'null': 'True'})
-        }
-    }
-
-    complete_apps = ['namebook']
+    operations = [
+        migrations.CreateModel(
+            name='Entity',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=50)),
+                ('type', models.IntegerField(null=True, choices=[(1, '\u7537\u751f'), (2, '\u5973\u751f'), (3, '\u56e2\u4f53')])),
+                ('text', models.TextField(blank=True)),
+                ('categories', models.ManyToManyField(related_name='categories_rel_+', to='namebook.Entity', blank=True)),
+                ('redirect', models.ForeignKey(blank=True, to='namebook.Entity', null=True)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='YssyRegistration',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('yssyid', models.CharField(max_length=12)),
+                ('date', models.DateField()),
+                ('code', models.CharField(max_length=10)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+    ]

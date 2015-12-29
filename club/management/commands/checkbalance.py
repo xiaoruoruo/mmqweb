@@ -1,13 +1,13 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from club.models import Member, Activity
-import reversion
+from reversion import revisions as reversion
 import club.admin  # for registration of reversion
 
 class Command(BaseCommand):
     help = 'Check the balance for each member and reset the balance if wrong.'
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def handle(self, *args, **options):
         with reversion.create_revision():
             self.check_balance()

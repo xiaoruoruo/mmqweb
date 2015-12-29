@@ -1,178 +1,157 @@
 # -*- coding: utf-8 -*-
-import datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
+from django.conf import settings
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'Tournament'
-        db.create_table('game_tournament', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('text', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('extra', self.gf('django.db.models.fields.TextField')(default='{}')),
-        ))
-        db.send_create_signal('game', ['Tournament'])
+    dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ('namebook', '0001_initial'),
+    ]
 
-        # Adding M2M table for field participants on 'Tournament'
-        db.create_table('game_tournament_participants', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('tournament', models.ForeignKey(orm['game.tournament'], null=False)),
-            ('participation', models.ForeignKey(orm['game.participation'], null=False))
-        ))
-        db.create_unique('game_tournament_participants', ['tournament_id', 'participation_id'])
-
-        # Adding model 'Participation'
-        db.create_table('game_participation', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('displayname', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
-            ('player', self.gf('django.db.models.fields.related.ForeignKey')(related_name='player', to=orm['namebook.Entity'])),
-            ('represent', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='represent', null=True, to=orm['namebook.Entity'])),
-        ))
-        db.send_create_signal('game', ['Participation'])
-
-        # Adding model 'Ranking'
-        db.create_table('game_ranking', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('type', self.gf('django.db.models.fields.IntegerField')()),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
-        ))
-        db.send_create_signal('game', ['Ranking'])
-
-        # Adding M2M table for field matches on 'Ranking'
-        db.create_table('game_ranking_matches', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('ranking', models.ForeignKey(orm['game.ranking'], null=False)),
-            ('match', models.ForeignKey(orm['game.match'], null=False))
-        ))
-        db.create_unique('game_ranking_matches', ['ranking_id', 'match_id'])
-
-        # Adding model 'MatchGroup'
-        db.create_table('game_matchgroup', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=50)),
-            ('tournament', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['game.Tournament'])),
-            ('ranking', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['game.Ranking'], null=True, blank=True)),
-            ('view_name', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
-        ))
-        db.send_create_signal('game', ['MatchGroup'])
-
-        # Adding model 'Match'
-        db.create_table('game_match', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('match_group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['game.MatchGroup'], null=True, blank=True)),
-            ('result', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('type', self.gf('django.db.models.fields.IntegerField')()),
-            ('player11', self.gf('django.db.models.fields.related.ForeignKey')(related_name='player11', to=orm['namebook.Entity'])),
-            ('player12', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='player12', null=True, to=orm['namebook.Entity'])),
-            ('player21', self.gf('django.db.models.fields.related.ForeignKey')(related_name='player21', to=orm['namebook.Entity'])),
-            ('player22', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='player22', null=True, to=orm['namebook.Entity'])),
-            ('text', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('extra', self.gf('django.db.models.fields.TextField')(default='{}')),
-        ))
-        db.send_create_signal('game', ['Match'])
-
-        # Adding model 'Game'
-        db.create_table('game_game', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('match', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['game.Match'])),
-            ('score1', self.gf('django.db.models.fields.IntegerField')()),
-            ('score2', self.gf('django.db.models.fields.IntegerField')()),
-            ('extra', self.gf('django.db.models.fields.TextField')(default='{}')),
-        ))
-        db.send_create_signal('game', ['Game'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'Tournament'
-        db.delete_table('game_tournament')
-
-        # Removing M2M table for field participants on 'Tournament'
-        db.delete_table('game_tournament_participants')
-
-        # Deleting model 'Participation'
-        db.delete_table('game_participation')
-
-        # Deleting model 'Ranking'
-        db.delete_table('game_ranking')
-
-        # Removing M2M table for field matches on 'Ranking'
-        db.delete_table('game_ranking_matches')
-
-        # Deleting model 'MatchGroup'
-        db.delete_table('game_matchgroup')
-
-        # Deleting model 'Match'
-        db.delete_table('game_match')
-
-        # Deleting model 'Game'
-        db.delete_table('game_game')
-
-
-    models = {
-        'game.game': {
-            'Meta': {'object_name': 'Game'},
-            'extra': ('django.db.models.fields.TextField', [], {'default': "'{}'"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'match': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['game.Match']"}),
-            'score1': ('django.db.models.fields.IntegerField', [], {}),
-            'score2': ('django.db.models.fields.IntegerField', [], {})
-        },
-        'game.match': {
-            'Meta': {'object_name': 'Match'},
-            'extra': ('django.db.models.fields.TextField', [], {'default': "'{}'"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'match_group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['game.MatchGroup']", 'null': 'True', 'blank': 'True'}),
-            'player11': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'player11'", 'to': "orm['namebook.Entity']"}),
-            'player12': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'player12'", 'null': 'True', 'to': "orm['namebook.Entity']"}),
-            'player21': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'player21'", 'to': "orm['namebook.Entity']"}),
-            'player22': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'player22'", 'null': 'True', 'to': "orm['namebook.Entity']"}),
-            'result': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'text': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'type': ('django.db.models.fields.IntegerField', [], {})
-        },
-        'game.matchgroup': {
-            'Meta': {'object_name': 'MatchGroup'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'ranking': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['game.Ranking']", 'null': 'True', 'blank': 'True'}),
-            'tournament': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['game.Tournament']"}),
-            'view_name': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'})
-        },
-        'game.participation': {
-            'Meta': {'object_name': 'Participation'},
-            'displayname': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'player': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'player'", 'to': "orm['namebook.Entity']"}),
-            'represent': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'represent'", 'null': 'True', 'to': "orm['namebook.Entity']"})
-        },
-        'game.ranking': {
-            'Meta': {'object_name': 'Ranking'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'matches': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['game.Match']", 'symmetrical': 'False'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
-            'type': ('django.db.models.fields.IntegerField', [], {})
-        },
-        'game.tournament': {
-            'Meta': {'object_name': 'Tournament'},
-            'extra': ('django.db.models.fields.TextField', [], {'default': "'{}'"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'participants': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'tournaments'", 'symmetrical': 'False', 'to': "orm['game.Participation']"}),
-            'text': ('django.db.models.fields.TextField', [], {'blank': 'True'})
-        },
-        'namebook.entity': {
-            'Meta': {'object_name': 'Entity'},
-            'categories': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'categories_rel_+'", 'blank': 'True', 'to': "orm['namebook.Entity']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'redirect': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['namebook.Entity']", 'null': 'True', 'blank': 'True'}),
-            'text': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'type': ('django.db.models.fields.IntegerField', [], {'null': 'True'})
-        }
-    }
-
-    complete_apps = ['game']
+    operations = [
+        migrations.CreateModel(
+            name='Game',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('score1', models.IntegerField()),
+                ('score2', models.IntegerField()),
+                ('extra', models.TextField(default=b'{}')),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Match',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('result', models.IntegerField(null=True, blank=True)),
+                ('type', models.IntegerField(choices=[(1, b'Team'), (2, b'\xe5\x8d\x95\xe6\x89\x93'), (3, b'\xe5\x8f\x8c\xe6\x89\x93'), (4, b'\xe4\xb8\x80\xe6\x89\x93\xe4\xba\x8c')])),
+                ('text', models.TextField(blank=True)),
+                ('extra', models.TextField(default=b'{}')),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='MatchGroup',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=50)),
+                ('view_name', models.CharField(max_length=50, blank=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Participation',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('displayname', models.CharField(max_length=50, blank=True)),
+                ('player', models.ForeignKey(related_name='player', to='namebook.Entity')),
+                ('represent', models.ForeignKey(related_name='represent', blank=True, to='namebook.Entity', null=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='PersonalRating',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('rating_singles', models.FloatField(null=True)),
+                ('rating_doubles', models.FloatField(null=True)),
+                ('match', models.ForeignKey(to='game.Match')),
+                ('player', models.ForeignKey(to='namebook.Entity')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Ranking',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('type', models.IntegerField(choices=[(1, b'\xe5\x8d\x95\xe6\xb7\x98\xe6\xb1\xb0'), (2, b'\xe5\x8d\x95\xe5\xbe\xaa\xe7\x8e\xaf'), (3, b'2n-1\xe5\xb1\x80n\xe8\x83\x9c'), (4, b'\xe4\xb8\xaa\xe4\xba\xba\xe6\x8e\x92\xe5\x90\x8d(fish)'), (5, b'\xe4\xb8\xaa\xe4\xba\xba\xe6\x8e\x92\xe5\x90\x8d(elo)')])),
+                ('name', models.CharField(max_length=50, blank=True)),
+                ('mg', models.ForeignKey(to='game.MatchGroup')),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Tournament',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=50)),
+                ('text', models.TextField(blank=True)),
+                ('extra', models.TextField(default=b'{}')),
+                ('admins', models.ManyToManyField(to=settings.AUTH_USER_MODEL, blank=True)),
+                ('participants', models.ManyToManyField(related_name='tournaments', to='game.Participation', blank=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.AddField(
+            model_name='personalrating',
+            name='ranking',
+            field=models.ForeignKey(to='game.Ranking'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='matchgroup',
+            name='tournament',
+            field=models.ForeignKey(to='game.Tournament'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='match',
+            name='match_group',
+            field=models.ForeignKey(blank=True, to='game.MatchGroup', null=True),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='match',
+            name='player11',
+            field=models.ForeignKey(related_name='player11', to='namebook.Entity'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='match',
+            name='player12',
+            field=models.ForeignKey(related_name='player12', blank=True, to='namebook.Entity', null=True),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='match',
+            name='player21',
+            field=models.ForeignKey(related_name='player21', to='namebook.Entity'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='match',
+            name='player22',
+            field=models.ForeignKey(related_name='player22', blank=True, to='namebook.Entity', null=True),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='game',
+            name='match',
+            field=models.ForeignKey(to='game.Match'),
+            preserve_default=True,
+        ),
+    ]
