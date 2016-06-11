@@ -1,16 +1,17 @@
-from django.conf.urls import patterns
+from django.conf.urls import url
+from game import views
 
-urlpatterns = patterns('',
-                       (r'^$',  'game.views.index'),
-                       (r'^login$', 'game.views.login_user'),
-                       (r'^del_match/(?P<match_id>\d+)/$', 'game.views.del_match'),
-                       (r'^(?P<tname>\w+)/$',  'game.views.tournament_index'),
-                       (r'^(?P<tname>\w+)/edit$',  'game.views.tournament_edit'),
-                       (r'^(?P<tname>\w+)/text$',  'game.views.tournament_edit_text'),
-                       (r'^(?P<tname>\w+)/addmatches$',  'game.views.tournament_add_matches'),
-                       (r'^(?P<tname>\w+)/addp$',  'game.views.tournament_add_participation'),
-                       (r'^mg/(?P<mgid>\d+)/matches$',  'game.views.matches'),
-                       (r'^mg/(?P<mgid>\d+)/runranking$',  'game.views.ranking_run'),
-                       (r'^ranking/(?P<ranking_id>\d+)/$', 'game.views.ranking_index'),
-                       (r'^ranking/(?P<ranking_id>\d+)/(?P<name>\w+)/$', 'game.views.ranking_person'),
-                       )
+urlpatterns = [
+    url(r'^$',  views.index),
+    url(r'^login$', views.login_user, name='game_login_user'),
+    url(r'^del_match/(?P<match_id>\d+)/$', views.del_match, name='game_del_match'),
+    url(r'^(?P<tname>\w+)/$',  views.tournament_index, name='game_tournament_index'),
+    url(r'^(?P<tname>\w+)/edit$',  views.tournament_edit, name='game_tournament_edit'),
+    url(r'^(?P<tname>\w+)/text$',  views.tournament_edit_text, name='game_tournament_edit_text'),
+    url(r'^(?P<tname>\w+)/addmatches$',  views.tournament_add_matches, name='game_tournament_add_matches'),
+    url(r'^(?P<tname>\w+)/addp$',  views.tournament_add_participation, name='game_tournament_add_participation'),
+    url(r'^mg/(?P<mgid>\d+)/matches$',  views.matches, name='game_matches'),
+    url(r'^mg/(?P<mgid>\d+)/runranking$',  views.ranking_run, name='game_ranking_run'),
+    url(r'^ranking/(?P<ranking_id>\d+)/$', views.ranking_index, name='game_ranking_index'),
+    url(r'^ranking/(?P<ranking_id>\d+)/(?P<name>\w+)/$', views.ranking_person, name='game_ranking_person'),
+]

@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load url from future %}
 {% block title %}比赛列表 - mmqweb{% endblock %}
 
 {% block head %}
@@ -31,7 +30,7 @@
 <div class="match">
     <pre>{{ match.asHtml|safe }}</pre>
     {% if is_admin %}
-        <a href="{% url 'game.views.del_match' match_id=match.id %}">删除</a>
+        <a href="{% url 'game_del_match' match_id=match.id %}">删除</a>
     {% endif %}
 </div>
 {% endfor %}

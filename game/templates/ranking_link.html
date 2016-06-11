@@ -1,12 +1,10 @@
-{% load url from future %}
-
 <h4>{{ ranking.name }}</h4>
 <div class='ranking_table'>
     <h5>男子 单打</h5>
     <table>
         <tr><th></th><th width="100px">选手</th><th>积分</th></tr>
         {% for player, rating, comment in ranking.ranking.MS %}
-        <tr><td align="center">{{ forloop.counter }}</td><td align="center"><a href="{% url 'game.views.ranking_person' ranking_id=ranking.id name=player %}">{{ player }}</a></td><td>{{ rating|floatformat:0 }}</td></tr>
+        <tr><td align="center">{{ forloop.counter }}</td><td align="center"><a href="{% url 'game_ranking_person' ranking_id=ranking.id name=player %}">{{ player }}</a></td><td>{{ rating|floatformat:0 }}</td></tr>
         {% endfor %}
     </table>
 </div>
@@ -16,7 +14,7 @@
     <table>
         <tr><th></th><th width="100px">选手</th><th>积分</th></tr>
         {% for player, rating, comment in ranking.ranking.MD %}
-        <tr><td align="center">{{ forloop.counter }}</td><td align="center"><a href="{% url 'game.views.ranking_person' ranking_id=ranking.id name=player %}">{{ player }}</a></td><td>{{ rating|floatformat:0 }}</td></tr>
+        <tr><td align="center">{{ forloop.counter }}</td><td align="center"><a href="{% url 'game_ranking_person' ranking_id=ranking.id name=player %}">{{ player }}</a></td><td>{{ rating|floatformat:0 }}</td></tr>
         {% endfor %}
     </table>
 </div>
@@ -26,7 +24,7 @@
     <table>
         <tr><th></th><th width="100px">选手</th><th>积分</th></tr>
         {% for player, rating, comment in ranking.ranking.WS %}
-        <tr><td align="center">{{ forloop.counter }}</td><td align="center"><a href="{% url 'game.views.ranking_person' ranking_id=ranking.id name=player %}">{{ player }}</a></td><td>{{ rating|floatformat:0 }}</td></tr>
+        <tr><td align="center">{{ forloop.counter }}</td><td align="center"><a href="{% url 'game_ranking_person' ranking_id=ranking.id name=player %}">{{ player }}</a></td><td>{{ rating|floatformat:0 }}</td></tr>
         {% endfor %}
     </table>
 </div>
@@ -36,7 +34,7 @@
     <table>
         <tr><th></th><th width="100px">选手</th><th>积分</th></tr>
         {% for player, rating, comment in ranking.ranking.WD %}
-        <tr><td align="center">{{ forloop.counter }}</td><td align="center"><a href="{% url 'game.views.ranking_person' ranking_id=ranking.id name=player %}">{{ player }}</a></td><td>{{ rating|floatformat:0 }}</td></tr>
+        <tr><td align="center">{{ forloop.counter }}</td><td align="center"><a href="{% url 'game_ranking_person' ranking_id=ranking.id name=player %}">{{ player }}</a></td><td>{{ rating|floatformat:0 }}</td></tr>
         {% endfor %}
     </table>
     

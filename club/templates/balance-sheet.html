@@ -1,5 +1,4 @@
 {% extends "bootstrap-base.html" %}
-{% load url from future %}
 {% block title %}
 会费情况表
 {% endblock %}
@@ -30,7 +29,7 @@
       </thead>
       {% for m in members %}
       <tr>
-        <td><a href="{% url 'club.views.activity_sheet' name=m.name %}">{{m.name}}</a></td>
+        <td><a href="{% url 'club_activity_sheet' name=m.name %}">{{m.name}}</a></td>
         <td><span class="{{ m.is_low_balance|yesno:"low_balance," }}">{{m.balance}}</span></td>
       </tr>
       {% endfor %}

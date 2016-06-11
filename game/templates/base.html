@@ -1,4 +1,3 @@
-{% load url from future %}
 <!DOCTYPE html>
 <html>
     <head>
@@ -12,13 +11,13 @@
     <body>
         <div id="header">
             <div id="nav">
-                <a href="{% url 'club.views.index' %}">首页</a>
+                <a href="{% url 'club_index' %}">首页</a>
             </div>
             <div id="account">
                 {% if user.is_authenticated %}
                 {{ user.username }} <a href="/accounts/logout/?next=/game/">登出</a>
                 {% else %}
-                <a href="{% url 'game.views.login_user' %}">登录</a>
+                <a href="{% url 'game_login_user' %}">登录</a>
                 {% endif %}
             </div>
         </div>

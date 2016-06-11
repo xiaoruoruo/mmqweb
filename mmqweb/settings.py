@@ -3,7 +3,6 @@
 import os
 
 DEBUG = os.getenv('PRODUCTION', 'False') == 'False'
-TEMPLATE_DEBUG = DEBUG
 print 'running with DEBUG=', DEBUG
 
 ADMINS = (
@@ -67,18 +66,25 @@ STATICFILES_DIRS = (
 SECRET_KEY = '+6w5l6e8gvpzl=a$&e&_40n4+t%*)!#nm$4!hn)lbvn4mi9v0d'
 
 # List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
+template_loaders = (
         'django.template.loaders.app_directories.Loader',
     )
-if not TEMPLATE_DEBUG:
-    TEMPLATE_LOADERS = (
-        ('django.template.loaders.cached.Loader', TEMPLATE_LOADERS),
-    )
+if not DEBUG:
+    template_loaders = ('django.template.loaders.cached.Loader', template_loaders)
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-        'django.core.context_processors.request',
-        'django.contrib.auth.context_processors.auth',
-    )
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'OPTIONS': {
+            'loaders': [template_loaders],
+            'context_processors': [
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+            ],
+        },
+    },
+]
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -104,13 +110,6 @@ INTERNAL_IPS = ('127.0.0.1',)
 ALLOWED_HOSTS = ['*']
 
 ROOT_URLCONF = 'mmqweb.urls'
-
-#TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-#    os.path.join(SITE_ROOT,"templates/")
-#)
 
 INSTALLED_APPS = (
     'django.contrib.admin',

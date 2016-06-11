@@ -7,8 +7,6 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django import forms
 from django.db import transaction
 from django.contrib.auth.decorators import permission_required
-from django.template import RequestContext
-from django.template.loader import render_to_string
 from django.contrib.auth.models import User
 
 from datetime import datetime
@@ -39,7 +37,7 @@ def register_yssy(request):
             {
                 'form':form,
                 'text':text,
-            }, RequestContext(request))
+            })
 
 def submit(request):
     if request.method != 'POST':

@@ -1,4 +1,3 @@
-{% load url from future %}
 <!DOCTYPE html>
 <html lang="zh">
   <head>
@@ -20,14 +19,14 @@
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
-          <a class="brand" href="{% url 'club.views.index' %}">三碗俱乐部</a>
+          <a class="brand" href="{% url 'club_index' %}">三碗俱乐部</a>
           <ul class="nav">
-            <li class="{% if balance_sheet_active %}active{% endif %}"><a href="{% url 'club.views.balance_sheet' %}">会员会费</a></li>
+            <li class="{% if balance_sheet_active %}active{% endif %}"><a href="{% url 'club_balance_sheet' %}">会员会费</a></li>
             <li class="{% if game_active %}active{% endif %}"><a href="/game/三碗积分赛/">积分赛</a></li>
 
             {% if perms.club.add_activity %}
-            <li class="{% if checkin_active %}active{% endif %}"><a href="{% url 'club.views.checkin' %}">点名</a></li>
-            <li class="{% if activity_overall_active %}active{% endif %}"><a href="{% url 'club.views.activity_overall' %}">活动总表</a></li>
+            <li class="{% if checkin_active %}active{% endif %}"><a href="{% url 'club_checkin' %}">点名</a></li>
+            <li class="{% if activity_overall_active %}active{% endif %}"><a href="{% url 'club_activity_overall' %}">活动总表</a></li>
             {% endif %}
           </ul>
           <ul class="nav pull-right">

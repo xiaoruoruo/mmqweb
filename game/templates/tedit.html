@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load url from future %}
 {% block title %}编辑{{ tournament.name }} - mmqweb{% endblock %}
 {% block head %}
 <script type="text/javascript">
@@ -19,7 +18,7 @@ function add_match() {
 <h4>简介文字：</h4>
 <a href="javascript:edit_text();">编辑</a> 
 <span id="text">{{ form_text.initial.text }}</span>
-<form id="form_text" action="{% url 'game.views.tournament_edit_text' tname=tournament.name %}" method="POST" style="display:none">
+<form id="form_text" action="{% url 'game_tournament_edit_text' tname=tournament.name %}" method="POST" style="display:none">
     {% csrf_token %}
     {{ form_text.as_p }}
     <input type="submit" value="修改" />
@@ -39,7 +38,7 @@ function add_match() {
 {% if player_notypes %}
 <div id="label_type">
     <p>性别标注</p>
-    <form action="{% url 'namebook.views.label_entity_types' %}" method="POST"> {% csrf_token %}
+    <form action="{% url 'namebook_label_entity_types' %}" method="POST"> {% csrf_token %}
     <input type='hidden' name='next' value='{{ request.path }}' />
     {% for p in player_notypes %}
         <input type="radio" name="pt{{p.id}}" id="st{{p.id}}" value="M">
@@ -54,11 +53,11 @@ function add_match() {
     <br/>
 </div>
 {% endif %}
-<a href="{% url 'game.views.tournament_add_participation' tname=tournament.name %}">增加参赛选手</a>
+<a href="{% url 'game_tournament_add_participation' tname=tournament.name %}">增加参赛选手</a>
 
 <h4>比赛记录</h4>
 {% for mg in match_groups %}
-<a href="{% url 'game.views.matches' mgid=mg.id %}">查看全部{{ mg.match_set.count }}场比赛</a>
+<a href="{% url 'game_matches' mgid=mg.id %}">查看全部{{ mg.match_set.count }}场比赛</a>
 <br/>
 <a href="javascript:add_match();">增加比赛记录</a>
 {% endfor %}
@@ -70,7 +69,7 @@ function add_match() {
     上面一行格式固定，这一行可以写评论。需要的话用[裁判:fish],[时间:2012年06月05日],[耗时:10]等来统一表示比赛的属性。弃权，犯规等导致胜方需要特别说明的情况，在这里额外用[胜者:老大]表示。
     </blockquote>
 </div>
-<form action="{% url 'game.views.tournament_add_matches' tname=tournament.name %}" method="POST">
+<form action="{% url 'game_tournament_add_matches' tname=tournament.name %}" method="POST">
     {% csrf_token %}
     <span class="hl_message">{{ addmatch_status }}</span>
     {{ form_match.as_p }}
@@ -84,10 +83,10 @@ function add_match() {
     {% for ranking in mg.ranking_set.all %}
     {% if forloop.first %}
     <span>该比赛纳入以下积分计算。</span>
-    <a href="{% url 'game.views.ranking_run' mgid=mg.id %}">重新计算积分</a>
+    <a href="{% url 'game_ranking_run' mgid=mg.id %}">重新计算积分</a>
     {% endif %}
     <ul>
-        <li><a href="{% url 'game.views.ranking_index' ranking_id=ranking.id %}">{{ ranking.name }}</a></li>
+        <li><a href="{% url 'game_ranking_index' ranking_id=ranking.id %}">{{ ranking.name }}</a></li>
     </ul>
     {% endfor %}
 {% endfor %}

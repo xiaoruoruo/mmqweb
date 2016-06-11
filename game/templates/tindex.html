@@ -1,11 +1,10 @@
 {% extends "base.html" %}
-{% load url from future %}
 {% block title %}{{ tournament.name }} - mmqweb{% endblock %}
 {% block content %}
 <div id="hl_tournament">
     <h2>{{ tournament.name }}</h2>
     {% if is_admin %}
-    <a href="{% url 'game.views.tournament_edit' tname=tournament.name %}">编辑</a>
+    <a href="{% url 'game_tournament_edit' tname=tournament.name %}">编辑</a>
     {% endif %}
     <pre>{{ tournament.text|safe }}</pre>
     {% for group in group_views %}

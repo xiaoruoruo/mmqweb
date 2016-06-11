@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load url from future %}
 {% block title %}增加参赛选手 - mmqweb{% endblock %}
 
 {% block content %}
@@ -18,7 +17,7 @@
     </blockquote>
 </div>
 
-<form action="{% url 'game.views.tournament_add_participation' tname=tournament.name %}" method="POST"> {% csrf_token %}
+<form action="{% url 'game_tournament_add_participation' tname=tournament.name %}" method="POST"> {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="增加" />
     {{ status }}

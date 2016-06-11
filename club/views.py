@@ -3,7 +3,7 @@ import json
 import re
 import datetime
 import itertools
-from django.shortcuts import get_list_or_404, get_object_or_404, render_to_response, redirect
+from django.shortcuts import get_list_or_404, get_object_or_404, render, redirect
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
 from django.db import transaction
@@ -40,9 +40,7 @@ class AngularJsCsrfMiddleware(object):
         return None
 
 def index(request):
-    return render_to_response('club-index.html',
-            {},
-            RequestContext(request))
+    return render(request, 'club-index.html')
 
 def checkin(request):
     if request.method == 'GET':
@@ -54,9 +52,7 @@ def checkin(request):
 
 @permission_required('club.add_activity')
 def checkin_GET(request):
-    return render_to_response('checkin.html',
-            {'checkin_active': True},
-            RequestContext(request))
+    return render(request, 'checkin.html', {'checkin_active': True})
 
 @permission_required('club.add_activity', raise_exception=True)
 def checkin_POST(request):
@@ -144,13 +140,12 @@ def balance_sheet(request):
 
     members = members_dict.values()
     members.sort(key=lambda m: m.index)
-    return render_to_response('balance-sheet.html',
+    return render(request, 'balance-sheet.html',
             {
                 'members':members,
                 'range': {'start': str(activity_start), 'end': str(activity_end)},
                 'balance_sheet_active': True,
-            },
-            RequestContext(request))
+            })
 
 def activity_sheet(request, name):
     "按照日期倒序，该会员的活动记录"
@@ -160,13 +155,12 @@ def activity_sheet(request, name):
     acts.reverse()
     running.reverse()
 
-    return render_to_response('activity-sheet.html',
+    return render(request, 'activity-sheet.html',
             {
                 'activity-active': True,
                 'activities':zip(acts, running),
                 'member': member,
-            },
-            RequestContext(request))
+            })
 
 @permission_required('club.add_activity', raise_exception=True)
 @not_minified_response
@@ -182,12 +176,11 @@ def activity_overall(request):
             current_activities.append({'member': a.member, 'cost': a.cost, 'deposit': a.deposit})
         overall.append({'date': current_date, 'acts': current_activities})
 
-    return render_to_response('activity-overall.html',
+    return render(request, 'activity-overall.html',
             {
                 'activity_overall_active': True,
                 'overall': overall
-            },
-            RequestContext(request))
+            })
 
 def determine_cost(member, weight, ver):
     if ver == '1':

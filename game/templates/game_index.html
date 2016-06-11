@@ -1,11 +1,10 @@
 {% extends "base.html" %}
-{% load url from future %}
 {% block content %}
 <div id="hl_tournament">
     <ul>
     {% for tournament in tournaments %}
     <li>
-        <a href="{% url 'game.views.tournament_index' tname=tournament.name %}">{{ tournament.name }}</a>
+        <a href="{% url 'game_tournament_index' tname=tournament.name %}">{{ tournament.name }}</a>
     </li>
     {% endfor %}
     </ul>

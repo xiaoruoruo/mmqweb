@@ -1,5 +1,4 @@
 {% extends "bootstrap-base.html" %}
-{% load url from future %}
 {% block title %}
 活动记录总表
 {% endblock %}
@@ -15,7 +14,7 @@
     <ul>
       {% for acts in dates.acts %}
       <li>
-        <a href="{% url 'club.views.activity_sheet' name=acts.member.name %}">{{acts.member.name}}</a> ( {{acts.cost}}
+        <a href="{% url 'club_activity_sheet' name=acts.member.name %}">{{acts.member.name}}</a> ( {{acts.cost}}
         {% if acts.deposit %}
         / {{acts.deposit}}
         {% endif %}

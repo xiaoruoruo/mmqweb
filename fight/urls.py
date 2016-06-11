@@ -1,6 +1,7 @@
-from django.conf.urls import patterns
+from django.conf.urls import url
+from fight import views
 
-urlpatterns = patterns('',
-                       (r'^$',  'fight.views.index'),
-                       (r'^submit$',  'fight.views.submit'),
-                       )
+urlpatterns = [
+    url(r'^$',  views.index),
+    url(r'^submit$',  views.submit),
+]

@@ -7,7 +7,6 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django import forms
 from django.contrib.auth import authenticate, login
 from django.db import transaction
-from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.core.exceptions import PermissionDenied
 
@@ -26,12 +25,12 @@ def index(request):
         ts = Tournament.objects.filter(admins=request.user)
         return render_to_response("game_index.html", {
             'tournaments': ts,
-            }, RequestContext(request))
+            })
     else:
         # show Tournament 1 by default
         return render_to_response("game_index.html", {
             'tournaments': Tournament.objects.filter(id=1),
-            }, RequestContext(request))
+            })
 
 def login_user(request):
     state = ""
@@ -51,8 +50,7 @@ def login_user(request):
         else:
             state = "Your username and/or password were incorrect."
 
-    return render_to_response('login.html',{'state':state, 'username': username},
-            RequestContext(request))
+    return render_to_response('login.html',{'state':state, 'username': username})
 
 def tournament_index(request, tname, t=None):
     if not t:
@@ -72,7 +70,7 @@ def tournament_index(request, tname, t=None):
                             {'tournament':t,
                             'group_views':group_views,
                             'is_admin': request.user.is_authenticated() and request.user in t.admins.all(),
-                            }, RequestContext(request))
+                            })
 
 def tournament_permitted(view_func):
     "A decorator that checks if a user can admin a specific Tournament"
@@ -108,7 +106,7 @@ def tournament_edit(request, tname, text_status="", addmatch_status="", match_te
                               'form_match':form_match, 'addmatch_status':addmatch_status,
                               'participation_list': p_list,
                               'player_notypes': player_notypes,
-                              }, RequestContext(request))
+                              })
 
 def matches(request, mgid):
     mg = MatchGroup.objects.get(id=mgid)
@@ -116,7 +114,7 @@ def matches(request, mgid):
     return render_to_response("matches.html", {
         'mg':mg,'matches':matches,
         'is_admin': request.user.is_authenticated() and request.user in mg.tournament.admins.all(),
-        }, RequestContext(request))
+        })
 
 @tournament_permitted
 def tournament_edit_text(request, tname, t=None):
@@ -255,7 +253,7 @@ def ranking_index(request, ranking_id):
     return render_to_response("ranking_index.html", {
         'ranking': r,
         'ranking_html': html,
-        }, RequestContext(request))
+        })
 
 def ranking_render(ranking):
     if ranking.type == 4 or ranking.type == 5:
@@ -280,7 +278,7 @@ def ranking_person(request, ranking_id, name):
         'player': player,
         'ranking': rs[0].ranking,
         'ratings': rs,
-        }, RequestContext(request))
+        })
 
 @tournament_permitted
 def ranking_run(request, mgid, **kwargs):
