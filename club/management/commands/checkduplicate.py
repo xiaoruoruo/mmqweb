@@ -1,3 +1,4 @@
+# encoding: utf-8
 import itertools
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
@@ -19,6 +20,7 @@ class Command(BaseCommand):
         success = True
         all_acts = Activity.objects.order_by('date').select_related('member')
         for date, acts in itertools.groupby(all_acts, lambda a: a.date):
+            if date.year < 2016: continue
             today = {}
             for a in acts:
                 if a.member in today:
