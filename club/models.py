@@ -12,7 +12,7 @@ class Activity(models.Model):
     member = models.ForeignKey('Member')
     # 算几次
     weight = models.FloatField(default=1.0)
-    date   = models.DateField(default=datetime.date.today())
+    date   = models.DateField(default=datetime.date.today)
 
     cost   = models.FloatField(blank=True)
     deposit= models.FloatField(null=True, blank=True)
@@ -21,7 +21,8 @@ class Activity(models.Model):
 
     def __unicode__(self):
         s = u'%s * %.1f @ %s' % (self.member.name, self.weight, self.date)
-        s += u' -￥%d' % self.cost
+        if self.cost:
+            s += u' -￥%d' % self.cost
         if self.deposit:
             s += u' +￥%.2f' % self.deposit
         if self.comment:
