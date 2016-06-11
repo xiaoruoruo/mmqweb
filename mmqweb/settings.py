@@ -20,6 +20,31 @@ MANAGERS = ADMINS
 
 SITE_ROOT = os.path.dirname(os.path.dirname(__file__))
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '%(levelname)s %(asctime)s %(name)s %(message)s',
+        },
+    },
+    'handlers': {
+        'views': {
+            'formatter': 'simple',
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'views.log',
+        },
+    },
+    'loggers': {
+        'club': {
+            'handlers': ['views'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
 DATABASES = {
     'default': {
         'ENGINE' : 'django.db.backends.sqlite3',

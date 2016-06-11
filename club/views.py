@@ -1,8 +1,9 @@
 # encoding: utf8
-import json
-import re
 import datetime
 import itertools
+import json
+import logging
+import re
 from django.shortcuts import get_list_or_404, get_object_or_404, render, redirect
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
@@ -15,6 +16,8 @@ from reversion import revisions as reversion
 from htmlmin.decorators import not_minified_response
 
 from club.models import Member, Activity
+
+logger = logging.getLogger(__name__)
 
 @csrf_protect
 def csrf_serve(*args, **kwargs):
@@ -63,6 +66,8 @@ def checkin_POST(request):
 
     l = data['list']
     ver = data.get('ver', '1')
+    if ver == '1':
+        logger.error('checkin ver 1 is used')
 
     with reversion.create_revision():
         for o in l:
