@@ -35,12 +35,20 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': 'views.log',
         },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        }
     },
     'loggers': {
         'club': {
             'handlers': ['views'],
             'level': 'DEBUG',
             'propagate': True,
+        },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'WARN', # Change to DEBUG to dump sql to console.
         },
     },
 }
