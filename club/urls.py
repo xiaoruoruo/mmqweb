@@ -16,5 +16,6 @@ urlpatterns = [
     url(r'^new_member$', views.new_member, name='club_new_member'),
     url(r'^balance_sheet$', views.balance_sheet, name='club_balance_sheet'),
     url(r'^activity/(?P<name>.+)$', views.activity_sheet, name='club_activity_sheet'),
+    url(r'^date/(?P<act_date>[\d-]+)/activity$', views.activity_by_date, name='club_activity_by_date'),
     url(r'^overall$', views.activity_overall, name='club_activity_overall'),
 ] + static('/', view=views.csrf_serve, document_root=os.path.join(os.path.dirname(__file__), 'static'))

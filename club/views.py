@@ -6,7 +6,7 @@ import logging
 import re
 from django.shortcuts import get_list_or_404, get_object_or_404, render, redirect
 from django.template import RequestContext
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, JsonResponse
 from django.db import transaction
 from django.views.decorators.csrf import csrf_protect
 from django.views.static import serve
@@ -186,6 +186,27 @@ def activity_overall(request):
                 'activity_overall_active': True,
                 'overall': overall
             })
+
+@permission_required('club.add_activity', raise_exception=True)
+def activity_by_date(request, act_date):
+    "API: 返回某日的所有Activity"
+    try:
+        d = datetime.datetime.strptime(act_date, "%Y-%m-%d")
+    except ValueError:
+        raise HttpResponseBadRequest('')
+    
+    acts = get_list_or_404(Activity, date=d)
+    def to_json(a):
+        return {
+            'member_id': a.member_id,
+            'cost': a.cost,
+            'deposit': a.deposit,
+        }
+    acts = [to_json(a) for a in acts]
+    return JsonResponse({
+        'date': datetime.datetime.strftime(d, "%Y-%m-%d"),
+        'activities': acts,
+    })
 
 def determine_cost(member, weight, ver):
     if ver == '1':
