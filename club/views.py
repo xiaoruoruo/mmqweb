@@ -189,12 +189,19 @@ def activity_overall(request):
 
 @permission_required('club.add_activity', raise_exception=True)
 def activity_by_date(request, act_date):
-    "API: 返回某日的所有Activity"
-    try:
-        d = datetime.datetime.strptime(act_date, "%Y-%m-%d")
-    except ValueError:
-        raise HttpResponseBadRequest('')
+    d = parse_date(act_date)
+    if not d:
+        return HttpResponseBadRequest('')
     
+    if request.method == 'GET':
+        return activity_by_date_GET(d)
+    elif request.method == 'POST':
+        return activity_by_date_POST(request, d)
+    else:
+        raise HttpResponseNotAllowed(['GET', 'POST'])
+
+def activity_by_date_GET(d):
+    "API: 返回某日的所有Activity"
     acts = get_list_or_404(Activity, date=d)
     def to_json(a):
         return {
@@ -207,6 +214,47 @@ def activity_by_date(request, act_date):
         'date': datetime.datetime.strftime(d, "%Y-%m-%d"),
         'activities': acts,
     })
+
+@transaction.atomic
+def activity_by_date_POST(request, d):
+    "API: 修改某日的所有Activity"
+    data = json.loads(request.body)
+
+    with reversion.create_revision():
+        # 1. Delete
+        Activity.objects.filter(date=d).delete()
+
+        # 2. Re-add
+        acts = {}
+        for a in data['activities']:
+            mid = a['member_id']
+            if mid in acts:
+                # Merge activities when member is duplicated.
+                act = acts[mid]
+                if 'cost' in a and a['cost']:
+                    act['cost'] += a['cost']
+                if 'deposit' in a and a['deposit']:
+                    act['deposit'] += a['deposit']
+            else:
+                if 'cost' not in a or not a['cost']:
+                    a['cost'] = 0
+                if 'deposit' not in a or not a['deposit']:
+                    a['deposit'] = 0
+                acts[mid] = a
+        for act in acts.values():
+            Activity(member_id=act['member_id'], cost=act['cost'], deposit=act['deposit'], date=d).save()
+
+        # 3. Re-balance
+        member_ids = acts.keys()
+        for member in Member.objects.filter(id__in=member_ids):
+            _, running, sum = member.running_total()
+            if sum != member.balance:
+                member.balance = sum
+                member.save()
+        reversion.set_user(request.user)
+
+    # 4. Done
+    return HttpResponse('"ok"', content_type="application/json")
 
 def determine_cost(member, weight, ver):
     if ver == '1':
@@ -222,6 +270,6 @@ re_date = re.compile(r'(\d\d\d\d)-(\d\d?)-(\d\d?)')
 def parse_date(date_string):
     m = re_date.match(date_string)
     if not m:
-        return HttpResponseBadRequest("'wrong date'")
+        return None
     return datetime.date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
 
