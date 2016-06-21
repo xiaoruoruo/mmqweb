@@ -1,7 +1,8 @@
 var app = angular.module('club', ['ui', 'ui.bootstrap']).
     config(['$routeProvider', function($routeProvider) {
     $routeProvider.
-        when('/', {templateUrl: '/static/club/checkin.html', controller: ClubCtrl}).
+        when('/', {redirectTo: '/date/' + today()}).
+        when('/date/:date', {templateUrl: '/static/club/checkin.html', controller: ClubCtrl}).
         when('/checkin/:name', {templateUrl: '/static/club/member-checkin.html', controller: ClubCtrl}).
         when('/members', {templateUrl: '/static/club/members.html', controller: MemberCtrl}).
         when('/hidden', {templateUrl: '/static/club/members-hidden.html', controller: MemberCtrl}).
@@ -40,6 +41,7 @@ function today() {
 
 function OutCtrl($scope, $http, $window) {
     /* hash: name -> {weight, deposit} */
+    /* weight is the same as cost in ver 2 */
     $scope.checkins = {};
 
     /* list: names */
@@ -74,7 +76,9 @@ function OutCtrl($scope, $http, $window) {
     }
 
     $scope.get_members = function() {
+        console.log("get_members");
         $http.get('api/member/?format=json').success(function(data) {
+            console.log("get_members done");
             $scope.members = [];
             $scope.hidden_members = [];
             _.each(data.objects, function(member) {
@@ -151,6 +155,36 @@ function OutCtrl($scope, $http, $window) {
             error(function() {api_error_func.apply($scope, arguments)});
     }
     
+    $scope.get_activities = function(date) {
+        console.log("get_activities");
+        var process = function(data) {
+            console.log("get_activities done");
+            $scope.checkins = {};
+            $scope.checkin_names_list = [];
+            $scope.checkin_weight_sum = 0;
+
+            if (!data) return;
+            _.each(data.activities, function(act) {
+                var name = act['name'];
+                if (!_.has($scope.checkins, name)) {
+                    $scope.checkins[name] = {
+                        'weight': act['cost'] || 0,
+                        'deposit': act['deposit'] || 0,
+                    }
+                    $scope.checkin_names_list.unshift(name);
+                    $scope.checkin_weight_sum ++;
+                } else {
+                    // Merge multiple activities of the same name.
+                    a = $scope.checkins[name];
+                    a['weight'] += act['cost'] || 0;
+                    a['deposit'] += act['deposit'] || 0;
+                }
+                // TODO fix checkin page when weight is not in the button.
+            });
+        };
+        $http.get('date/' + date + '/activity').success(process).error(process);
+    };
+
     $scope.do_checkin = function(name, weight) {
         if (!_.has($scope.checkins, name)) {
             $scope.checkins[name] = {};
@@ -179,8 +213,13 @@ function OutCtrl($scope, $http, $window) {
 
 function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
     $scope.name = $routeParams.name;
+    $scope.info.date = $routeParams.date;
     $scope.deposit = ($scope.checkins[$scope.name] || {})['deposit'];
     console.log("ClubCtrl");
+
+    if ($scope.info.date) {
+        $scope.get_activities($scope.info.date);
+    }
 
     /* checkin using enter if only one is left */
     $scope.queryOnEnter = function() {
@@ -216,8 +255,12 @@ function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
         if (_.has(member, 'male')) {
             return !member.male;
         }
-        var member = _.findWhere($scope.members, {"name": member});
-        return !member.male;
+        var found = _.findWhere($scope.members, {"name": member});
+        if (!found) {
+            console.log('isGirl member not found: ' + member);
+            return false;
+        }
+        return !found.male;
     }
 
     $scope.isCheckin = function(name) {

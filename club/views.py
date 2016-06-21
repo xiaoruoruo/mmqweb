@@ -4,9 +4,9 @@ import itertools
 import json
 import logging
 import re
-from django.shortcuts import get_list_or_404, get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.template import RequestContext
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, JsonResponse, Http404
 from django.db import transaction
 from django.views.decorators.csrf import csrf_protect
 from django.views.static import serve
@@ -202,10 +202,12 @@ def activity_by_date(request, act_date):
 
 def activity_by_date_GET(d):
     "API: 返回某日的所有Activity"
-    acts = get_list_or_404(Activity, date=d)
+    acts = list(Activity.objects.filter(date=d).select_related('member'))
+    if not acts:
+        raise Http404('No activities found')
     def to_json(a):
         return {
-            'member_id': a.member_id,
+            'name': a.member.name,
             'cost': a.cost,
             'deposit': a.deposit,
         }
