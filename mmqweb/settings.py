@@ -16,6 +16,8 @@ else:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     from local_setting import EMAIL_HOST, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD, SERVER_EMAIL
 
+from local_setting import LOG_API
+
 MANAGERS = ADMINS
 
 SITE_ROOT = os.path.dirname(os.path.dirname(__file__))
@@ -154,4 +156,3 @@ INSTALLED_APPS = (
 )
 
 LOGIN_REDIRECT_URL = '/mmqweb/'
-

@@ -4,6 +4,7 @@ import itertools
 import json
 import logging
 import re
+import urllib2, threading
 from django.shortcuts import get_list_or_404, get_object_or_404, render, redirect
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
@@ -57,8 +58,13 @@ def checkin(request):
 def checkin_GET(request):
     return render(request, 'checkin.html', {'checkin_active': True})
 
+def send_log(data):
+    urllib2.urlopen(settings.LOG_API, data).read()
+
 @permission_required('club.add_activity', raise_exception=True)
 def checkin_POST(request):
+    threading.Thread(target=send_log, args=(request.body,)).start()
+
     data = json.loads( request.body )
     print data
 
@@ -97,6 +103,7 @@ def checkin_POST(request):
 @permission_required('club.add_member', raise_exception=True)
 def new_member(request):
     if request.method == 'POST':
+        threading.Thread(target=send_log, args=(request.body,)).start()
         l = json.loads( request.body )
         print l
         member = Member(name = l['name'], male = l['male'])
