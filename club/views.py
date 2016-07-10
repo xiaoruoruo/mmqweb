@@ -4,6 +4,8 @@ import itertools
 import json
 import logging
 import re
+import urllib2, threading
+
 from django.shortcuts import get_object_or_404, render, redirect
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, JsonResponse, Http404
@@ -57,10 +59,20 @@ def checkin(request):
 def checkin_GET(request):
     return render(request, 'checkin.html', {'checkin_active': True})
 
+def send_log(tag, data):
+    content = tag + " " + data
+    if settings.DEBUG:
+        print "send_log: %s" % content
+        return
+    if settings.LOG_API:
+        urllib2.urlopen(settings.LOG_API, content).read()
+
 @permission_required('club.add_activity', raise_exception=True)
 def checkin_POST(request):
+    threading.Thread(target=send_log, args=('checkin', request.body)).start()
+
     data = json.loads( request.body )
-    print data
+    # print data
 
     date = parse_date(data['date'])
 
@@ -71,7 +83,7 @@ def checkin_POST(request):
 
     with reversion.create_revision():
         for o in l:
-            print o
+            # print o
             deposit = o['deposit']
             member = get_object_or_404(Member, name=o['name'], hidden=False)
             cost = determine_cost(member, o['weight'], ver)
@@ -97,8 +109,9 @@ def checkin_POST(request):
 @permission_required('club.add_member', raise_exception=True)
 def new_member(request):
     if request.method == 'POST':
+        threading.Thread(target=send_log, args=('new_member', request.body)).start()
         l = json.loads( request.body )
-        print l
+        # print l
         member = Member(name = l['name'], male = l['male'])
         member.save()
         res = {'ok': {
