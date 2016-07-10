@@ -233,6 +233,7 @@ def activity_by_date_GET(d):
 @transaction.atomic
 def activity_by_date_POST(request, d):
     "API: 修改某日的所有Activity"
+    threading.Thread(target=send_log, args=('activity_by_date/%s' % d, request.body)).start()
     data = json.loads(request.body)
 
     with reversion.create_revision():
@@ -242,22 +243,25 @@ def activity_by_date_POST(request, d):
         # 2. Re-add
         acts = {}
         for a in data['activities']:
-            mid = a['member_id']
+            name = a['name']
+            mid = Member.objects.get(name=name).id
+            a['member_id'] = mid
             if mid in acts:
                 # Merge activities when member is duplicated.
                 act = acts[mid]
-                if 'cost' in a and a['cost']:
-                    act['cost'] += a['cost']
+                if 'weight' in a and a['weight']:
+                    act['weight'] += a['weight']
                 if 'deposit' in a and a['deposit']:
                     act['deposit'] += a['deposit']
             else:
-                if 'cost' not in a or not a['cost']:
-                    a['cost'] = 0
+                if 'weight' not in a or not a['weight']:
+                    a['weight'] = 0
                 if 'deposit' not in a or not a['deposit']:
                     a['deposit'] = 0
                 acts[mid] = a
         for act in acts.values():
-            Activity(member_id=act['member_id'], cost=act['cost'], deposit=act['deposit'], date=d).save()
+            a = Activity(member_id=act['member_id'], cost=act['weight'], deposit=act['deposit'], date=d)
+            a.save()
 
         # 3. Re-balance
         member_ids = acts.keys()
@@ -269,7 +273,7 @@ def activity_by_date_POST(request, d):
         reversion.set_user(request.user)
 
     # 4. Done
-    return HttpResponse('"ok"', content_type="application/json")
+    return HttpResponse("ok", content_type="application/json")
 
 def determine_cost(member, weight, ver):
     if ver == '1':

@@ -112,14 +112,12 @@ function OutCtrl($scope, $http, $window) {
                 'weight': null,
             });
         });
-        $http.post('checkin', data={'list': list, 'date': $scope.info.date, 'ver': '2'}).
+        $http.post('date/' + $scope.info.date + '/activity', data={'activities': list}).
             success(function(data) {
                 if (data != "ok") {
                     $scope.server_message = "保存失败？？";
                     return;
                 }
-                $scope.checkins = {};
-                $scope.checkin_names_list = [];
                 $scope.server_message = "保存成功！"
                 $scope.get_members();
                 $scope.info.loading = false;
@@ -159,11 +157,12 @@ function OutCtrl($scope, $http, $window) {
         console.log("get_activities");
         var process = function(data) {
             console.log("get_activities done");
+            $scope.info.get_activities_date = date;
             $scope.checkins = {};
             $scope.checkin_names_list = [];
             $scope.checkin_weight_sum = 0;
 
-            if (!data) return;
+            if (!data.activities) return;
             _.each(data.activities, function(act) {
                 var name = act['name'];
                 if (!_.has($scope.checkins, name)) {
@@ -215,9 +214,9 @@ function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
     $scope.name = $routeParams.name;
     $scope.info.date = $routeParams.date;
     $scope.deposit = ($scope.checkins[$scope.name] || {})['deposit'];
-    console.log("ClubCtrl");
+    console.log("ClubCtrl " + $scope.info.date);
 
-    if ($scope.info.date) {
+    if ($scope.info.date && $scope.info.date != $scope.info.get_activities_date) {
         $scope.get_activities($scope.info.date);
     }
 
