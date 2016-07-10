@@ -181,7 +181,8 @@ function OutCtrl($scope, $http, $window) {
                 // TODO fix checkin page when weight is not in the button.
             });
         };
-        $http.get('date/' + date + '/activity').success(process).error(process);
+        $http.get('date/' + date + '/activity').success(process);
+        // TODO implement .error because it's dangerous when user attempt to save.
     };
 
     $scope.do_checkin = function(name, weight) {
@@ -210,7 +211,7 @@ function OutCtrl($scope, $http, $window) {
     }
 }
 
-function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
+function ClubCtrl($scope, $http, $routeParams, $location, $filter, $window) {
     $scope.name = $routeParams.name;
     $scope.info.date = $routeParams.date;
     $scope.deposit = ($scope.checkins[$scope.name] || {})['deposit'];
@@ -239,7 +240,7 @@ function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
 
     $scope.checkin_weight = function(name, weight) {
         $scope.do_checkin(name, weight);
-        $location.path('/');
+        $window.history.back();
     }
 
     $scope.checkin_deposit = function(deposit) {
@@ -247,7 +248,7 @@ function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
         if (isNaN(deposit)) return;
         if (deposit < 0) return;
         $scope.do_deposit($scope.name, deposit);
-        $location.path('/');
+        $window.history.back();
     }
 
     $scope.isGirl = function(member) {

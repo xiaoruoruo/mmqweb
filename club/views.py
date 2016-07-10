@@ -8,7 +8,7 @@ import urllib2, threading
 
 from django.shortcuts import get_object_or_404, render, redirect
 from django.template import RequestContext
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, JsonResponse, Http404
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, JsonResponse
 from django.db import transaction
 from django.views.decorators.csrf import csrf_protect
 from django.views.static import serve
@@ -205,7 +205,7 @@ def activity_by_date(request, act_date):
     d = parse_date(act_date)
     if not d:
         return HttpResponseBadRequest('')
-    
+
     if request.method == 'GET':
         return activity_by_date_GET(d)
     elif request.method == 'POST':
@@ -216,8 +216,6 @@ def activity_by_date(request, act_date):
 def activity_by_date_GET(d):
     "API: 返回某日的所有Activity"
     acts = list(Activity.objects.filter(date=d).select_related('member'))
-    if not acts:
-        raise Http404('No activities found')
     def to_json(a):
         return {
             'name': a.member.name,
