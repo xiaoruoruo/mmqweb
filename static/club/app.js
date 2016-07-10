@@ -263,6 +263,18 @@ function ClubCtrl($scope, $http, $routeParams, $location, $filter, $window) {
         $location.path('/checkin/' + name);
     }
 
+    $scope.change_date = function() {
+        if ($scope.has_unsaved_data()) {
+            if (!$window.confirm($scope.info.date + "的点名信息已修改，还未保存，确定要离开吗？")) {
+                return;
+            }
+        }
+        var newDate = $window.prompt("请输入你想点名的日期");
+        if (newDate.match(/\d\d\d\d-\d\d?-\d\d?/)) {
+            $location.path('/date/' + newDate);
+        }
+    }
+
     $scope.member_checkin = function(name, weight, deposit) {
         console.log('member_checkin');
         weight = Number(weight);
