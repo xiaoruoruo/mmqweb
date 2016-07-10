@@ -255,14 +255,13 @@ function ClubCtrl($scope, $http, $routeParams, $location, $filter, $window) {
                 return;
             }
         }
-        var newDate = $window.prompt("请输入你想点名的日期");
+        var newDate = $window.prompt("请输入你想点名的日期（如2013-3-13）");
         if (newDate.match(/\d\d\d\d-\d\d?-\d\d?/)) {
             $location.path('/date/' + newDate);
         }
     }
 
     $scope.member_checkin = function(name, weight, deposit) {
-        console.log('member_checkin');
         weight = Number(weight);
         if (!isNaN(weight) && weight >= 0) {
             $scope.do_checkin(name, weight);
