@@ -46,7 +46,7 @@
   </script>
 
   <div ng-controller="OutCtrl">
-    <div ng-view></div>
+    <div ng-view ng-class="{loading:info.loading}"></div>
   </div>
 </div>
 {% endblock %}

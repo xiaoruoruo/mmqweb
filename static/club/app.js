@@ -9,22 +9,6 @@ var app = angular.module('club', ['ui', 'ui.bootstrap']).
         otherwise({redirectTo: '/'});
 }]);
 
-app.directive('disabler', function($compile) {
-    return {
-        link: function(scope, elm, attrs) {
-            scope.$watch(attrs.ngModel, function(value) {
-                if (value) {
-                    setTimeout(function(){
-                        elm.attr('disabled',true);
-                    }, 0);
-                } else {
-                    elm.attr('disabled',false);
-                }
-            });
-        }
-    }
-})
-
 function api_error_func(data, status) {
     if (status == 403) {
         this.server_message = "请先登录！";
@@ -158,8 +142,10 @@ function OutCtrl($scope, $http, $window) {
     
     $scope.get_activities = function(date) {
         console.log("get_activities");
+        $scope.info.loading = true;
         var process = function(data) {
             console.log("get_activities done");
+            $scope.info.loading = false;
             $scope.info.get_activities_date = date;
             $scope.checkins = {};
             $scope.checkin_names_list = [];
@@ -318,8 +304,6 @@ function ClubCtrl($scope, $http, $routeParams, $location, $filter, $window) {
         $scope.add_member(name, is_girl, function () {
             if (do_checkin) {
                 $location.path('/checkin/' + name);
-            } else {
-                $scope.server_message = "已添加会员 " + name;
             }
         });
     }
