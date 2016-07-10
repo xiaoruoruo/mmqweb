@@ -3,7 +3,11 @@
   <li><a href="#/members">会员管理</a></li>
   <li><a href="#/hidden">老会员</a></li>
 </ul>
-日期（如2013-3-13）：<input ng-model="info.date">
+
+<h3>
+  日期：{{info.date}}
+  <button ng-click="change_date()">切换日期</button>
+</h3>
 
 <div class='row'>
   <div class='span9'>
@@ -14,6 +18,7 @@
 </p>
 首字母过滤：<input ng-model="info.query" ui-keyup="{'enter':'queryOnEnter()', 'esc': 'queryOnEsc()'}">
 名字大小：<input type="button" value="+" ng-click="member_font_adjust(5)"> <input type="button" value="-" ng-click="member_font_adjust(-5)">
+<p></p>
 <ul class="flat">
     <li ng-repeat="member in members | filter:doFilter | orderBy:info.member_order">
         <a ng-style='member_style' ng-click='checkin_click(member.name)' ng-class='{checkedin:isCheckin(member.name), girl:isGirl(member)}'>{{member.name}}</a>
@@ -22,11 +27,11 @@
 
 <div style="clear:both">
     新会员：<input ng-model="name_new_member"> 女生<input type="checkbox" ng-model="girl_new_member" ng-true-value="1" ng-false-value="0">
-    <button ng-model="info.loading" disabler ng-click='new_member(false)'>添加</button> 
-    <button ng-model="info.loading" disabler ng-click='new_member(true)'>添加并签到</button>
+    <button ng-click='new_member(false)'>添加</button>
+    <button ng-click='new_member(true)'>添加并签到</button>
 </div>
 
-<button style="font-size:14pt" ng-model="info.loading" disabler ng-click='save()'>保存签到表、缴费表</button>
+<button style="font-size:14pt" ng-click='save()'>保存签到表、缴费表</button>
 <span>{{server_message}}</span>
 <p>
   使用说明：

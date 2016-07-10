@@ -65,6 +65,10 @@ ul.flat a.checkedin {
     color: red;
 }
 
+.loading {
+    pointer-events:none;
+}
+
 table.sheet {
     border-collapse:collapse;
     width: 300px;

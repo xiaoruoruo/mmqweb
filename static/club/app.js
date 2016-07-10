@@ -1,28 +1,13 @@
 var app = angular.module('club', ['ui', 'ui.bootstrap']).
     config(['$routeProvider', function($routeProvider) {
     $routeProvider.
-        when('/', {templateUrl: '/static/club/checkin.html', controller: ClubCtrl}).
+        when('/', {redirectTo: '/date/' + today()}).
+        when('/date/:date', {templateUrl: '/static/club/checkin.html', controller: ClubCtrl}).
         when('/checkin/:name', {templateUrl: '/static/club/member-checkin.html', controller: ClubCtrl}).
         when('/members', {templateUrl: '/static/club/members.html', controller: MemberCtrl}).
         when('/hidden', {templateUrl: '/static/club/members-hidden.html', controller: MemberCtrl}).
         otherwise({redirectTo: '/'});
 }]);
-
-app.directive('disabler', function($compile) {
-    return {
-        link: function(scope, elm, attrs) {
-            scope.$watch(attrs.ngModel, function(value) {
-                if (value) {
-                    setTimeout(function(){
-                        elm.attr('disabled',true);
-                    }, 0);
-                } else {
-                    elm.attr('disabled',false);
-                }
-            });
-        }
-    }
-})
 
 function api_error_func(data, status) {
     if (status == 403) {
@@ -40,6 +25,7 @@ function today() {
 
 function OutCtrl($scope, $http, $window) {
     /* hash: name -> {weight, deposit} */
+    /* weight is the same as cost in ver 2 */
     $scope.checkins = {};
 
     /* list: names */
@@ -54,6 +40,8 @@ function OutCtrl($scope, $http, $window) {
         'date': today(),
         'member_order': "-weight",
         'loading': false,
+        'checkin_modified': false,
+        'get_activities_date': '',
     };
 
     /* shows hint messages or message from server */
@@ -74,7 +62,9 @@ function OutCtrl($scope, $http, $window) {
     }
 
     $scope.get_members = function() {
+        console.log("get_members");
         $http.get('api/member/?format=json').success(function(data) {
+            console.log("get_members done");
             $scope.members = [];
             $scope.hidden_members = [];
             _.each(data.objects, function(member) {
@@ -91,12 +81,12 @@ function OutCtrl($scope, $http, $window) {
     console.log("OutCtrl");
 
     $scope.has_unsaved_data = function() {
-        return _.size($scope.checkins) > 0;
+        return $scope.info.checkin_modified;
     }
 
     $scope.save = function() {
         if (!$scope.has_unsaved_data()) {
-            $scope.server_message = "还没有点一个名不能保存";
+            $scope.server_message = "什么都没有改，不能保存";
             return;
         }
         $scope.info.loading = true;
@@ -108,17 +98,16 @@ function OutCtrl($scope, $http, $window) {
                 'weight': null,
             });
         });
-        $http.post('checkin', data={'list': list, 'date': $scope.info.date, 'ver': '2'}).
+        $http.post('date/' + $scope.info.date + '/activity', data={'activities': list}).
             success(function(data) {
                 if (data != "ok") {
                     $scope.server_message = "保存失败？？";
                     return;
                 }
-                $scope.checkins = {};
-                $scope.checkin_names_list = [];
                 $scope.server_message = "保存成功！"
                 $scope.get_members();
                 $scope.info.loading = false;
+                $scope.info.checkin_modified = false;
             }).
             error(function() {api_error_func.apply($scope, arguments)});
     }
@@ -151,6 +140,40 @@ function OutCtrl($scope, $http, $window) {
             error(function() {api_error_func.apply($scope, arguments)});
     }
     
+    $scope.get_activities = function(date) {
+        console.log("get_activities");
+        $scope.info.loading = true;
+        var process = function(data) {
+            console.log("get_activities done");
+            $scope.info.loading = false;
+            $scope.info.get_activities_date = date;
+            $scope.checkins = {};
+            $scope.checkin_names_list = [];
+            $scope.checkin_weight_sum = 0;
+            $scope.info.checkin_modified = false;
+
+            _.each(data.activities, function(act) {
+                var name = act['name'];
+                if (!_.has($scope.checkins, name)) {
+                    $scope.checkins[name] = {
+                        'weight': act['cost'] || 0,
+                        'deposit': act['deposit'] || 0,
+                    }
+                    $scope.checkin_names_list.unshift(name);
+                    $scope.checkin_weight_sum ++;
+                } else {
+                    // Merge multiple activities of the same name.
+                    a = $scope.checkins[name];
+                    a['weight'] += act['cost'] || 0;
+                    a['deposit'] += act['deposit'] || 0;
+                }
+                // TODO fix checkin page when weight is not in the button.
+            });
+        };
+        $http.get('date/' + date + '/activity').success(process);
+        // TODO implement .error because it's dangerous when user attempt to save.
+    };
+
     $scope.do_checkin = function(name, weight) {
         if (!_.has($scope.checkins, name)) {
             $scope.checkins[name] = {};
@@ -158,8 +181,9 @@ function OutCtrl($scope, $http, $window) {
         }
         $scope.checkins[name]['weight'] = weight;
         var sum = _.reduce(_.values($scope.checkins), function(sum, c) {return sum + (c['weight'] > 0 ? 1 : 0)}, 0);
-        $scope.server_message = "已经点了" + sum + "位会员";
         $scope.checkin_weight_sum = sum;
+        $scope.server_message = "已点名：" + name;
+        $scope.info.checkin_modified = true;
     }
 
     $scope.do_deposit = function(name, deposit) {
@@ -169,6 +193,8 @@ function OutCtrl($scope, $http, $window) {
             $scope.checkin_names_list.unshift(name);
         }
         $scope.checkins[name]['deposit'] = deposit;
+        $scope.server_message = "已点名：" + name;
+        $scope.info.checkin_modified = true;
     }
 
     $scope.doFilter = function(elem) {
@@ -177,10 +203,34 @@ function OutCtrl($scope, $http, $window) {
     }
 }
 
-function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
+function ClubCtrl($scope, $http, $routeParams, $location, $filter, $window) {
     $scope.name = $routeParams.name;
+    if ($routeParams.date) {
+        $scope.info.date = $routeParams.date;
+    }
     $scope.deposit = ($scope.checkins[$scope.name] || {})['deposit'];
-    console.log("ClubCtrl");
+    console.log("ClubCtrl " + $scope.info.date);
+
+    if ($scope.info.date && $scope.info.date != $scope.info.get_activities_date) {
+        $scope.get_activities($scope.info.date);
+    }
+
+    $scope.$on('$locationChangeStart', function(event, next, current) {
+        var hash = next.substr(next.indexOf('#') + 1);
+        if (!hash.match(/^\/date\//)) {
+            return;
+        }
+        var nextDate = next.substr(next.lastIndexOf('/')+1);
+        if (nextDate && $scope.info.date != nextDate && $scope.has_unsaved_data()) {
+            console.log("Trying to change date to " + nextDate + " from " + $scope.info.date);
+            // Changing to a new checkin date.
+            if ($window.confirm("点名信息还未提交，真的要离开吗？")) {
+                // Allow url change.
+            } else {
+                event.preventDefault();
+            }
+        }
+    });
 
     /* checkin using enter if only one is left */
     $scope.queryOnEnter = function() {
@@ -199,25 +249,40 @@ function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
         $location.path('/checkin/' + name);
     }
 
-    $scope.checkin_weight = function(name, weight) {
-        $scope.do_checkin(name, weight);
-        $location.path('/');
+    $scope.change_date = function() {
+        if ($scope.has_unsaved_data()) {
+            if (!$window.confirm($scope.info.date + "的点名信息已修改，还未保存，确定要离开吗？")) {
+                return;
+            }
+        }
+        var newDate = $window.prompt("请输入你想点名的日期（如2013-3-13）");
+        if (newDate.match(/\d\d\d\d-\d\d?-\d\d?/)) {
+            $location.path('/date/' + newDate);
+        }
     }
 
-    $scope.checkin_deposit = function(deposit) {
+    $scope.member_checkin = function(name, weight, deposit) {
+        weight = Number(weight);
+        if (!isNaN(weight) && weight >= 0) {
+            $scope.do_checkin(name, weight);
+        }
         deposit = Number(deposit);
-        if (isNaN(deposit)) return;
-        if (deposit < 0) return;
-        $scope.do_deposit($scope.name, deposit);
-        $location.path('/');
+        if (!isNaN(deposit) && deposit >= 0) {
+            $scope.do_deposit($scope.name, deposit);
+        }
+        $window.history.back();
     }
 
     $scope.isGirl = function(member) {
         if (_.has(member, 'male')) {
             return !member.male;
         }
-        var member = _.findWhere($scope.members, {"name": member});
-        return !member.male;
+        var found = _.findWhere($scope.members, {"name": member});
+        if (!found) {
+            console.log('isGirl member not found: ' + member);
+            return false;
+        }
+        return !found.male;
     }
 
     $scope.isCheckin = function(name) {
@@ -238,8 +303,6 @@ function ClubCtrl($scope, $http, $routeParams, $location, $filter) {
         $scope.add_member(name, is_girl, function () {
             if (do_checkin) {
                 $location.path('/checkin/' + name);
-            } else {
-                $scope.server_message = "已添加会员 " + name;
             }
         });
     }

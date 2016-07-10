@@ -5,9 +5,10 @@ import json
 import logging
 import re
 import urllib2, threading
-from django.shortcuts import get_list_or_404, get_object_or_404, render, redirect
+
+from django.shortcuts import get_object_or_404, render, redirect
 from django.template import RequestContext
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed, JsonResponse
 from django.db import transaction
 from django.views.decorators.csrf import csrf_protect
 from django.views.static import serve
@@ -199,6 +200,81 @@ def activity_overall(request):
                 'overall': overall
             })
 
+@permission_required('club.add_activity', raise_exception=True)
+def activity_by_date(request, act_date):
+    d = parse_date(act_date)
+    if not d:
+        return HttpResponseBadRequest('')
+
+    if request.method == 'GET':
+        return activity_by_date_GET(d)
+    elif request.method == 'POST':
+        return activity_by_date_POST(request, d)
+    else:
+        raise HttpResponseNotAllowed(['GET', 'POST'])
+
+def activity_by_date_GET(d):
+    "API: 返回某日的所有Activity"
+    acts = list(Activity.objects.filter(date=d).select_related('member'))
+    def to_json(a):
+        return {
+            'name': a.member.name,
+            'cost': a.cost,
+            'deposit': a.deposit,
+        }
+    acts = [to_json(a) for a in acts]
+    return JsonResponse({
+        'date': datetime.datetime.strftime(d, "%Y-%m-%d"),
+        'activities': acts,
+    })
+
+@transaction.atomic
+def activity_by_date_POST(request, d):
+    "API: 修改某日的所有Activity"
+    threading.Thread(target=send_log, args=('activity_by_date/%s' % d, request.body)).start()
+    data = json.loads(request.body)
+
+    with reversion.create_revision():
+        # 1. Delete
+        Activity.objects.filter(date=d).delete()
+
+        # 2. Re-add
+        acts = {}
+        for a in data['activities']:
+            name = a['name']
+            mid = Member.objects.get(name=name, hidden=False).id
+            a['member_id'] = mid
+            if mid in acts:
+                # Merge activities when member is duplicated.
+                act = acts[mid]
+                if 'weight' in a and a['weight']:
+                    act['weight'] += a['weight']
+                if 'deposit' in a and a['deposit']:
+                    act['deposit'] += a['deposit']
+            else:
+                if 'weight' not in a or not a['weight']:
+                    a['weight'] = 0
+                if 'deposit' not in a or not a['deposit']:
+                    a['deposit'] = 0
+                acts[mid] = a
+        for act in acts.values():
+            a = Activity(member_id=act['member_id'], cost=act['weight'], deposit=act['deposit'], date=d)
+            if a.cost or a.deposit:
+                # Don't save when both cost and deposit are 0, basically delete this activity.
+                a.save()
+
+        # 3. Re-balance
+        member_ids = acts.keys()
+        for member in Member.objects.filter(id__in=member_ids):
+            _, running, sum = member.running_total()
+            if sum != member.balance:
+                member.balance = sum
+                member.save()
+        reversion.set_user(request.user)
+
+    # 4. Done
+    return HttpResponse("ok", content_type="application/json")
+
 def determine_cost(member, weight, ver):
     if ver == '1':
         return weight * member.cost
@@ -213,6 +289,6 @@ re_date = re.compile(r'(\d\d\d\d)-(\d\d?)-(\d\d?)')
 def parse_date(date_string):
     m = re_date.match(date_string)
     if not m:
-        return HttpResponseBadRequest("'wrong date'")
+        return None
     return datetime.date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
 

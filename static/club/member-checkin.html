@@ -5,7 +5,7 @@
 {{name}}：记帐多少元？
 
 <ul class="flat">
-    <li ng-repeat="w in [0, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]"><button ng-click="checkin_deposit(deposit);checkin_weight(name,w)" ng-class="weight_style(w)">{{w}}</button></li>
+    <li ng-repeat="w in [0, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60]"><button ng-click="member_checkin(name, w, deposit)" ng-class="weight_style(w)">{{w}}</button></li>
 </ul>
 
 <form name="depositForm">
@@ -13,7 +13,7 @@
 <br/>
 <b>缴费</b>
 <input type="number" name="money" min="0" ng-model="deposit">
-<button ng-click="checkin_deposit(deposit)">保存</button>
-<button ng-click="checkin_deposit(deposit);checkin_weight(name,0)">仅缴费，算0次</button>
+<button ng-click="member_checkin(name, -1, deposit)">保存</button>
+<button ng-click="member_checkin(name, 0, deposit)">仅缴费，算0次</button>
 </p>
 </form>

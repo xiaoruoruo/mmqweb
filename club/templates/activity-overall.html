@@ -10,7 +10,11 @@
 {% for dates in overall %}
 <div class='row'>
   <div class='span6'>
-    <h2>{{dates.date}} ({{dates.acts|length}}人)</h2>
+    <h2>
+      {{dates.date}}
+      ({{dates.acts|length}}人)
+      <a href="{% url 'club_checkin' %}#/date/{{dates.date}}">修改</a>
+    </h2>
     <ul>
       {% for acts in dates.acts %}
       <li>
