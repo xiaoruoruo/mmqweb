@@ -1,11 +1,14 @@
+var mversion = window.mversion || "0";
+var _m = "?c=" + mversion;
+
 var app = angular.module('club', ['ui', 'ui.bootstrap']).
     config(['$routeProvider', function($routeProvider) {
     $routeProvider.
         when('/', {redirectTo: '/date/' + today()}).
-        when('/date/:date', {templateUrl: '/static/club/checkin.html', controller: ClubCtrl}).
-        when('/checkin/:name', {templateUrl: '/static/club/member-checkin.html', controller: ClubCtrl}).
-        when('/members', {templateUrl: '/static/club/members.html', controller: MemberCtrl}).
-        when('/hidden', {templateUrl: '/static/club/members-hidden.html', controller: MemberCtrl}).
+        when('/date/:date', {templateUrl: '/static/club/checkin.html' + _m, controller: ClubCtrl}).
+        when('/checkin/:name', {templateUrl: '/static/club/member-checkin.html' + _m, controller: ClubCtrl}).
+        when('/members', {templateUrl: '/static/club/members.html' + _m, controller: MemberCtrl}).
+        when('/hidden', {templateUrl: '/static/club/members-hidden.html' + _m, controller: MemberCtrl}).
         otherwise({redirectTo: '/'});
 }]);
 

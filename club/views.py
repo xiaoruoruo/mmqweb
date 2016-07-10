@@ -14,6 +14,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.static import serve
 from django.contrib.auth.decorators import permission_required
 from django.conf import settings
+from django.views.decorators.cache import never_cache
 from reversion import revisions as reversion
 from htmlmin.decorators import not_minified_response
 
@@ -56,6 +57,7 @@ def checkin(request):
         raise HttpResponseNotAllowed(['GET', 'POST'])
 
 @permission_required('club.add_activity')
+@never_cache
 def checkin_GET(request):
     return render(request, 'checkin.html', {'checkin_active': True})
 
@@ -213,6 +215,7 @@ def activity_by_date(request, act_date):
     else:
         raise HttpResponseNotAllowed(['GET', 'POST'])
 
+@never_cache
 def activity_by_date_GET(d):
     "API: 返回某日的所有Activity"
     acts = list(Activity.objects.filter(date=d).select_related('member'))
