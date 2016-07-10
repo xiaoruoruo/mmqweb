@@ -56,6 +56,8 @@ function OutCtrl($scope, $http, $window) {
         'date': today(),
         'member_order': "-weight",
         'loading': false,
+        'checkin_modified': false,
+        'get_activities_date': '',
     };
 
     /* shows hint messages or message from server */
@@ -95,12 +97,12 @@ function OutCtrl($scope, $http, $window) {
     console.log("OutCtrl");
 
     $scope.has_unsaved_data = function() {
-        return _.size($scope.checkins) > 0;
+        return $scope.info.checkin_modified;
     }
 
     $scope.save = function() {
         if (!$scope.has_unsaved_data()) {
-            $scope.server_message = "还没有点一个名不能保存";
+            $scope.server_message = "什么都没有改，不能保存";
             return;
         }
         $scope.info.loading = true;
@@ -121,6 +123,7 @@ function OutCtrl($scope, $http, $window) {
                 $scope.server_message = "保存成功！"
                 $scope.get_members();
                 $scope.info.loading = false;
+                $scope.info.checkin_modified = false;
             }).
             error(function() {api_error_func.apply($scope, arguments)});
     }
@@ -161,8 +164,8 @@ function OutCtrl($scope, $http, $window) {
             $scope.checkins = {};
             $scope.checkin_names_list = [];
             $scope.checkin_weight_sum = 0;
+            $scope.info.checkin_modified = false;
 
-            if (!data.activities) return;
             _.each(data.activities, function(act) {
                 var name = act['name'];
                 if (!_.has($scope.checkins, name)) {
@@ -192,8 +195,9 @@ function OutCtrl($scope, $http, $window) {
         }
         $scope.checkins[name]['weight'] = weight;
         var sum = _.reduce(_.values($scope.checkins), function(sum, c) {return sum + (c['weight'] > 0 ? 1 : 0)}, 0);
-        $scope.server_message = "已经点了" + sum + "位会员";
         $scope.checkin_weight_sum = sum;
+        $scope.server_message = "已点名：" + name;
+        $scope.info.checkin_modified = true;
     }
 
     $scope.do_deposit = function(name, deposit) {
@@ -203,6 +207,8 @@ function OutCtrl($scope, $http, $window) {
             $scope.checkin_names_list.unshift(name);
         }
         $scope.checkins[name]['deposit'] = deposit;
+        $scope.server_message = "已点名：" + name;
+        $scope.info.checkin_modified = true;
     }
 
     $scope.doFilter = function(elem) {
@@ -213,13 +219,32 @@ function OutCtrl($scope, $http, $window) {
 
 function ClubCtrl($scope, $http, $routeParams, $location, $filter, $window) {
     $scope.name = $routeParams.name;
-    $scope.info.date = $routeParams.date;
+    if ($routeParams.date) {
+        $scope.info.date = $routeParams.date;
+    }
     $scope.deposit = ($scope.checkins[$scope.name] || {})['deposit'];
     console.log("ClubCtrl " + $scope.info.date);
 
     if ($scope.info.date && $scope.info.date != $scope.info.get_activities_date) {
         $scope.get_activities($scope.info.date);
     }
+
+    $scope.$on('$locationChangeStart', function(event, next, current) {
+        var hash = next.substr(next.indexOf('#') + 1);
+        if (!hash.match(/^\/date\//)) {
+            return;
+        }
+        var nextDate = next.substr(next.lastIndexOf('/')+1);
+        if (nextDate && $scope.info.date != nextDate && $scope.has_unsaved_data()) {
+            console.log("Trying to change date to " + nextDate + " from " + $scope.info.date);
+            // Changing to a new checkin date.
+            if ($window.confirm("点名信息还未提交，真的要离开吗？")) {
+                // Allow url change.
+            } else {
+                event.preventDefault();
+            }
+        }
+    });
 
     /* checkin using enter if only one is left */
     $scope.queryOnEnter = function() {
@@ -238,16 +263,16 @@ function ClubCtrl($scope, $http, $routeParams, $location, $filter, $window) {
         $location.path('/checkin/' + name);
     }
 
-    $scope.checkin_weight = function(name, weight) {
-        $scope.do_checkin(name, weight);
-        $window.history.back();
-    }
-
-    $scope.checkin_deposit = function(deposit) {
+    $scope.member_checkin = function(name, weight, deposit) {
+        console.log('member_checkin');
+        weight = Number(weight);
+        if (!isNaN(weight) && weight >= 0) {
+            $scope.do_checkin(name, weight);
+        }
         deposit = Number(deposit);
-        if (isNaN(deposit)) return;
-        if (deposit < 0) return;
-        $scope.do_deposit($scope.name, deposit);
+        if (!isNaN(deposit) && deposit >= 0) {
+            $scope.do_deposit($scope.name, deposit);
+        }
         $window.history.back();
     }
 

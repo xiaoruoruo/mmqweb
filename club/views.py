@@ -242,7 +242,7 @@ def activity_by_date_POST(request, d):
         acts = {}
         for a in data['activities']:
             name = a['name']
-            mid = Member.objects.get(name=name).id
+            mid = Member.objects.get(name=name, hidden=False).id
             a['member_id'] = mid
             if mid in acts:
                 # Merge activities when member is duplicated.
@@ -259,7 +259,9 @@ def activity_by_date_POST(request, d):
                 acts[mid] = a
         for act in acts.values():
             a = Activity(member_id=act['member_id'], cost=act['weight'], deposit=act['deposit'], date=d)
-            a.save()
+            if a.cost or a.deposit:
+                # Don't save when both cost and deposit are 0, basically delete this activity.
+                a.save()
 
         # 3. Re-balance
         member_ids = acts.keys()
