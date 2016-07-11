@@ -54,10 +54,9 @@ def checkin(request):
     elif request.method == 'POST':
         return checkin_POST(request)
     else:
-        raise HttpResponseNotAllowed(['GET', 'POST'])
+        return HttpResponseNotAllowed(['GET', 'POST'])
 
 @permission_required('club.add_activity')
-@never_cache
 def checkin_GET(request):
     return render(request, 'checkin.html', {'checkin_active': True})
 
@@ -213,7 +212,7 @@ def activity_by_date(request, act_date):
     elif request.method == 'POST':
         return activity_by_date_POST(request, d)
     else:
-        raise HttpResponseNotAllowed(['GET', 'POST'])
+        return HttpResponseNotAllowed(['GET', 'POST'])
 
 @never_cache
 def activity_by_date_GET(d):
