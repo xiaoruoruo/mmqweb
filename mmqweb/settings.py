@@ -35,7 +35,7 @@ LOGGING = {
             'formatter': 'simple',
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': 'views.log',
+            'filename': 'data/views.log',
         },
         'console': {
             'level': 'DEBUG',
@@ -58,7 +58,7 @@ LOGGING = {
 DATABASES = {
     'default': {
         'ENGINE' : 'django.db.backends.sqlite3',
-        'NAME' : os.path.join(SITE_ROOT, 'mmqweb.db')
+        'NAME' : os.path.join(SITE_ROOT, 'data/mmqweb.db')
     }
 }
 
